@@ -1,0 +1,8 @@
+2013-06-12  James D. Callahan III  <jcallahan@curse.com>
+
+[71437f934f89] [r27-release]
+* LibToast-1.0.toc:
+
+Bump ToC version to 50300.
+
+

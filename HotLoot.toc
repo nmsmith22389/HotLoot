@@ -1,0 +1,15 @@
+## Interface: 50400
+## Title: HotLoot
+## Notes: Auto looting AddOn.
+## Version: 2.2.2
+## SavedVariables: HotLootDB
+## Author: Neil & Jessica
+
+# I Love You Jessica!
+
+embeds.xml
+Locales\Locales.xml
+
+HotLoot.lua
+Options.lua
+

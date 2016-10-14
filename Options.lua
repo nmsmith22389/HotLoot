@@ -724,70 +724,70 @@ local themeTable = {
 		},
 		},
 		},
-		groupTimeless = {
-			name = L["TimelessIsleGroup"],
-			type = "group",
-			order = 9,
-			args = {
-				timelessDesc1 = {
-					name = L["TimelessIsleDesc"],			
-					type = "description",
-					order = 0,
-				},
-				groupTBuffs = {
-					name = L["BuffItemsGroup"],
-					type = "group",
-					order = 1,
-					inline = true,
-					args = {
-						lootBotA = {
-							name = L["BoAFilterName"],
-							desc = L["BoAFilterDesc"],
-							type = "toggle",
-							set = "SetLootBotA",
-							get = "GetLootBotA",
-							width = "double",
-							order = 2,
-						},
-						lootDoEM = {
-							name = L["DoEMFilterName"],
-							desc = L["DoEMFilterDesc"],
-							type = "toggle",
-							set = "SetLootDoEM",
-							get = "GetLootDoEM",
-							width = "double",
-							order = 3,
-						},
-						lootSC = {
-							name = L["SCFilterName"],
-							desc = L["SCFilterDesc"],
-							type = "toggle",
-							set = "SetLootSC",
-							get = "GetLootSC",
-							width = "double",
-							order = 4,
-						},
-					},
-				},
-				groupTRep = {
-					name = L["RepGroup"],
-					type = "group",
-					order = 2,
-					inline = true,
-					args = {
-						lootRepMeat = {
-							name = L["RepMeatFilterName"],
-							desc = L["RepMeatFilterDesc"],
-							type = "toggle",
-							set = "SetLootRepMeat",
-							get = "GetLootRepMeat",
-							width = "double",
-							order = 1,
-						},
-					},
-				},
-			},
-		},
+		-- groupTimeless = {
+		-- 	name = L["TimelessIsleGroup"],
+		-- 	type = "group",
+		-- 	order = 9,
+		-- 	args = {
+		-- 		timelessDesc1 = {
+		-- 			name = L["TimelessIsleDesc"],			
+		-- 			type = "description",
+		-- 			order = 0,
+		-- 		},
+		-- 		groupTBuffs = {
+		-- 			name = L["BuffItemsGroup"],
+		-- 			type = "group",
+		-- 			order = 1,
+		-- 			inline = true,
+		-- 			args = {
+		-- 				lootBotA = {
+		-- 					name = L["BoAFilterName"],
+		-- 					desc = L["BoAFilterDesc"],
+		-- 					type = "toggle",
+		-- 					set = "SetLootBotA",
+		-- 					get = "GetLootBotA",
+		-- 					width = "double",
+		-- 					order = 2,
+		-- 				},
+		-- 				lootDoEM = {
+		-- 					name = L["DoEMFilterName"],
+		-- 					desc = L["DoEMFilterDesc"],
+		-- 					type = "toggle",
+		-- 					set = "SetLootDoEM",
+		-- 					get = "GetLootDoEM",
+		-- 					width = "double",
+		-- 					order = 3,
+		-- 				},
+		-- 				lootSC = {
+		-- 					name = L["SCFilterName"],
+		-- 					desc = L["SCFilterDesc"],
+		-- 					type = "toggle",
+		-- 					set = "SetLootSC",
+		-- 					get = "GetLootSC",
+		-- 					width = "double",
+		-- 					order = 4,
+		-- 				},
+		-- 			},
+		-- 		},
+		-- 		groupTRep = {
+		-- 			name = L["RepGroup"],
+		-- 			type = "group",
+		-- 			order = 2,
+		-- 			inline = true,
+		-- 			args = {
+		-- 				lootRepMeat = {
+		-- 					name = L["RepMeatFilterName"],
+		-- 					desc = L["RepMeatFilterDesc"],
+		-- 					type = "toggle",
+		-- 					set = "SetLootRepMeat",
+		-- 					get = "GetLootRepMeat",
+		-- 					width = "double",
+		-- 					order = 1,
+		-- 				},
+		-- 			},
+		-- 		},
+		-- 	},
+		-- },
 		groupQuality = {
 			name = L["ItemQualityGroup"],
 			type = "group",
@@ -1431,10 +1431,10 @@ hlDefaults = {
 		lootElixirs = false,
 		lootMoH = false,
 		lootElemental = false,
-		lootBotA = true,
-		lootDoEM = true,
-		lootSC = true,
-		lootRepMeat = true,
+		-- lootBotA = true,
+		-- lootDoEM = true,
+		-- lootSC = true,
+		-- lootRepMeat = true,
 		lootPoor = false,
 		sellGreys = false,
 		lootCommon = false,
@@ -2136,40 +2136,40 @@ function HotLoot:GetLootElemental(info)
 end
 
 --SetLootBotA
-function HotLoot:SetLootBotA(info, value)
-	self.db.profile.lootBotA = value;
-	HotLoot:dBug("lootBotA", value);
-end
-function HotLoot:GetLootBotA(info)
-	return self.db.profile.lootBotA;
-end
+-- function HotLoot:SetLootBotA(info, value)
+-- 	self.db.profile.lootBotA = value;
+-- 	HotLoot:dBug("lootBotA", value);
+-- end
+-- function HotLoot:GetLootBotA(info)
+-- 	return self.db.profile.lootBotA;
+-- end
 
 --SetLootDoEM
-function HotLoot:SetLootDoEM(info, value)
-	self.db.profile.lootDoEM = value;
-	HotLoot:dBug("lootDoEM", value);
-end
-function HotLoot:GetLootDoEM(info)
-	return self.db.profile.lootDoEM;
-end
+-- function HotLoot:SetLootDoEM(info, value)
+-- 	self.db.profile.lootDoEM = value;
+-- 	HotLoot:dBug("lootDoEM", value);
+-- end
+-- function HotLoot:GetLootDoEM(info)
+-- 	return self.db.profile.lootDoEM;
+-- end
 
 --SetLootSC
-function HotLoot:SetLootSC(info, value)
-	self.db.profile.lootSC = value;
-	HotLoot:dBug("lootSC", value);
-end
-function HotLoot:GetLootSC(info)
-	return self.db.profile.lootSC;
-end
+-- function HotLoot:SetLootSC(info, value)
+-- 	self.db.profile.lootSC = value;
+-- 	HotLoot:dBug("lootSC", value);
+-- end
+-- function HotLoot:GetLootSC(info)
+-- 	return self.db.profile.lootSC;
+-- end
 
 --SetLootRepMeat
-function HotLoot:SetLootRepMeat(info, value)
-	self.db.profile.lootRepMeat = value;
-	HotLoot:dBug("lootRepMeat", value);
-end
-function HotLoot:GetLootRepMeat(info)
-	return self.db.profile.lootRepMeat;
-end
+-- function HotLoot:SetLootRepMeat(info, value)
+-- 	self.db.profile.lootRepMeat = value;
+-- 	HotLoot:dBug("lootRepMeat", value);
+-- end
+-- function HotLoot:GetLootRepMeat(info)
+-- 	return self.db.profile.lootRepMeat;
+-- end
 
 --lootPoor
 function HotLoot:SetLootPoor(info, value)

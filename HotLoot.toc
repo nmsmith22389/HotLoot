@@ -1,4 +1,4 @@
-## Interface: 50400
+## Interface: 70000
 ## Title: HotLoot
 ## Notes: Auto looting AddOn.
 ## Version: 2.2.2

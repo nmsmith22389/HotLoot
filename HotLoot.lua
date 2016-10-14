@@ -693,7 +693,8 @@ local function ToFilters(slot)
 					return true
 			elseif
 				-- Cloth
-				(itemSubType == L["Cloth"]) and (itemType == L["Trade Goods"]) and HotLoot:GetLootCloth() and CheckThreshold("Cloth", itemSellPrice, lootQuantity) then 
+				-- TODO: Change ALL Trade Goods to Tradeskill
+				(itemSubType == L["Cloth"]) and (itemType == L["Tradeskill"]) and HotLoot:GetLootCloth() and CheckThreshold("Cloth", itemSellPrice, lootQuantity) then 
 					return true
 			elseif
 				-- Mining
@@ -709,7 +710,7 @@ local function ToFilters(slot)
 					return true
 			elseif
 				-- Leather
-				(itemSubType == L["Leather"]) and (itemType == L["Trade Goods"]) and HotLoot:GetLootSkinning() and CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
+				(itemSubType == L["Leather"]) and (itemType == L["Tradeskill"]) and HotLoot:GetLootSkinning() and CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
 					return true
 			elseif
 				-- Fishing (-junk)

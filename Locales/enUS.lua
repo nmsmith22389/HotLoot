@@ -368,7 +368,7 @@ This option can be enabled to use (quantity x value) instead of the value of one
 L["TimelessIsleDesc"] = [=[These are some items that commonly drop in the Timeless Isle and are generally wanted.
 ]=]
 L["TimelessIsleGroup"] = "Timeless Isle"
-L["Trade Goods"] = "Trade Goods"
+L["Tradeskill"] = "Tradeskill"
 L["TransDesc"] = "Set the transparency of the Loot Monitor."
 L["TransName"] = "Transparency"
 L["TxtSideDesc"] = "Here you can choose whether the loot item names show on the right or left."

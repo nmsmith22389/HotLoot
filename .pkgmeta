@@ -1,0 +1,5 @@
+package-as: HotLoot
+
+manual-changelog:
+    filename: CHANGELOG.txt
+    markup-type: markdown

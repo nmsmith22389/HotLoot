@@ -1348,7 +1348,7 @@ local themeTable = {
 			order = 17,
 			args = {
 				spacer2 = {
-					name = HotLoot:MakeColor("ctrl", "HotLoot v"..GetAddOnMetadata("HotLoot", "Version").." ©2016\n\nAuthor:").." Neil Smith\n"..HotLoot:MakeColor("ctrl","Co-author:").." Jessica Mitchell\n"..HotLoot:MakeColor("ctrl","Translations:").."\nphilipp5796 - German\nMad_Ti - French\n",			
+					name = HotLoot:MakeColor("ctrl", "HotLoot v"..GetAddOnMetadata("HotLoot", "Version").." ©2016\n\nAuthor:").." Neil Smith\n"..HotLoot:MakeColor("ctrl","Co-author:").." Jessica Mitchell\n"..HotLoot:MakeColor("ctrl","Testing:").."\ndsblack115\n"..HotLoot:MakeColor("ctrl","Translations:").."\nphilipp5796 - German\nMad_Ti - French\n",			
 					type = "description",
 					order = 1,
 				},

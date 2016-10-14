@@ -69,7 +69,7 @@ local hLDB = LibStub("LibDataBroker-1.1"):NewDataObject("HotLoot", {
 --	CREATE MONITOR ANCHOR
 --==========================
 function HotLoot:CreateMainFrame()
-	
+	-- TODO FIX BG
 	HotLoot.mainFrame = CreateFrame("Frame", "mainFrame", UIParent)
 	HotLoot.mainFrame:SetHeight(16)
 	HotLoot.mainFrame:SetPoint("CENTER", 0, 0)

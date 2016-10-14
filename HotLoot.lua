@@ -69,22 +69,21 @@ local hLDB = LibStub("LibDataBroker-1.1"):NewDataObject("HotLoot", {
 --	CREATE MONITOR ANCHOR
 --==========================
 function HotLoot:CreateMainFrame()
-	-- TODO FIX BG
-	HotLoot.mainFrame = CreateFrame("Frame", "mainFrame", UIParent)
+	HotLoot.mainFrame = CreateFrame("Frame", "mainFrame", UIParent, "ThinGoldEdgeTemplate")
 	HotLoot.mainFrame:SetHeight(16)
 	HotLoot.mainFrame:SetPoint("CENTER", 0, 0)
 	HotLoot.fade = CreateFrame("Frame", nil, UIParent)
 	HotLoot.fade:SetScript("OnUpdate", hlFadeItems)
 
-	HotLoot.mainFrame.mainBG = HotLoot.mainFrame:CreateTexture("mainBG", "BACKGROUND")
-	HotLoot.mainFrame.mainBG:SetAllPoints(HotLoot.mainFrame)
-	HotLoot.mainFrame.mainBG:SetTexture(0, 0.7, 0, 0.7)
+	-- HotLoot.mainFrame.mainBG = HotLoot.mainFrame:CreateTexture("mainBG", "BACKGROUND")
+	-- HotLoot.mainFrame.mainBG:SetAllPoints(HotLoot.mainFrame)
+	-- HotLoot.mainFrame.mainBG:SetColorTexture(0, 0.7, 0, 0.7)
 	
 	HotLoot.mainFrame.anchorText = HotLoot.mainFrame:CreateFontString(nil, "OVERLAY")
 	HotLoot.mainFrame.anchorText:SetPoint("CENTER", HotLoot.mainFrame, "CENTER", 0, 0)
 	HotLoot.mainFrame.anchorText:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
 	--name:SetJustifyH("LEFT")
-	HotLoot.mainFrame.anchorText:SetText("HotLoot")
+	HotLoot.mainFrame.anchorText:SetText("HotLoot Anchor")
 	HotLoot.mainFrame:SetWidth(145)
 	
 	HotLoot.mainFrame:RegisterForDrag("LeftButton")

@@ -1252,8 +1252,13 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
 			glowAnimIn:SetDuration(0.2)
 			glowAnimOut:SetDuration(0.5)
 			
-			glowAnimIn:SetChange(0.7)
-			glowAnimOut:SetChange(-1)
+			-- Depreciated - Use From/To
+			-- glowAnimIn:SetChange(0.7)
+			-- glowAnimOut:SetChange(-1)
+			glowAnimIn:SetFromAlpha(0)
+			glowAnimIn:SetToAlpha(0.6)
+			glowAnimOut:SetFromAlpha(0.6)
+			glowAnimOut:SetToAlpha(0)
 			
 			glowAnimIn:SetOrder(1)
 			glowAnimOut:SetOrder(2)
@@ -1262,15 +1267,20 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
 			shineAnimT:SetOrder(2)
 			shineAnimOut:SetOrder(2)
 			
-			shineAnimIn:SetChange(1)
-			shineAnimOut:SetChange(-1)
+			-- shineAnimIn:SetChange(1)
+			-- shineAnimOut:SetChange(-1)
+			shineAnimIn:SetFromAlpha(0)
+			shineAnimIn:SetToAlpha(0.6)
+			shineAnimOut:SetFromAlpha(0.6)
+			shineAnimOut:SetToAlpha(0)
+
 			shineAnimT:SetOffset(200,0)
 			
 			shineAnimOut:SetStartDelay(0)
 			
 			shineAnimT:SetDuration(0.5)
 			shineAnimIn:SetDuration(0.2)
-			shineAnimOut:SetDuration(0.4)
+			shineAnimOut:SetDuration(0.3)
 			
 			animation1:SetDuration(1.5)
 			animation1:SetSmoothing("IN")

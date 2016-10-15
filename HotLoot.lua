@@ -2,6 +2,7 @@
 --        TODO         --
 -------------------------
 -- * Make Include & Exclude button look better (texture)
+-- * Export and update localization (en done) (for artifact and heirloom qualities and other stuff maybe)
 -- =================== --
 
 

@@ -233,293 +233,295 @@ local themeTable = {
             childGroups = "tab",
             args = {
                 goupLootMonitor1 = {
-                name = L["GeneralGroup"], 
-                type = "group", 
-                order = 5, 
-                args = {
-                lootEnableMonitor = {
-                    name = L["LootMonName"],
-                    desc = L["LootMonDesc"],
-                    type = "toggle",
-                    set = "SetLootEnableMonitor",
-                    get = "GetLootEnableMonitor",
-                    width = "double",
-                    order = 1
-                },
-                lootShowAnchor = {
-                    name = L["ShowAnchName"],
-                    desc = L["ShowAnchDesc"],
-                    type = "toggle",
-                    set = "SetLootShowAnchor",
-                    get = "GetLootShowAnchor",
-                    width = "double",
-                    order = 2
-                },
-                lootShowNames = {
-                    name = L["ShowNamesName"],
-                    desc = L["ShowNamesDesc"],
-                    type = "toggle",
-                    set = "SetLootShowNames",
-                    get = "GetLootShowNames",
-                    disabled = "ToggleNamesDisable",
-                    hidden = true, --"Advanced",
-                    width = "double",
-                    order = 3
-                },
-                lootShowQuantities = {
-                    name = L["ShowQuantName"],
-                    desc = L["ShowQuantDesc"],
-                    type = "toggle",
-                    set = "SetLootShowQuantities",
-                    get = "GetLootShowQuantities",
-                    width = "double",
-                    order = 4
-                },
-                inlineQuant = {
-                    name = L["InlineQuantName"],
-                    desc = L["InlineQuantDesc"],
-                    type = "toggle",
-                    set = "SetInlineQuant",
-                    get = "GetInlineQuant",
-                    hidden = true,
-                    --hidden = "Advanced",
-                    width = "double",
-                    order = 5
-                },
-                lootShowTotal = {
-                    name = L["ShowTotName"],
-                    desc = L["ShowTotDesc"],
-                    type = "toggle",
-                    set = "SetShowTotal",
-                    get = "GetShowTotal",
-                    width = "double",
-                    order = 6
-                },
-                lootShowSellPrice = {
-                    name = L["ShowSellName"],
-                    desc = L["ShowSellDesc"],
-                    type = "toggle",
-                    set = "SetShowSellPrice",
-                    get = "GetShowSellPrice",
-                    width = "double",
-                    order = 7
-                },
-                lootShowItemType = {
-                    name = L["ShowTypeName"],
-                    desc = L["ShowTypeDesc"],
-                    type = "toggle",
-                    set = "SetShowItemType",
-                    get = "GetShowItemType",
-                    width = "double",
-                    order = 8
-                },
-                groupGridMode = {
-                    name = L["GridModeGroup"],
-                    type = "group",
-                    order = 15,
-                    inline = true,
-                    hidden = true,
-                    --hidden = "Advanced",
-                    disabled = "ToggleGridDisable",
+                    name = L["GeneralGroup"], 
+                    type = "group", 
+                    order = 5, 
                     args = {
-                        lootGridMode = {
-                            name = L["GridEnableName"],
-                            desc = L["GridEnableDesc"],
+                        lootEnableMonitor = {
+                            name = L["LootMonName"],
+                            desc = L["LootMonDesc"],
                             type = "toggle",
-                            set = "SetLootGridMode",
-                            get = "GetLootGridMode",
+                            set = "SetLootEnableMonitor",
+                            get = "GetLootEnableMonitor",
+                            width = "double",
                             order = 1
                         },
-                        lootGridNumColumns = {
-                            name = L["GridColName"],
+                        lootShowAnchor = {
+                            name = L["ShowAnchName"],
+                            desc = L["ShowAnchDesc"],
+                            type = "toggle",
+                            set = "SetLootShowAnchor",
+                            get = "GetLootShowAnchor",
+                            width = "double",
+                            order = 2
+                        },
+                        lootShowNames = {
+                            name = L["ShowNamesName"],
+                            desc = L["ShowNamesDesc"],
+                            type = "toggle",
+                            set = "SetLootShowNames",
+                            get = "GetLootShowNames",
+                            disabled = "ToggleNamesDisable",
+                            hidden = true, --"Advanced",
+                            width = "double",
+                            order = 3
+                        },
+                        lootShowQuantities = {
+                            name = L["ShowQuantName"],
+                            desc = L["ShowQuantDesc"],
+                            type = "toggle",
+                            set = "SetLootShowQuantities",
+                            get = "GetLootShowQuantities",
+                            width = "double",
+                            order = 4
+                        },
+                        inlineQuant = {
+                            name = L["InlineQuantName"],
+                            desc = L["InlineQuantDesc"],
+                            type = "toggle",
+                            set = "SetInlineQuant",
+                            get = "GetInlineQuant",
+                            hidden = true,
+                            --hidden = "Advanced",
+                            width = "double",
+                            order = 5
+                        },
+                        lootShowTotal = {
+                            name = L["ShowTotName"],
+                            desc = L["ShowTotDesc"],
+                            type = "toggle",
+                            set = "SetShowTotal",
+                            get = "GetShowTotal",
+                            width = "double",
+                            order = 6
+                        },
+                        lootShowSellPrice = {
+                            name = L["ShowSellName"],
+                            desc = L["ShowSellDesc"],
+                            type = "toggle",
+                            set = "SetShowSellPrice",
+                            get = "GetShowSellPrice",
+                            width = "double",
+                            order = 7
+                        },
+                        lootShowItemType = {
+                            name = L["ShowTypeName"],
+                            desc = L["ShowTypeDesc"],
+                            type = "toggle",
+                            set = "SetShowItemType",
+                            get = "GetShowItemType",
+                            width = "double",
+                            order = 8
+                        },
+                        groupGridMode = {
+                            name = L["GridModeGroup"],
+                            type = "group",
+                            order = 15,
+                            inline = true,
+                            hidden = true,
+                            --hidden = "Advanced",
+                            disabled = "ToggleGridDisable",
+                            args = {
+                                lootGridMode = {
+                                    name = L["GridEnableName"],
+                                    desc = L["GridEnableDesc"],
+                                    type = "toggle",
+                                    set = "SetLootGridMode",
+                                    get = "GetLootGridMode",
+                                    order = 1
+                                },
+                                lootGridNumColumns = {
+                                    name = L["GridColName"],
+                                    type = "range",
+                                    min = 1,
+                                    max = 10,
+                                    step = 1, 
+                                    bigStep = 1,
+                                    set = "SetLootGridNumColumns",
+                                    get = "GetLootGridNumColumns",
+                                    order = 2
+                                }
+                            }
+                        }
+                    }
+                },
+                goupLootMonitor2 = {
+                    name = L["Appearance"], 
+                    type = "group", 
+                    order = 6, 
+                    args = {
+                        lootIconSize = {
+                            name = L["IconSizeName"],
+                            desc = L["IconSizeDesc"],
+                            type = "range",
+                            min = 16,
+                            max = 32,
+                            step = 8, 
+                            bigStep = 8,
+                            disabled = "ToggleSizeDisable",
+                            set = "SetLootIconSize",
+                            get = "GetLootIconSize",
+                            hidden = "Advanced",
+                            order = 7
+                        },
+                        lootTransparency = {
+                            name = L["TransName"],
+                            desc = L["TransDesc"],
+                            type = "range",
+                            min = 0,
+                            max = 1,
+                            step = 0.1, 
+                            bigStep = 0.1,
+                            set = "SetLootTrans",
+                            get = "GetLootTrans",
+                            --hidden = "Advanced",
+                            order = 8
+                        },
+                        lootGrowthDirection = {
+                            name = L["GrowthDircName"],
+                            desc = L["GrowthDircDesc"],
+                            type = "select",
+                            values = growthDirectionTable,
+                            set = "SetLootGrowthDirection",
+                            get = "GetLootGrowthDirection",
+                            order = 9
+                        },
+                        textSide = {
+                            name = L["TxtSideName"],
+                            desc = L["TxtSideDesc"],
+                            type = "select",
+                            values = textSideTable,
+                            set = "SetTextSide",
+                            get = "GetTextSide",
+                            order = 10
+                        },
+                        
+                        themeSelect = {
+                            name = L["ThemeSelName"],
+                            desc = L["ThemeSelDesc"],
+                            type = "select",
+                            values = themeTable,
+                            set = "SetThemeSelect",
+                            get = "GetThemeSelect",
+                            --disabled = true,
+                            order = 11
+                        },
+                        colorQual = {
+                            name = L["ColorQualName"],
+                            desc = L["ColorQualDesc"],
+                            type = "toggle",
+                            set = "SetColorQual",
+                            get = "GetColorQual",
+                            hidden = "ColorHide",
+                            --disabled = true,
+                            order = 12
+                        },
+                        themeColorSelect = {
+                            name = L["ThemeColorSelect"],
+                            --desc = L["ThemeSelDesc"],
+                            type = "color",
+                            set = "SetThemeColorSelect",
+                            get = "GetThemeColorSelect",
+                            hidden = "ColorHide",
+                            hasAlpha = true,
+                            --disabled = true,
+                            order = 13
+                        },
+                        themeColorBorderSelect = {
+                            name = L["ThemeColorBorderSelect"],
+                            --desc = L["ThemeSelDesc"],
+                            type = "color",
+                            set = "SetThemeColorBorderSelect",
+                            get = "GetThemeColorBorderSelect",
+                            hidden = "ColorHide",
+                            hasAlpha = true,
+                            --disabled = true,
+                            order = 14
+                        },
+                        minWidth = {
+                            name = L["MinWidthName"],
+                            desc = L["MinWidthDesc"],
+                            type = "input",
+                            --width = "half",
+                            set = "SetMinWidth",
+                            get = "GetMinWidth",
+                            hidden = "Advanced",
+                            order = 15
+                        },
+                        initialDelay = {
+                            name = L["InitDelayName"],
+                            desc = L["InitDelayDesc"],
                             type = "range",
                             min = 1,
                             max = 10,
                             step = 1, 
                             bigStep = 1,
-                            set = "SetLootGridNumColumns",
-                            get = "GetLootGridNumColumns",
-                            order = 2
+                            --width = "half",
+                            set = "SetIDelay",
+                            get = "GetIDelay",
+                            hidden = "Advanced",
+                            order = 16
                         },
-                    },
+                        secondaryDelay = {
+                            name = L["SecDelayName"],
+                            desc = L["SecDelayDesc"],
+                            type = "range",
+                            min = 1,
+                            max = 10,
+                            step = 1, 
+                            bigStep = 1,
+                            --width = "half",
+                            set = "SetSDelay",
+                            get = "GetSDelay",
+                            hidden = "Advanced",
+                            order = 17
+                        },
+                        fadeSpeed = {
+                            name = L["FadeDelayName"],
+                            desc = L["FadeDelayDesc"],
+                            type = "range",
+                            min = 5,
+                            max = 15,
+                            step = 1, 
+                            bigStep = 1,
+                            hidden = "Advanced",
+                            set = "SetFSpeed",
+                            get = "GetFSpeed",
+                            order = 18
+                        },
+                        showAnim = {
+                            name = L["ShowAnimationName"],
+                            desc = L["ShowAnimationDesc"],
+                            type = "toggle",
+                            set = "SetShowAnimation",
+                            get = "GetShowAnimation",
+                            --hidden = "ColorHide",
+                            --disabled = true,
+                            order = 19
+                        }
+                    }
                 },
-                }},
-                goupLootMonitor2 = {
-                name = L["Appearance"], 
-                type = "group", 
-                order = 6, 
-                args = {
-                lootIconSize = {
-                    name = L["IconSizeName"],
-                    desc = L["IconSizeDesc"],
-                    type = "range",
-                    min = 16,
-                    max = 32,
-                    step = 8, 
-                    bigStep = 8,
-                    disabled = "ToggleSizeDisable",
-                    set = "SetLootIconSize",
-                    get = "GetLootIconSize",
-                    hidden = "Advanced",
-                    order = 7
-                },
-                lootTransparency = {
-                    name = L["TransName"],
-                    desc = L["TransDesc"],
-                    type = "range",
-                    min = 0,
-                    max = 1,
-                    step = 0.1, 
-                    bigStep = 0.1,
-                    set = "SetLootTrans",
-                    get = "GetLootTrans",
-                    --hidden = "Advanced",
-                    order = 8
-                },
-                lootGrowthDirection = {
-                    name = L["GrowthDircName"],
-                    desc = L["GrowthDircDesc"],
-                    type = "select",
-                    values = growthDirectionTable,
-                    set = "SetLootGrowthDirection",
-                    get = "GetLootGrowthDirection",
-                    order = 9
-                },
-                textSide = {
-                    name = L["TxtSideName"],
-                    desc = L["TxtSideDesc"],
-                    type = "select",
-                    values = textSideTable,
-                    set = "SetTextSide",
-                    get = "GetTextSide",
-                    order = 10
-                },
-                
-                themeSelect = {
-                    name = L["ThemeSelName"],
-                    desc = L["ThemeSelDesc"],
-                    type = "select",
-                    values = themeTable,
-                    set = "SetThemeSelect",
-                    get = "GetThemeSelect",
-                    --disabled = true,
-                    order = 11
-                },
-                colorQual = {
-                    name = L["ColorQualName"],
-                    desc = L["ColorQualDesc"],
-                    type = "toggle",
-                    set = "SetColorQual",
-                    get = "GetColorQual",
-                    hidden = "ColorHide",
-                    --disabled = true,
-                    order = 12
-                },
-                themeColorSelect = {
-                    name = L["ThemeColorSelect"],
-                    --desc = L["ThemeSelDesc"],
-                    type = "color",
-                    set = "SetThemeColorSelect",
-                    get = "GetThemeColorSelect",
-                    hidden = "ColorHide",
-                    hasAlpha = true,
-                    --disabled = true,
-                    order = 13
-                },
-                themeColorBorderSelect = {
-                    name = L["ThemeColorBorderSelect"],
-                    --desc = L["ThemeSelDesc"],
-                    type = "color",
-                    set = "SetThemeColorBorderSelect",
-                    get = "GetThemeColorBorderSelect",
-                    hidden = "ColorHide",
-                    hasAlpha = true,
-                    --disabled = true,
-                    order = 14
-                },
-                minWidth = {
-                    name = L["MinWidthName"],
-                    desc = L["MinWidthDesc"],
-                    type = "input",
-                    --width = "half",
-                    set = "SetMinWidth",
-                    get = "GetMinWidth",
-                    hidden = "Advanced",
-                    order = 15
-                },
-                initialDelay = {
-                    name = L["InitDelayName"],
-                    desc = L["InitDelayDesc"],
-                    type = "range",
-                    min = 1,
-                    max = 10,
-                    step = 1, 
-                    bigStep = 1,
-                    --width = "half",
-                    set = "SetIDelay",
-                    get = "GetIDelay",
-                    hidden = "Advanced",
-                    order = 16
-                },
-                secondaryDelay = {
-                    name = L["SecDelayName"],
-                    desc = L["SecDelayDesc"],
-                    type = "range",
-                    min = 1,
-                    max = 10,
-                    step = 1, 
-                    bigStep = 1,
-                    --width = "half",
-                    set = "SetSDelay",
-                    get = "GetSDelay",
-                    hidden = "Advanced",
-                    order = 17
-                },
-                fadeSpeed = {
-                    name = L["FadeDelayName"],
-                    desc = L["FadeDelayDesc"],
-                    type = "range",
-                    min = 5,
-                    max = 15,
-                    step = 1, 
-                    bigStep = 1,
-                    hidden = "Advanced",
-                    set = "SetFSpeed",
-                    get = "GetFSpeed",
-                    order = 18
-                },
-                showAnim = {
-                    name = L["ShowAnimationName"],
-                    desc = L["ShowAnimationDesc"],
-                    type = "toggle",
-                    set = "SetShowAnimation",
-                    get = "GetShowAnimation",
-                    --hidden = "ColorHide",
-                    --disabled = true,
-                    order = 19
-                },
-                }},
                 lootTestMonitor = {
-                            name = L["TestMonName"],
-                            --desc = " ",
-                            type = "execute",
-                            func = "TestMonitor", 
-                            order = 30
-                        },
-                        lootResetMonitor = {
-                            name = L["ResetMonName"],
-                            --desc = " ",
-                            type = "execute",
-                            func = "ResetMonitor", 
-                            order = 31
+                    name = L["TestMonName"],
+                    --desc = " ",
+                    type = "execute",
+                    func = "TestMonitor", 
+                    order = 30
+                },
+                lootResetMonitor = {
+                    name = L["ResetMonName"],
+                    --desc = " ",
+                    type = "execute",
+                    func = "ResetMonitor", 
+                    order = 31
                 },
                 lootDesc = {
                     name = L["MonDescName"],
                     type = "description",
                     hidden = true,
                     order = 65,
-                },
-            }, 
+                }
+            }
         },
         groupFilters = {
             name = L["FilterGroup"],

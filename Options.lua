@@ -2095,15 +2095,6 @@ function HotLoot:GetLootElixirs(info)
     return self.db.profile.lootElixirs;
 end
 
--- lootMoH
-function HotLoot:SetLootMoH(info, value)
-    self.db.profile.lootMoH = value;
-    HotLoot:dBug("lootMoH", value);
-end
-function HotLoot:GetLootMoH(info)
-    return self.db.profile.lootMoH;
-end
-
 -- excludeList
 function HotLoot:SetExcludeList(info, value)
     --self.db.profile.excludeList = value

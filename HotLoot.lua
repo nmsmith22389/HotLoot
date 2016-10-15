@@ -828,6 +828,14 @@ local function ToFilters(slot)
                 -- Legendary
                 --[[(IsInGroup() == false) and ]](HotLoot:GetLootLegendary() == true) and (lootQuality == 5) and (CheckThreshold("z6Legendary", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
                     return true
+            elseif
+                -- Artifact
+                --[[(IsInGroup() == false) and ]](HotLoot:GetLootArtifact() == true) and (lootQuality == 6) and (CheckThreshold("z7Artifact", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                    return true
+            elseif
+                -- Heirloom
+                --[[(IsInGroup() == false) and ]](HotLoot:GetLootHeirloom() == true) and (lootQuality == 7) and (CheckThreshold("z8Heirloom", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                    return true
             end
             
             

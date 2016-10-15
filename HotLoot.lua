@@ -338,6 +338,10 @@ function HotLoot:ChatCommand(input)
         local item = string.match(input, "%a+%s(.+)")
         HotLoot:SetExcludeList(nil, item)
          HotLoot:Announce(item..L["ChatCmdExclude"])
+    elseif string.match(input, "%a+") == "filter" then
+        local id = string.match(input, "%a+%s(.+)")
+        HotLoot:Announce("Running Filter...")
+        HotLoot:CheckFilter(id)
     elseif string.match(input, "%a+") == "history" then
         HotLoot:ToggleLootHistory()
     else
@@ -643,6 +647,196 @@ local function ScanTip(slot, name)
     else
         hlTipScan:Hide()
         return false
+    end
+end
+
+function HotLoot:CheckFilter(itemID)
+    local wasLooted = false;
+    local whereLooted = "???"
+    local itemName, itemLink, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice = GetItemInfo(itemID)
+    if
+        -- Quest
+        HotLoot:GetLootQuest() and (itemType == L["Quest"]) --[[or ScanTip(slot, L["Quest Item"]))]] and CheckThreshold("Quest", itemSellPrice, lootQuantity) then 
+            wasLooted = true
+            whereLooted = "Quest"
+    -- Commented out to remove "junk" option
+    --elseif
+        -- Junk
+    --  (itemSubType == L["Junk"]) and HotLoot:GetLootJunk() and CheckThreshold("Junk", itemSellPrice, lootQuantity) then 
+    --      wasLooted = true
+    elseif
+        -- HotLoot:GetLootPick(
+        (IsStealthed()) and (lootQuality ~= 0) and HotLoot:GetLootPick() then 
+            wasLooted = true
+            whereLooted = "PickPocket"
+    elseif
+        -- Cloth
+        -- TODO: Change ALL Trade Goods to Tradeskill
+        (itemSubType == L["Cloth"]) and (itemType == L["Tradeskill"]) and HotLoot:GetLootCloth() and CheckThreshold("Cloth", itemSellPrice, lootQuantity) then 
+            wasLooted = true
+            whereLooted = "Cloth"
+    elseif
+        -- Mining
+        (itemSubType == L["Metal & Stone"]) and HotLoot:GetLootMining() and CheckThreshold("Metal & Stone", itemSellPrice, lootQuantity) then 
+            wasLooted = true
+            whereLooted = "Mining"
+    elseif
+        -- Gems
+        (itemType == L["Gem"]) and HotLoot:GetLootGems() and CheckThreshold("Gem", itemSellPrice, lootQuantity) then 
+            wasLooted = true
+            whereLooted = "Gems"
+    elseif
+        -- Herbs
+        (itemSubType == L["Herb"]) and HotLoot:GetLootHerbs() and CheckThreshold("Herb", itemSellPrice, lootQuantity) then 
+            wasLooted = true
+            whereLooted = "Herbs"
+    elseif
+        -- Leather
+        (itemSubType == L["Leather"]) and (itemType == L["Tradeskill"]) and HotLoot:GetLootSkinning() and CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
+            wasLooted = true
+            whereLooted = "Leather"
+    elseif
+        -- Fishing (-junk)
+        IsFishingLoot() and HotLoot:GetLootFishing() and (itemSubType ~= L["Junk"]) then 
+            wasLooted = true
+            whereLooted = "Fishing"
+    elseif
+        -- enchanting
+        HotLoot:GetLootEnchanting() and (itemSubType == L["Enchanting"]) and CheckThreshold("Enchanting", itemSellPrice, lootQuantity) then 
+            wasLooted = true
+            whereLooted = "Enchanting"
+    
+    elseif
+        -- GetLootCooking
+        HotLoot:GetLootCooking() and (itemSubType == L["Cooking"]) and CheckThreshold("Cooking Ingredient", itemSellPrice, lootQuantity) then 
+            wasLooted = true
+            whereLooted = "Cooking"
+    elseif
+        -- GetLootRecipes
+        HotLoot:GetLootRecipes() and (itemType == L["Recipe"]) then 
+            wasLooted = true
+            whereLooted = "Recipes"
+    elseif
+        --HotLoot:GetLootPigments(info)
+        HotLoot:GetLootPigments() and (string.find(lootName, "Pigment")) then 
+            wasLooted = true
+            whereLooted = "Pigments"
+    elseif
+        -- Pots
+        (itemSubType == L["Potion"]) and HotLoot:GetLootPots() and CheckThreshold("Potion", itemSellPrice, lootQuantity) then 
+            if HotLoot:GetPotionType() == "both" then
+                wasLooted = true
+                whereLooted = "Potion"
+            elseif HotLoot:GetPotionType() == "healing" and string.find(lootName, L["Healing"])  then
+                wasLooted = true
+                whereLooted = "Health Potion"
+            elseif HotLoot:GetPotionType() == "mana" and string.find(lootName, L["Mana"])  then
+                wasLooted = true
+                whereLooted = "Mana Potion"
+            else
+                wasLooted = false
+            end
+    elseif
+        -- Flasks
+        (itemSubType == L["Flask"]) and HotLoot:GetLootFlasks() and CheckThreshold("Flask", itemSellPrice, lootQuantity) then 
+            wasLooted = true
+            whereLooted = "Flask"
+    elseif
+        -- Elixirs
+        (itemSubType == L["Elixir"]) and HotLoot:GetLootElixirs() and CheckThreshold("Elixir", itemSellPrice, lootQuantity) then 
+            wasLooted = true
+            whereLooted = "Elixer"
+    elseif
+        -- Motes
+        (itemSubType == L["Elemental"]) and HotLoot:GetLootElemental() and CheckThreshold("Elemental", itemSellPrice, lootQuantity) then 
+            wasLooted = true
+            whereLooted = "Elemental"
+    elseif
+        -- MoH
+        (itemID == 89112) and (HotLoot:GetLootMoH() == true) then 
+            wasLooted = true 
+    elseif
+        --lootBotA
+        (itemID == 103642) and (HotLoot:GetLootBotA() == true) then 
+            wasLooted = true 
+    elseif
+        --lootDoEM
+        (itemID == 103643) and (HotLoot:GetLootDoEM() == true) then 
+            wasLooted = true 
+    elseif
+        --lootSC
+        (itemID == 103641) and (HotLoot:GetLootSC() == true) then 
+            wasLooted = true
+    elseif
+        --lootRepMeat
+        (itemID == 104265) and (HotLoot:GetLootRepMeat() == true) then 
+            wasLooted = true
+    elseif
+        --lootRepMeat
+        (itemID == 104266) and (HotLoot:GetLootRepMeat() == true) then 
+            wasLooted = true
+    elseif
+        --lootRepMeat
+        (itemID == 104264) and (HotLoot:GetLootRepMeat() == true) then 
+            wasLooted = true
+    elseif
+        --lootRepMeat
+        (itemID == 104257) and (HotLoot:GetLootRepMeat() == true) then 
+            wasLooted = true
+    elseif
+        --lootRepMeat
+        (itemID == 104267) and (HotLoot:GetLootRepMeat() == true) then 
+            wasLooted = true
+    elseif
+        -- Include List
+        HotLoot:GetIncludeTable()[lootName] then 
+            wasLooted = true
+            whereLooted = "INCLUDE"
+    elseif
+        -- Poor
+        (HotLoot:GetLootPoor() == true) and (lootQuality == 0) and (CheckThreshold("z1Poor", itemSellPrice, lootQuantity)) --[[and (CheckILvl(itemLevel))]] then 
+            wasLooted = true
+            whereLooted = "Poor"
+    elseif
+        -- Common
+        (HotLoot:GetLootCommon() == true) and (lootQuality == 1) and (CheckThreshold("z2Common", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+            wasLooted = true
+            whereLooted = "Common"
+    elseif
+        -- Uncommon
+        --[[(IsInGroup() == false) and ]](HotLoot:GetLootUncommon() == true) and (lootQuality == 2) and (CheckThreshold("z3Uncommon", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+            wasLooted = true
+            whereLooted = "Uncommon"
+    elseif
+        -- Rare
+        --[[(IsInGroup() == false) and ]](HotLoot:GetLootRare() == true) and (lootQuality == 3) and (CheckThreshold("z4Rare", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+            wasLooted = true
+            whereLooted = "Rare"
+    elseif
+        -- Epic
+        --[[(IsInGroup() == false) and ]](HotLoot:GetLootEpic() == true) and (lootQuality == 4) and (CheckThreshold("z5Epic", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+            wasLooted = true
+            whereLooted = "Epic"
+    elseif
+        -- Legendary
+        --[[(IsInGroup() == false) and ]](HotLoot:GetLootLegendary() == true) and (lootQuality == 5) and (CheckThreshold("z6Legendary", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+            wasLooted = true
+            whereLooted = "Legendary"
+    elseif
+        -- Artifact
+        --[[(IsInGroup() == false) and ]](HotLoot:GetLootArtifact() == true) and (lootQuality == 6) and (CheckThreshold("z7Artifact", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+            wasLooted = true
+            whereLooted = "Artifact"
+    elseif
+        -- Heirloom
+        --[[(IsInGroup() == false) and ]](HotLoot:GetLootHeirloom() == true) and (lootQuality == 7) and (CheckThreshold("z8Heirloom", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+            wasLooted = true
+            whereLooted = "Heirloom"
+    end
+    if wasLooted == true then
+        print(itemName.." looted in section "..whereLooted..".")
+    else
+        print(itemName.." NOT \'looted\'!")
     end
 end
 

@@ -219,7 +219,7 @@ local themeTable = {
                             type = "toggle",
                             set = "SetLootSkinMode",
                             get = "GetLootSkinMode",
-                            confirm = true,
+                            -- confirm = true,
                             order = 1
                         },
                     },
@@ -1934,8 +1934,18 @@ end
 
 -- lootSkinMode
 function HotLoot:SetLootSkinMode(info, value)
-    self.db.profile.lootSkinMode = value;
-    HotLoot:dBug("lootSkinMode", value);
+    if value == true then
+        GameTooltip:Hide();
+        LibStub("AceConfigDialog-3.0"):Close("HotLoot");
+        GameTooltip:Show();
+        StaticPopup_Show("CONFIRM_SKINNING_MODE");
+    elseif value == "confirmed" then
+        self.db.profile.lootSkinMode = true;
+        HotLoot:dBug("lootSkinMode", true);
+    else
+        self.db.profile.lootSkinMode = value;
+        HotLoot:dBug("lootSkinMode", value);
+    end
 end
 function HotLoot:GetLootSkinMode(info)
     return self.db.profile.lootSkinMode;

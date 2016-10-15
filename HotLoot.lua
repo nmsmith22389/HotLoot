@@ -284,7 +284,25 @@ function HotLoot:OnInitialize()
     self:RegisterChatCommand("hotloot", "ChatCommand")
     HotLoot:CreateMainFrame()
     --LootHistory:CreateLootHistory()
-    
+    -- Register Confirm Dialog for SkinMode
+    StaticPopupDialogs["CONFIRM_SKINNING_MODE"] = {
+        text = "Are you sure you want to enable Skinning Mode?\n\n"..
+                "|cffec5840(WARNING: Skinning mode WILL DELETE anything not caught by the loot filters)|r",
+        button1 = "Yes",
+        button2 = "No",
+        OnAccept = function()
+            HotLoot:SetLootSkinMode(nil, "confirmed");
+            LibStub("AceConfigDialog-3.0"):Open("HotLoot");
+        end,
+        OnCancel = function ()
+            HotLoot:SetLootSkinMode(nil, false);
+            LibStub("AceConfigDialog-3.0"):Open("HotLoot");
+        end,
+        timeout = 25,
+        whileDead = true,
+        hideOnEscape = true,
+        preferredIndex = 3,  -- avoid some UI taint, see http://www.wowace.com/announcements/how-to-avoid-some-ui-taint/
+    }
     --HotLoot:CreateFishingMacro()
 end
 

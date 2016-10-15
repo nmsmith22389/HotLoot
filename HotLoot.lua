@@ -958,7 +958,7 @@ local function ToFilters(slot)
                 -- Motes
                 (itemSubType == L["Elemental"]) and HotLoot:GetLootElemental() and CheckThreshold("Elemental", itemSellPrice, lootQuantity) then 
                     return true
-            elseif
+            --[[elseif
                 -- MoH
                 (itemID == 89112) and (HotLoot:GetLootMoH() == true) then 
                     return true 
@@ -993,7 +993,7 @@ local function ToFilters(slot)
             elseif
                 --lootRepMeat
                 (itemID == 104267) and (HotLoot:GetLootRepMeat() == true) then 
-                    return true
+                    return true]]
             elseif
                 -- Include List
                 HotLoot:GetIncludeTable()[lootName] then 

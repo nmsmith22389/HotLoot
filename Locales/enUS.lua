@@ -1,74 +1,5 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("HotLoot", "enUS", true)
 
-L["GroupRollDesc"] = "This extra module can automatically roll on loot for you based on your preferences"
-L["NeedStringDesc"] = "Here you can input different string of text to have search for among the items up for roll. This accepts partial words and proper capitalization is required."
-L["NeedStringName"] = "Need by String"
-L["SearchStringsName"] = "Search Strings"
-L["InputStringName"] = "Input String"
-L["RemoveStringName"] = "Remove String"
-
-L["FishingModeLureSelectName"] = "Lure Select"
-L["FishingModeLureSelectDesc"] = "Select the type of lure you would like to have applied."
-L["HeatTreatedSpinningLure"] = "Heat-Treated Spinning Lure"
-L["AquadynamicFishAttractor"] = "Aquadynamic Fish Attractor"
-L["NatsHat"] = "Nat's Hat"
-L["FishingModeLureDesc"] = "Applies the selected lure to the currently equipped fishing pole when needed."
-
-L["ItemQualityDesc"] = "These options will loot ALL types of items of that quality."
-
-L["Rolled"] = true
-L["on"] = true
-L["nothing"] = true
-L["pass"] = true
-L["need"] = true
-L["greed"] = true
-L["disenchant"] = true
-L["GroupRollName"] = "Group Rolls"
-
-L["GroupDelayRollName"] = "Delay Auto Roll"
-L["GroupDelayRollDesc"] = "Delays automatically rolling so that you can choose a different option if decided."
-L["GroupRollEnableName"] = "Enable Group"
-L["GroupRollEnableDesc"] = ""
-
-L["ExtrasDesc"] = "Extras are optional modules that provide extra features and functionality. Extra modules can be enabled/disabled in your AddOn manager."
-L["Never"] = true
-L["Daily"] = true
-L["Combat"] = true
-L["ResetName"] = "Reset History"
-L["ResetDesc"] = "Choose when or if the Loot History is cleared."
-
-L["FishingModeName"] = "Fishing Mode"
-L["FishingModeDesc"] = "Fishing Mode enables you to double right-click to cast and apply lures."
-L["FishingModeEnableName"] = "Enable Fishing Mode"
-L["FishingModeEnableDesc"] = "Fishing Mode enables you to double right-click to cast and apply lures."
-L["FishingModeRaftName"] = "Apply |cff0070dd[Anglers Fishing Raft]|r"
-L["FishingModeRaftDesc"] = "Applies |cff0070dd[Anglers Fishing Raft]|r while fishing and it is not already applied."
-L["FishingModeLureName"] = "Apply Lure"
-
-L["FishingModeCtrlLureName"] = "Ctrl Modifier Lure"
-L["FishingModeCtrlLureDesc"] = "Ctrl+DoubleRightClick to apply a lure."
-L["FishingModeNatName"] = "Alert Daily Nat Fish"
-L["FishingModeNatDesc"] = "Adds the 3 daily reputation fish for Nat Pagle to the Loot Notification system."
-L["FishingModeNatAnnounce"] = "The 3 daily reputation fish for Nat Pagle have been added to the Loot Notification system."
-
-L["LootNotificationName"] = "Loot Notification"
-L["LootNotificationDesc"] = "Notifies you when certain items are looted"
-L["LootNotificationSoundName"] = "Sound"
-L["LootNotificationSoundDesc"] = "The sound to play when an item is found"
-L["LootNotificationListName"] = "Alert Items"
-L["LootNotificationInputName"] = "Item Name"
-L["LootNotificationRemoveName"] = "Remove Item"
-L["LootNotificationEnableName"] = "Enable Loot Notification"
-L["LootNotificationEnableDesc"] = ""
-
-
-
-
-L["ShowSellName"] = "Show Sell Price"
-L["ShowSellDesc"] = "Shows the sell price of the looted item on the Loot Monitor.\n(Large sized themes only)"
-L["ShowTypeName"] = "Show Item Type"
-L["ShowTypeDesc"] = "Shows the item type of the looted item on the Loot Monitor.\n(Large sized themes only)"
-
 L["ACEnableDesc"] = [=[Check to automatically close the loot window after autolooting
 
 Hold |cFFFFCC00Ctrl|r (or whichever key you choose) to temporarily disable while looting.]=]
@@ -85,6 +16,9 @@ L["AnnounceExcludeAdd"] = " added to the Exclude List."
 L["AnnounceLoadingTheme"] = "Loading theme: "
 L["AnnounceName"] = "Announce Events"
 L["Appearance"] = "Appearance"
+L["AquadynamicFishAttractor"] = "Aquadynamic Fish Attractor"
+L["ArtifactFilterDesc"] = "Check to autoloot |cffe6cc80Artifact|r items."
+L["ArtifactFilterName"] = "Loot |cffe6cc80Artifact|r Items"
 L["BagsFull"] = "Your bags are full. Please make room for HotLoot to keep looting."
 L["BoAFilterDesc"] = "Check to autoloot Book of the Ages."
 L["BoAFilterName"] = "Loot Book of the Ages"
@@ -97,6 +31,7 @@ L["ClothFilterDesc"] = "Check to autoloot cloth."
 L["ClothFilterName"] = "Loot Cloth"
 L["ColorQualDesc"] = "Colors the border by item quality."
 L["ColorQualName"] = "Color by Quality"
+L["Combat"] = "Combat"
 L["Common"] = "Common"
 L["CommonFilterDesc"] = [=[
 Check to autoloot |cffffffffCommon|r items.]=]
@@ -109,8 +44,10 @@ L["Cooking Ingredients"] = "Cooking Ingredients"
 L["CurrFilterDesc"] = [=[Check to autoloot Currency.
 (i.e. Lesser Charm of Good Fortune)]=]
 L["CurrFilterName"] = "Loot Currency"
+L["Daily"] = "Daily"
 L["DebugDesc"] = "Check to enable debugging."
 L["DebugName"] = "Debug Mode"
+L["disenchant"] = "disenchant"
 L["DoEMFilterDesc"] = "Check to autoloot Dew of Eternal Morning."
 L["DoEMFilterName"] = "Loot Dew of Eternal Morning"
 L["Down"] = "Down"
@@ -143,11 +80,27 @@ L["ExcludeListDesc"] = ""
 L["ExcludeListName"] = "Items"
 L["ExcludeRemoveName"] = "Remove Item"
 L["Extras"] = "Extras"
+L["ExtrasDesc"] = "Extras are optional modules that provide extra features and functionality. Extra modules can be enabled/disabled in your AddOn manager."
 L["FadeDelayDesc"] = ""
 L["FadeDelayName"] = "Fade Speed"
 L["FilterGroup"] = "Loot Filters"
 L["FishingFilterDesc"] = "Check to autoloot fishing."
 L["FishingFilterName"] = "Loot Fishing"
+L["FishingModeCtrlLureDesc"] = "Ctrl+DoubleRightClick to apply a lure."
+L["FishingModeCtrlLureName"] = "Ctrl Modifier Lure"
+L["FishingModeDesc"] = "Fishing Mode enables you to double right-click to cast and apply lures."
+L["FishingModeEnableDesc"] = "Fishing Mode enables you to double right-click to cast and apply lures."
+L["FishingModeEnableName"] = "Enable Fishing Mode"
+L["FishingModeLureDesc"] = "Applies the selected lure to the currently equipped fishing pole when needed."
+L["FishingModeLureName"] = "Apply Lure"
+L["FishingModeLureSelectDesc"] = "Select the type of lure you would like to have applied."
+L["FishingModeLureSelectName"] = "Lure Select"
+L["FishingModeName"] = "Fishing Mode"
+L["FishingModeNatAnnounce"] = "The 3 daily reputation fish for Nat Pagle have been added to the Loot Notification system."
+L["FishingModeNatDesc"] = "Adds the 3 daily reputation fish for Nat Pagle to the Loot Notification system."
+L["FishingModeNatName"] = "Alert Daily Nat Fish"
+L["FishingModeRaftDesc"] = "Applies |cff0070dd[Anglers Fishing Raft]|r while fishing and it is not already applied."
+L["FishingModeRaftName"] = "Apply |cff0070dd[Anglers Fishing Raft]|r"
 L["Flask"] = "Flask"
 L["FlaskFilterDesc"] = "Check to autoloot flasks."
 L["FlaskFilterName"] = "Loot Flasks"
@@ -160,6 +113,7 @@ L["GeneralGroup"] = "General"
 L["Goal"] = "Goal"
 L["GoldFilterDesc"] = "Check to autoloot gold."
 L["GoldFilterName"] = "Loot Gold"
+L["greed"] = "greed"
 L["GreyItemSold"] = "Sold %s x%s for %s"
 L["GridColName"] = "Grid Columns"
 L["GridEnableDesc"] = [=[Icons display in a grid style.
@@ -167,9 +121,18 @@ L["GridEnableDesc"] = [=[Icons display in a grid style.
 |cFFFF0000(show names must be off)|r]=]
 L["GridEnableName"] = "Icon Grid Mode"
 L["GridModeGroup"] = "Grid Mode"
+L["GroupDelayRollDesc"] = "Delays automatically rolling so that you can choose a different option if decided."
+L["GroupDelayRollName"] = "Delay Auto Roll"
+L["GroupRollDesc"] = "This extra module can automatically roll on loot for you based on your preferences"
+L["GroupRollEnableDesc"] = ""
+L["GroupRollEnableName"] = "Enable Group"
+L["GroupRollName"] = "Group Rolls"
 L["GrowthDircDesc"] = "Here you can choose whether the monitor grows up or down."
 L["GrowthDircName"] = "Growth Direction"
 L["Healing"] = "Healing"
+L["HeatTreatedSpinningLure"] = "Heat-Treated Spinning Lure"
+L["HeirloomFilterDesc"] = "Check to autoloot |cff00ccffHeirloom|r items."
+L["HeirloomFilterName"] = "Loot |cff00ccffHeirloom|r Items"
 L["HelpDesc"] = [=[Select a topic from the drop-down box to see a specific help topic.
 ]=]
 L["HelpGroup"] = "Help"
@@ -204,13 +167,14 @@ L["InitDelayDesc"] = "The delay between the first item looted and before it fade
 L["InitDelayName"] = "Initial Delay"
 L["InlineQuantDesc"] = "Shows the quantities alongside the item names."
 L["InlineQuantName"] = "Inline Quantities"
+L["InputStringName"] = "Input String"
 L["IQHelp1"] = [=[These options work almost the same as the other loot filters with the exception of being in a group. While in a group, items with a quality of Uncommon or above will not be automatically looted due to the fact that HotLoot does not handle loot rolls yet.
 
 ]=]
 L["IQHelp2"] = [=[
 Although similar to the Loot Junk filter this option is not the same. This option loots all poor (gray) quality items. Keep in mind that not all junk items are gray.]=]
 L["ItemName"] = "Item Name"
-
+L["ItemQualityDesc"] = "These options will loot ALL types of items of that quality."
 L["ItemQualityGroup"] = "Item Quality"
 L["Junk"] = "Junk"
 L["JunkFilterDesc"] = [=[Check to autoloot junk items.
@@ -240,6 +204,15 @@ L["LootHistoryToggleName"] = "Show/Hide Loot History"
 L["LootMonDesc"] = "Check to enable the loot monitor"
 L["LootMonGroup"] = "Loot Monitor"
 L["LootMonName"] = "Enable Loot Monitor"
+L["LootNotificationDesc"] = "Notifies you when certain items are looted"
+L["LootNotificationEnableDesc"] = ""
+L["LootNotificationEnableName"] = "Enable Loot Notification"
+L["LootNotificationInputName"] = "Item Name"
+L["LootNotificationListName"] = "Alert Items"
+L["LootNotificationName"] = "Loot Notification"
+L["LootNotificationRemoveName"] = "Remove Item"
+L["LootNotificationSoundDesc"] = "The sound to play when an item is found"
+L["LootNotificationSoundName"] = "Sound"
 L["LootTrackerAddName"] = "Add Item"
 L["LootTrackerAnnounceInvalid"] = "The item you entered is either invalid or not in your inventory."
 L["LootTrackerEnableName"] = "Enable Loot Tracker"
@@ -261,9 +234,17 @@ L["MoHFilterName"] = "Loot Motes of Harmony"
 L["MonDescName"] = [=[
 NOTE: This monitor is designed to only show loot that is specifically looted automatically. It will not show items that you loot manually.]=]
 L["Name"] = "Name"
+L["NatsHat"] = "Nat's Hat"
+L["need"] = "need"
+L["NeedStringDesc"] = "Here you can input different string of text to have search for among the items up for roll. This accepts partial words and proper capitalization is required."
+L["NeedStringName"] = "Need by String"
+L["Never"] = "Never"
 L["None"] = "None"
+L["nothing"] = "nothing"
+L["on"] = "on"
 L["OreFilterDesc"] = "Check to autoloot ore and stone."
 L["OreFilterName"] = "Loot Ore and Stone"
+L["pass"] = "pass"
 L["PickFilterDesc"] = [=[Check to autoloot while pickpocketing.
 (for rogues)]=]
 L["PickFilterName"] = "Loot Pickpocket"
@@ -293,15 +274,20 @@ L["RareFilterName"] = "Loot |cff0070ddRare|r Items"
 L["Recipe"] = "Recipe"
 L["RecipeFilterDesc"] = "Check to autoloot profession recipes."
 L["RecipeFilterName"] = "Loot Recipes"
+L["RemoveStringName"] = "Remove String"
 L["RepGroup"] = "Rep Items"
 L["RepMeatFilterDesc"] = "Check to autoloot meat that can be turned in for coins."
 L["RepMeatFilterName"] = "Loot Rep Meat"
+L["ResetDesc"] = "Choose when or if the Loot History is cleared."
 L["ResetMonName"] = "Reset Anchor"
+L["ResetName"] = "Reset History"
 L["Right"] = "Right"
+L["Rolled"] = "Rolled"
 L["SCFilterDesc"] = "Check to autoloot Singing Crystal."
 L["SCFilterName"] = "Loot Singing Crystal"
 L["SCHelp1"] = "Slash commands aren't completely finished but are still included. To see a list of available commands please type \"/hl help\"."
 L["SCHelpGroup"] = "Slash Commands"
+L["SearchStringsName"] = "Search Strings"
 L["SecDelayDesc"] = "The delay between items after the first item fades out."
 L["SecDelayName"] = "Secondary Delay"
 L["ShowAnchDesc"] = "Shows the anchor so you can move the Loot Monitor."
@@ -314,8 +300,14 @@ L["ShowNamesDesc"] = [=[Shows the item names next to the icons in the Loot Monit
 L["ShowNamesName"] = "Show Item Names"
 L["ShowQuantDesc"] = "Shows the quantities of the items on top of icons in the Loot Monitor."
 L["ShowQuantName"] = "Show Item Quantities"
+L["ShowSellDesc"] = [=[Shows the sell price of the looted item on the Loot Monitor.
+(Large sized themes only)]=]
+L["ShowSellName"] = "Show Sell Price"
 L["ShowTotDesc"] = "Shows the quantity of the item in your bags."
 L["ShowTotName"] = "Show Quantity In Bags"
+L["ShowTypeDesc"] = [=[Shows the item type of the looted item on the Loot Monitor.
+(Large sized themes only)]=]
+L["ShowTypeName"] = "Show Item Type"
 L["SkinAnnounce1"] = "Deleting leftover items..."
 L["SkinAnnounce2"] = " has been deleted."
 L["SkinningEnableDesc"] = [=[Skinning mode will pick up and delete any items left over after autolooting.

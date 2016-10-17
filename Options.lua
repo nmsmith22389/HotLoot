@@ -534,199 +534,231 @@ local themeTable = {
                     order = 1,
                     inline = true,
                     args = {
-                lootGold = {
-                    name = L["GoldFilterName"],
-                    desc = L["GoldFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootGold",
-                    get = "GetLootGold",
-                    order = 1
+                        buttonEnableAllFiltersGeneral = {
+                            name = L["buttonEnableAll"],
+                            desc = L["buttonEnableAllFiltersGeneralDesc"],
+                            type = "execute",
+                            func = "buttonEnableAllFiltersGeneral", 
+                            order = 1
+                        },
+                        buttonDisableAllFiltersGeneral = {
+                            name = L["buttonDisableAll"],
+                            desc = L["buttonDisableAllFiltersGeneralDesc"],
+                            type = "execute",
+                            func = "buttonDisableAllFiltersGeneral", 
+                            order = 2
+                        },
+                        lootGold = {
+                            name = L["GoldFilterName"],
+                            desc = L["GoldFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootGold",
+                            get = "GetLootGold",
+                            order = 3
+                        },
+                        lootCurrency = {
+                            name = L["CurrFilterName"],
+                            desc = L["CurrFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootCurrency",
+                            get = "GetLootCurrency",
+                            order = 4
+                        },
+                        lootQuest = {
+                            name = L["QuestFilterName"],
+                            desc = L["QuestFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootQuest",
+                            get = "GetLootQuest",
+                            order = 5
+                        },
+                        lootJunk = {
+                            name = L["JunkFilterName"], 
+                            desc = L["JunkFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootJunk",
+                            get = "GetLootJunk",
+                            order = 4,
+                            hidden = true
+                        },
+                        
+                        lootPick = {
+                            name = L["PickFilterName"], 
+                            desc = L["PickFilterName"],
+                            type = "toggle",
+                            set = "SetLootPick",
+                            get = "GetLootPick",
+                            order = 7
+                        }
+                    }
                 },
-                lootCurrency = {
-                    name = L["CurrFilterName"],
-                    desc = L["CurrFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootCurrency",
-                    get = "GetLootCurrency",
-                    order = 2
+                groupProfessions = {
+                    name = L["ProfessionsGroup"],
+                    type = "group",
+                    order = 2,
+                    inline = true,
+                    args = {
+                        buttonEnableAllFiltersProfessions = {
+                            name = L["buttonEnableAll"],
+                            desc = L["buttonEnableAllFiltersProfessionsDesc"],
+                            type = "execute",
+                            func = "buttonEnableAllFiltersProfessions", 
+                            order = 1
+                        },
+                        buttonDisableAllFiltersProfessions = {
+                            name = L["buttonDisableAll"],
+                            desc = L["buttonDisableAllFiltersProfessionsDesc"],
+                            type = "execute",
+                            func = "buttonDisableAllFiltersProfessions", 
+                            order = 2
+                        },
+                        lootCloth = {
+                            name = L["ClothFilterName"],
+                            desc = L["ClothFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootCloth",
+                            get = "GetLootCloth",
+                            order = 3
+                        },
+                        lootMining = {
+                            name = L["OreFilterName"],
+                            desc = L["OreFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootMining",
+                            get = "GetLootMining",
+                            order = 4
+                        },
+                        lootGems = {
+                            name = L["GemFilterName"],
+                            desc = L["GemFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootGems",
+                            get = "GetLootGems",
+                            order = 5
+                        },
+                        lootHerbs = {
+                            name = L["HerbFilterName"],
+                            desc = L["HerbFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootHerbs",
+                            get = "GetLootHerbs",
+                            order = 6
+                        },
+                        lootSkinning = {
+                            name = L["LeatherFilterName"],
+                            desc = L["LeatherFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootSkinning",
+                            get = "GetLootSkinning",
+                            order = 7
+                        },
+                        lootFishing = {
+                            name = L["FishingFilterName"],
+                            desc = L["FishingFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootFishing",
+                            get = "GetLootFishing",
+                            order = 8
+                        },
+                        lootEnchanting = {
+                            name = L["EnchantingFilterName"],
+                            desc = L["EnchantingFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootEnchanting",
+                            get = "GetLootEnchanting",
+                            order = 9
+                        },
+                        lootPigments = {
+                            name = L["PigmentsFilterName"],
+                            desc = L["PigmentsFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootPigments",
+                            get = "GetLootPigments",
+                            order = 10
+                        },
+                        lootCooking = {
+                            name = L["CookingFilterName"],
+                            desc = L["CookingFilterDesc"],
+                            --\n\n|cff1eff00Note: Blizzard has cooking ingredients spread all over different categories but this should get most of them.|r
+                            type = "toggle",
+                            set = "SetLootCooking",
+                            get = "GetLootCooking",
+                            width = "full",
+                            order = 12
+                        },
+                        lootRecipes = {
+                            name = L["RecipeFilterName"],
+                            desc = L["RecipeFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootRecipes",
+                            get = "GetLootRecipes",
+                            order = 13
+                        }
+                    }
                 },
-                lootQuest = {
-                    name = L["QuestFilterName"],
-                    desc = L["QuestFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootQuest",
-                    get = "GetLootQuest",
-                    order = 3
-                },
-                lootJunk = {
-                    name = L["JunkFilterName"], 
-                    desc = L["JunkFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootJunk",
-                    get = "GetLootJunk",
-                    order = 4,
-                    hidden = true
-                },
-                
-                lootPick = {
-                    name = L["PickFilterName"], 
-                    desc = L["PickFilterName"],
-                    type = "toggle",
-                    set = "SetLootPick",
-                    get = "GetLootPick",
-                    order = 5
-                },
-            },
-        },
-        groupProfessions = {
-            name = L["ProfessionsGroup"],
-            type = "group",
-            order = 2,
-            inline = true,
-            args = {
-                lootCloth = {
-                    name = L["ClothFilterName"],
-                    desc = L["ClothFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootCloth",
-                    get = "GetLootCloth",
-                    order = 0
-                },
-                lootMining = {
-                    name = L["OreFilterName"],
-                    desc = L["OreFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootMining",
-                    get = "GetLootMining",
-                    order = 1
-                },
-                lootGems = {
-                    name = L["GemFilterName"],
-                    desc = L["GemFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootGems",
-                    get = "GetLootGems",
-                    order = 2
-                },
-                lootHerbs = {
-                    name = L["HerbFilterName"],
-                    desc = L["HerbFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootHerbs",
-                    get = "GetLootHerbs",
-                    order = 3
-                },
-                lootSkinning = {
-                    name = L["LeatherFilterName"],
-                    desc = L["LeatherFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootSkinning",
-                    get = "GetLootSkinning",
-                    order = 4
-                },
-                lootFishing = {
-                    name = L["FishingFilterName"],
-                    desc = L["FishingFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootFishing",
-                    get = "GetLootFishing",
-                    order = 5
-                },
-                lootEnchanting = {
-                    name = L["EnchantingFilterName"],
-                    desc = L["EnchantingFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootEnchanting",
-                    get = "GetLootEnchanting",
-                    order = 6
-                },
-                lootPigments = {
-                    name = L["PigmentsFilterName"],
-                    desc = L["PigmentsFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootPigments",
-                    get = "GetLootPigments",
-                    order = 7
-                },
-                lootCooking = {
-                    name = L["CookingFilterName"],
-                    desc = L["CookingFilterDesc"],
-                    --\n\n|cff1eff00Note: Blizzard has cooking ingredients spread all over different categories but this should get most of them.|r
-                    type = "toggle",
-                    set = "SetLootCooking",
-                    get = "GetLootCooking",
-                    width = "full",
-                    order = 9
-                },
-                lootRecipes = {
-                    name = L["RecipeFilterName"],
-                    desc = L["RecipeFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootRecipes",
-                    get = "GetLootRecipes",
-                    order = 10
-                },
-                
-            }
-        },
-        groupDrops = {
-            name = L["DropsGroup"],
-            type = "group",
-            order = 3,
-            inline = true,
-            args = {
-                lootPots = {
-                    name = L["PotionFilterName"],
-                    desc = L["PotionFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootPots",
-                    get = "GetLootPots",
-                    order = 2
-                },
-                potionType = {
-                    name = L["PotionType"],
-                    type = "select",
-                    set = "SetPotionType",
-                    get = "GetPotionType",
-                    values = potionTypeTable,
+                groupDrops = {
+                    name = L["DropsGroup"],
+                    type = "group",
                     order = 3,
-                },
-                lootFlasks = {
-                    name = L["FlaskFilterName"],
-                    desc = L["FlaskFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootFlasks",
-                    get = "GetLootFlasks",
-                    order = 4
-                },
-                lootElixirs = {
-                    name = L["ElixirFilterName"],
-                    desc = L["ElixirFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootElixirs",
-                    get = "GetLootElixirs",
-                    order = 5
-                },
-                lootMoH = {
-                    name = L["MoHFilterName"],
-                    desc = L["MoHFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootMoH",
-                    get = "GetLootMoH",
-                    width = "double",
-                    order = 7
-                },
-                lootElemental = {
-                    name = L["EleFilterName"],
-                    desc = L["EleFilterDesc"],
-                    type = "toggle",
-                    set = "SetLootElemental",
-                    get = "GetLootElemental",
-                    order = 6
-                },  
-            },
-        },
-        },
+                    inline = true,
+                    args = {
+                        buttonEnableAllFiltersCommon = {
+                            name = L["buttonEnableAll"],
+                            desc = L["buttonEnableAllFiltersCommonDesc"],
+                            type = "execute",
+                            func = "buttonEnableAllFiltersCommon", 
+                            order = 1
+                        },
+                        buttonDisableAllFiltersCommon = {
+                            name = L["buttonDisableAll"],
+                            desc = L["buttonDisableAllFiltersCommonDesc"],
+                            type = "execute",
+                            func = "buttonDisableAllFiltersCommon", 
+                            order = 2
+                        },
+                        lootPots = {
+                            name = L["PotionFilterName"],
+                            desc = L["PotionFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootPots",
+                            get = "GetLootPots",
+                            order = 3
+                        },
+                        potionType = {
+                            name = L["PotionType"],
+                            type = "select",
+                            set = "SetPotionType",
+                            get = "GetPotionType",
+                            values = potionTypeTable,
+                            order = 4
+                        },
+                        lootFlasks = {
+                            name = L["FlaskFilterName"],
+                            desc = L["FlaskFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootFlasks",
+                            get = "GetLootFlasks",
+                            order = 5
+                        },
+                        lootElixirs = {
+                            name = L["ElixirFilterName"],
+                            desc = L["ElixirFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootElixirs",
+                            get = "GetLootElixirs",
+                            order = 6
+                        },
+                        lootElemental = {
+                            name = L["EleFilterName"],
+                            desc = L["EleFilterDesc"],
+                            type = "toggle",
+                            set = "SetLootElemental",
+                            get = "GetLootElemental",
+                            order = 7
+                        }
+                    }
+                }
+            }
         },
         -- groupTimeless = {
         --  name = L["TimelessIsleGroup"],
@@ -798,9 +830,23 @@ local themeTable = {
             order = 10,
             args = {
                 magicDesc1 = {
-                    name = L["ItemQualityDesc"],
+                    name = L["ItemQualityDesc"].."\n",
                     type = "description",
                     order = 0,
+                },
+                buttonEnableAllFiltersQuality = {
+                    name = L["buttonEnableAll"],
+                    desc = L["buttonEnableAllFiltersQualityDesc"],,
+                    type = "execute",
+                    func = "buttonEnableAllFiltersQuality", 
+                    order = 1
+                },
+                buttonDisableAllFiltersQuality = {
+                    name = L["buttonDisableAll"],
+                    desc = L["buttonDisableAllFiltersQualityDesc"],
+                    type = "execute",
+                    func = "buttonDisableAllFiltersQuality", 
+                    order = 2
                 },
                 lootPoor = {
                     name = L["PoorFilterName"],
@@ -809,7 +855,7 @@ local themeTable = {
                     set = "SetLootPoor",
                     get = "GetLootPoor",
                     width = "full",
-                    order = 1,
+                    order = 3,
                 },
                 sellPoor = {
                     name = L["PoorSellName"],
@@ -818,12 +864,12 @@ local themeTable = {
                     set = "SetSellGreys",
                     get = "GetSellGreys",
                     width = "full",
-                    order = 2,
+                    order = 4,
                 },
                 spacerQ1 = {
                     name = "",          
                     type = "description",
-                    order = 3,
+                    order = 5,
                 },
                 lootCommon = {
                     name = L["CommonFilterName"],
@@ -832,12 +878,12 @@ local themeTable = {
                     set = "SetLootCommon",
                     get = "GetLootCommon",
                     width = "full",
-                    order = 4,
+                    order = 6,
                 },
                 spacerQ2 = {
                     name = "",          
                     type = "description",
-                    order = 5,
+                    order = 7,
                 },
                 lootUncommon = {
                     name = L["UncommonFilterName"],
@@ -845,13 +891,13 @@ local themeTable = {
                     type = "toggle",
                     set = "SetLootUncommon",
                     get = "GetLootUncommon",
-                    order = 6,
+                    order = 8,
                     width = "full",
                 },  
                 spacerQ3 = {
                     name = "",          
                     type = "description",
-                    order = 7,
+                    order = 9,
                 },
                 lootRare = {
                     name = L["RareFilterName"],
@@ -860,12 +906,12 @@ local themeTable = {
                     set = "SetLootRare",
                     get = "GetLootRare",
                     width = "full",
-                    order = 8,
+                    order = 10,
                 },
                 spacerQ4 = {
                     name = "",          
                     type = "description",
-                    order = 9,
+                    order = 11,
                 },
                 lootEpic = {
                     name = L["EpicFilterName"],
@@ -874,12 +920,12 @@ local themeTable = {
                     set = "SetLootEpic",
                     get = "GetLootEpic",
                     width = "full",
-                    order = 10,
+                    order = 12,
                 },
                 spacerQ5 = {
                     name = "",          
                     type = "description",
-                    order = 11,
+                    order = 13,
                 },
                 lootLegendary = {
                     name = L["LegendaryFilterName"],
@@ -888,12 +934,12 @@ local themeTable = {
                     set = "SetLootLegendary",
                     get = "GetLootLegendary",
                     width = "full",
-                    order = 12,
+                    order = 14,
                 },
                 spacerQ6 = {
                     name = "",          
                     type = "description",
-                    order = 13,
+                    order = 15,
                 },
                 lootArtifact = {
                     name = L["ArtifactFilterName"],
@@ -902,12 +948,12 @@ local themeTable = {
                     set = "SetLootArtifact",
                     get = "GetLootArtifact",
                     width = "full",
-                    order = 14,
+                    order = 16,
                 },
                 spacerQ7 = {
                     name = "",          
                     type = "description",
-                    order = 15,
+                    order = 17,
                 },
                 lootHeirloom = {
                     name = L["HeirloomFilterName"],
@@ -916,7 +962,7 @@ local themeTable = {
                     set = "SetLootHeirloom",
                     get = "GetLootHeirloom",
                     width = "full",
-                    order = 16,
+                    order = 18,
                 },
                 minILvl = {
                     name = L["MinimumItemLevelName"],
@@ -925,7 +971,7 @@ local themeTable = {
                     -- pattern = "%d+",
                     set = "SetMinILvl",
                     get = "GetMinILvl",
-                    order = 17,
+                    order = 19,
                 },
             },
         },
@@ -1768,6 +1814,24 @@ function HotLoot:ResetMonitor()
     HotLoot:Announce(L["AnchorReset"]);
 end
 
+--buttonEnableAllFiltersGeneral
+function HotLoot:buttonEnableAllFiltersGeneral()
+    HotLoot:SetLootGold(nil, true);
+    HotLoot:SetLootCurrency(nil, true);
+    HotLoot:SetLootQuest(nil, true);
+    HotLoot:SetLootJunk(nil, true);
+    HotLoot:SetLootPick(nil, true);
+end
+
+--buttonDisableAllFiltersGeneral
+function HotLoot:buttonDisableAllFiltersGeneral()
+    HotLoot:SetLootGold(nil, false);
+    HotLoot:SetLootCurrency(nil, false);
+    HotLoot:SetLootQuest(nil, false);
+    HotLoot:SetLootJunk(nil, false);
+    HotLoot:SetLootPick(nil, false);
+end
+
 -- lootGold
 function HotLoot:SetLootGold(info, value)
     self.db.profile.lootGold = value;
@@ -1951,6 +2015,34 @@ function HotLoot:GetLootSkinMode(info)
     return self.db.profile.lootSkinMode;
 end
 
+--buttonEnableAllFiltersProfessions
+function HotLoot:buttonEnableAllFiltersProfessions()
+    HotLoot:SetLootCloth(nil, true);
+    HotLoot:SetLootMining(nil, true);
+    HotLoot:SetLootGems(nil, true);
+    HotLoot:SetLootHerbs(nil, true);
+    HotLoot:SetLootSkinning(nil, true);
+    HotLoot:SetLootFishing(nil, true);
+    HotLoot:SetLootEnchanting(nil, true);
+    HotLoot:SetLootPigments(nil, true);
+    HotLoot:SetLootCooking(nil, true);
+    HotLoot:SetLootRecipes(nil, true);
+end
+
+--buttonDisableAllFiltersProfessions
+function HotLoot:buttonDisableAllFiltersProfessions()
+    HotLoot:SetLootCloth(nil, false);
+    HotLoot:SetLootMining(nil, false);
+    HotLoot:SetLootGems(nil, false);
+    HotLoot:SetLootHerbs(nil, false);
+    HotLoot:SetLootSkinning(nil, false);
+    HotLoot:SetLootFishing(nil, false);
+    HotLoot:SetLootEnchanting(nil, false);
+    HotLoot:SetLootPigments(nil, false);
+    HotLoot:SetLootCooking(nil, false);
+    HotLoot:SetLootRecipes(nil, false);
+end
+
 --lootCloth
 function HotLoot:SetLootCloth(info, value)
     self.db.profile.lootCloth = value;
@@ -2057,6 +2149,22 @@ function HotLoot:SetLootPigments(info, value)
 end
 function HotLoot:GetLootPigments(info)
     return self.db.profile.lootPigments;
+end
+
+--buttonEnableAllFiltersCommon
+function HotLoot:buttonEnableAllFiltersCommon()
+    HotLoot:SetLootPots(nil, true);
+    HotLoot:SetLootFlasks(nil, true);
+    HotLoot:SetLootElixirs(nil, true);
+    HotLoot:SetLootElemental(nil, true);
+end
+
+--buttonDisableAllFiltersCommon
+function HotLoot:buttonDisableAllFiltersCommon()
+    HotLoot:SetLootPots(nil, false);
+    HotLoot:SetLootFlasks(nil, false);
+    HotLoot:SetLootElixirs(nil, false);
+    HotLoot:SetLootElemental(nil, false);
 end
 
 -- lootPots
@@ -2205,6 +2313,30 @@ end
 -- function HotLoot:GetLootRepMeat(info)
 --  return self.db.profile.lootRepMeat;
 -- end
+
+--buttonEnableAllFiltersQuality
+function HotLoot:buttonEnableAllFiltersQuality()
+    HotLoot:SetLootPoor(nil, true);
+    HotLoot:SetLootCommon(nil, true);
+    HotLoot:SetLootUncommon(nil, true);
+    HotLoot:SetLootRare(nil, true);
+    HotLoot:SetLootEpic(nil, true);
+    HotLoot:SetLootLegendary(nil, true);
+    HotLoot:SetLootArtifact(nil, true);
+    HotLoot:SetLootHeirloom(nil, true);
+end
+
+--buttonDisableAllFiltersQuality
+function HotLoot:buttonDisableAllFiltersQuality()
+    HotLoot:SetLootPoor(nil, false);
+    HotLoot:SetLootCommon(nil, false);
+    HotLoot:SetLootUncommon(nil, false);
+    HotLoot:SetLootRare(nil, false);
+    HotLoot:SetLootEpic(nil, false);
+    HotLoot:SetLootLegendary(nil, false);
+    HotLoot:SetLootArtifact(nil, false);
+    HotLoot:SetLootHeirloom(nil, false);
+end
 
 --lootPoor
 function HotLoot:SetLootPoor(info, value)

@@ -33,8 +33,7 @@ L["ColorQualDesc"] = "Colors the border by item quality."
 L["ColorQualName"] = "Color by Quality"
 L["Combat"] = "Combat"
 L["Common"] = "Common"
-L["CommonFilterDesc"] = [=[
-Check to autoloot |cffffffffCommon|r items.]=]
+L["CommonFilterDesc"] = "Check to autoloot |cffffffffCommon|r items."
 L["CommonFilterName"] = "Loot |cffffffffCommon|r Items"
 L["Cooking"] = "Cooking"
 L["CookingFilterDesc"] = "Check to autoloot cooking ingredients."
@@ -47,6 +46,9 @@ L["CurrFilterName"] = "Loot Currency"
 L["Daily"] = "Daily"
 L["DebugDesc"] = "Check to enable debugging."
 L["DebugName"] = "Debug Mode"
+L["dialogConfirmSkinningMode"] = [=[Are you sure you want to enable Skinning Mode?
+
+|cffec5840(WARNING: Skinning mode WILL DELETE anything not caught by the loot filters)|r]=]
 L["disenchant"] = "disenchant"
 L["DoEMFilterDesc"] = "Check to autoloot Dew of Eternal Morning."
 L["DoEMFilterName"] = "Loot Dew of Eternal Morning"
@@ -133,8 +135,7 @@ L["Healing"] = "Healing"
 L["HeatTreatedSpinningLure"] = "Heat-Treated Spinning Lure"
 L["HeirloomFilterDesc"] = "Check to autoloot |cff00ccffHeirloom|r items."
 L["HeirloomFilterName"] = "Loot |cff00ccffHeirloom|r Items"
-L["HelpDesc"] = [=[Select a topic from the drop-down box to see a specific help topic.
-]=]
+L["HelpDesc"] = "Select a topic from the drop-down box to see a specific help topic."
 L["HelpGroup"] = "Help"
 L["Herb"] = "Herb"
 L["HerbFilterDesc"] = "Check to autoloot herbs."
@@ -175,7 +176,7 @@ L["IQHelp2"] = [=[
 Although similar to the Loot Junk filter this option is not the same. This option loots all poor (gray) quality items. Keep in mind that not all junk items are gray.]=]
 L["ItemName"] = "Item Name"
 L["ItemQualityDesc"] = "These options will loot ALL types of items of that quality."
-L["ItemQualityGroup"] = "Item Quality"
+L["ItemQualityGroup"] = "Item Quality Filter"
 L["Junk"] = "Junk"
 L["JunkFilterDesc"] = [=[Check to autoloot junk items.
 (not just poor quality items)]=]
@@ -366,8 +367,7 @@ L["TransName"] = "Transparency"
 L["TxtSideDesc"] = "Here you can choose whether the loot item names show on the right or left."
 L["TxtSideName"] = "Text Side"
 L["Uncommon"] = "Uncommon"
-L["UncommonFilterDesc"] = [=[
-Check to autoloot |cff1eff00Uncommon|r items.]=]
+L["UncommonFilterDesc"] = "Check to autoloot |cff1eff00Uncommon|r items."
 L["UncommonFilterName"] = "Loot |cff1eff00Uncommon|r Items"
 L["Up"] = "Up"
 L["UseQuantValDesc"] = [=[Take quantity into account when determining value.

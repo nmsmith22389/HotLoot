@@ -286,8 +286,7 @@ function HotLoot:OnInitialize()
     --LootHistory:CreateLootHistory()
     -- Register Confirm Dialog for SkinMode
     StaticPopupDialogs["CONFIRM_SKINNING_MODE"] = {
-        text = "Are you sure you want to enable Skinning Mode?\n\n"..
-                "|cffec5840(WARNING: Skinning mode WILL DELETE anything not caught by the loot filters)|r",
+        text = L["dialogConfirmSkinningMode"],
         button1 = "Yes",
         button2 = "No",
         OnAccept = function()

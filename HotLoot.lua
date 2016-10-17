@@ -1,8 +1,10 @@
 -- =================== --
 --        TODO         --
 -------------------------
+-- * Add L[] strings for all the Enable/Disable All buttons
 -- * Make Include & Exclude button look better (texture)
--- * Export and update localization (en done) (for artifact and heirloom qualities and other stuff maybe)
+-- * Export and update localizations (for artifact and heirloom qualities and other stuff maybe)
+-- * Optimize Code
 -- =================== --
 
 

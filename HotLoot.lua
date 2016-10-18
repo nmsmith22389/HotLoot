@@ -59,8 +59,8 @@ local hLDB = LibStub("LibDataBroker-1.1"):NewDataObject("HotLoot", {
             HotLoot:dBug(button)
             if button == "LeftButton" then
                 LibStub("AceConfigDialog-3.0"):Open("HotLoot")
-            elseif button == "RightButton" and IsAddOnLoaded("HotLoot_LootHistory") then
-                HotLoot:ToggleLootHistory()
+            -- elseif button == "RightButton" and IsAddOnLoaded("HotLoot_LootHistory") then
+            --     HotLoot:ToggleLootHistory()
             elseif button == "MiddleButton" then
                 HotLoot:MMToggleAnchor()
             end

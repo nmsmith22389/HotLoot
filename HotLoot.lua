@@ -56,7 +56,7 @@ local hLDB = LibStub("LibDataBroker-1.1"):NewDataObject("HotLoot", {
     type = "launcher",
     icon = "Interface\\AddOns\\HotLoot\\icon",
     OnClick = function(clickedframe, button)
-            HotLoot:dBug(button)
+            -- HotLoot:dBug(button)
             if button == "LeftButton" then
                 LibStub("AceConfigDialog-3.0"):Open("HotLoot")
             -- elseif button == "RightButton" and IsAddOnLoaded("HotLoot_LootHistory") then
@@ -382,15 +382,21 @@ end
 --==========================
 --      Debug Mode
 --==========================
-function HotLoot:dBug(name, value)
+function HotLoot:Debug(string)
     if (HotLoot:GetLootDebug() == true) then
-        local toP
+        print("<|c"..HotLoot:GetColor("alert").."HotLoot Debug|r> " .. tostring(string));
+        -- Old HL color was --> |cFFCD6600HotLoot|r
+    end
+end
+function HotLoot:DebugOption(name, value)
+    if (HotLoot:GetLootDebug() == true) then
+        local toPrint
         if value then
-            toP = tostring(name) .. " = " .. tostring(value)
+            toPrint = tostring(name) .. " = " .. tostring(value)
         else
-            toP = tostring(name)
+            toPrint = tostring(name)
         end
-        print("<HotLoot Debug> " .. toP)
+        print("<|c"..HotLoot:GetColor("alert").."HotLoot Debug|r> " .. toPrint)
     end
 end
 --==========================
@@ -489,7 +495,7 @@ local function ToSkin(slot)
         itemsToDelete = itemsToDelete .. " " .. lootName
         --itemsToDelete[curSlot] = itemLink
         LootSlot(slot)
-        HotLoot:dBug(lootName, "added to itemsToDelete")
+        HotLoot:Debug("|c" .. HotLoot:GetColor("alert") .. lootName .. " is set to be deleted!|r")
         skinModeTrigger = 1
         --HotLoot:dBug("skinModeTrigger", skinModeTrigger)
     end
@@ -904,11 +910,10 @@ local function ToFilters(slot)
     local itemID = GetItemID(itemLink)
     if (HasRoom(1) or CanStack(lootName, itemStackCount, lootQuantity))--[[ and locked == 0 ]]then
             
-            if (HotLoot:GetLootDebug() == true) then
-                print("---------------")
-                print("Slot " .. slot .. ": " .. lootName)
-                print("Item type: " .. itemType.."| Item sub type: " .. itemSubType)
-            end
+            local strFilterDebug =  "---------------------\n"..
+                                    itemLink .. "(" .. itemID .. ") Loot Slot: " .. slot .. "\n" ..
+                                    "Type: [" .. itemType .. "]  Sub-Type: [" .. itemSubType .. "]\n";
+            HotLoot:Debug(strFilterDebug);
             if
                 -- Quest
                 HotLoot:GetLootQuest() and (itemType == L["Quest"] or ScanTip(slot, L["Quest Item"])) and CheckThreshold("Quest", itemSellPrice, lootQuantity) then 
@@ -1064,7 +1069,8 @@ local function ToFilters(slot)
             
             
     else
-         HotLoot:Announce(L["BagsFull"])
+        HotLoot:Announce(L["BagsFull"])
+        HotLoot:Debug("Bags are full.");
         return false
     end
     else
@@ -1678,7 +1684,7 @@ function HotLoot:LOOT_OPENED()
                 --HotLoot:dBug(incButtons[i])
             end
             if ToFilters(i) then
-                HotLoot:dBug("Looted: true")
+                HotLoot:Debug("Item Looted in " .. ) -- TODO: Localize
                 --local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(i)
                 --Toast:Spawn("Loot",lootName, lootIcon )
                     local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(i)
@@ -1704,7 +1710,7 @@ function HotLoot:LOOT_OPENED()
                 
                 LootSlot(i)
             else
-                HotLoot:dBug("Looted: false")
+                HotLoot:Debug("Item NOT Looted")
                 ToSkin(i)
                 
             end
@@ -1750,7 +1756,7 @@ end
 
 function HotLoot:MERCHANT_SHOW(...)
     if HotLoot:GetLootEnabled() and HotLoot:GetSellGreys() then
-    HotLoot:dBug("Merchant Window Opened")
+    HotLoot:Debug("Merchant Window Opened")
         HotLoot:SellGreys()
     end
 end

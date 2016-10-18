@@ -267,6 +267,17 @@ function HotLoot:MakeColor(key, input)
     end
 end
 
+--=========================
+--       Get Color
+--=========================
+function HotLoot:GetColor(color)
+    if      color == "success"  then return "ff5cb85c"
+    elseif  color == "info"     then return "ff5bc0de"
+    elseif  color == "warning"  then return "fff0ad4e"
+    elseif  color == "alert"    then return "ffd9534f"
+    else                             return "ff000000"
+    end
+end
 
 
 -- OnInitialize

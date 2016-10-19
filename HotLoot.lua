@@ -20,6 +20,7 @@ hIcon = LibStub("LibDBIcon-1.0")
 --==========================
 --==GENERAL==--
 local lootedByHL, icons, itemsToDelete, closeEL, skinModeTrigger  = {}, {}, "", 0, 0
+local strFilterCaught;
 
 --==THEMES==--
 --Current
@@ -896,15 +897,18 @@ local function ToFilters(slot)
         return false
     end
     if IsGold(slot) then
+        strFilterCaught = "Gold";
         return true
     elseif IsCurrency(slot) then
+        strFilterCaught = "Currency";
         return true
     end
-    if IsGold(slot) and not HotLoot:GetLootGold() then
-        return false
-    elseif IsCurrency(slot) and not HotLoot:GetLootCurrency() then
-        return false
-    end
+    -- NOTE: Commented out because it appears to not be needed.
+    -- if IsGold(slot) and not HotLoot:GetLootGold() then
+    --     return false
+    -- elseif IsCurrency(slot) and not HotLoot:GetLootCurrency() then
+    --     return false
+    -- end
     if lootLink then
     local _, itemLink, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice = GetItemInfo(lootLink)
     local itemID = GetItemID(itemLink)
@@ -917,6 +921,7 @@ local function ToFilters(slot)
             if
                 -- Quest
                 HotLoot:GetLootQuest() and (itemType == L["Quest"] or ScanTip(slot, L["Quest Item"])) and CheckThreshold("Quest", itemSellPrice, lootQuantity) then 
+                    strFilterCaught = "Quest Item";
                     return true
             -- Commented out to remove "junk" option
             --elseif
@@ -926,57 +931,71 @@ local function ToFilters(slot)
             elseif
                 -- HotLoot:GetLootPick(
                 (IsStealthed()) and (lootQuality ~= 0) and HotLoot:GetLootPick() then 
+                    strFilterCaught = "PickPocket";
                     return true
             elseif
                 -- Cloth
                 -- TODO: Change ALL Trade Goods to Tradeskill
                 (itemSubType == L["Cloth"]) and (itemType == L["Tradeskill"]) and HotLoot:GetLootCloth() and CheckThreshold("Cloth", itemSellPrice, lootQuantity) then 
+                    strFilterCaught = "Cloth";
                     return true
             elseif
                 -- Mining
                 (itemSubType == L["Metal & Stone"]) and HotLoot:GetLootMining() and CheckThreshold("Metal & Stone", itemSellPrice, lootQuantity) then 
+                    strFilterCaught = "Metal & Stone";
                     return true
             elseif
                 -- Gems
                 (itemType == L["Gem"]) and HotLoot:GetLootGems() and CheckThreshold("Gem", itemSellPrice, lootQuantity) then 
+                    strFilterCaught = "Gem";
                     return true
             elseif
                 -- Herbs
                 (itemSubType == L["Herb"]) and HotLoot:GetLootHerbs() and CheckThreshold("Herb", itemSellPrice, lootQuantity) then 
+                    strFilterCaught = "Herb";
                     return true
             elseif
                 -- Leather
                 (itemSubType == L["Leather"]) and (itemType == L["Tradeskill"]) and HotLoot:GetLootSkinning() and CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
+                    strFilterCaught = "Leather";
                     return true
             elseif
                 -- Fishing (-junk)
                 IsFishingLoot() and HotLoot:GetLootFishing() and (itemSubType ~= L["Junk"]) then 
+                    strFilterCaught = "Fishing";
                     return true
             elseif
                 -- enchanting
                 HotLoot:GetLootEnchanting() and (itemSubType == L["Enchanting"]) and CheckThreshold("Enchanting", itemSellPrice, lootQuantity) then 
+                    strFilterCaught = "Enchanting";
                     return true
             
             elseif
                 -- GetLootCooking
                 HotLoot:GetLootCooking() and (itemSubType == L["Cooking"]) and CheckThreshold("Cooking Ingredient", itemSellPrice, lootQuantity) then 
+                    strFilterCaught = "Cooking";
                     return true
             elseif
                 -- GetLootRecipes
                 HotLoot:GetLootRecipes() and (itemType == L["Recipe"]) then 
+                    strFilterCaught = "Recipe";
                     return true
             elseif
                 --HotLoot:GetLootPigments(info)
                 HotLoot:GetLootPigments() and (string.find(lootName, "Pigment")) then 
+                    strFilterCaught = "Pigment";
                     return true
             elseif
                 -- Pots
                 (itemSubType == L["Potion"]) and HotLoot:GetLootPots() and CheckThreshold("Potion", itemSellPrice, lootQuantity) then 
                     if HotLoot:GetPotionType() == "both" then
+                        strFilterCaught = "Potion";
                         return true
                     elseif HotLoot:GetPotionType() == "healing" and string.find(lootName, L["Healing"])  then
+                        strFilterCaught = "Health Potion";
                         return true
                     elseif HotLoot:GetPotionType() == "mana" and string.find(lootName, L["Mana"])  then
+                        strFilterCaught = "Mana Potion";
                         return true
                     else
                         return false
@@ -984,14 +1003,17 @@ local function ToFilters(slot)
             elseif
                 -- Flasks
                 (itemSubType == L["Flask"]) and HotLoot:GetLootFlasks() and CheckThreshold("Flask", itemSellPrice, lootQuantity) then 
+                    strFilterCaught = "Flask";
                     return true
             elseif
                 -- Elixirs
                 (itemSubType == L["Elixir"]) and HotLoot:GetLootElixirs() and CheckThreshold("Elixir", itemSellPrice, lootQuantity) then 
+                    strFilterCaught = "Elixir";
                     return true
             elseif
                 -- Motes
                 (itemSubType == L["Elemental"]) and HotLoot:GetLootElemental() and CheckThreshold("Elemental", itemSellPrice, lootQuantity) then 
+                    strFilterCaught = "Elemental";
                     return true
             --[[elseif
                 -- MoH
@@ -1032,38 +1054,47 @@ local function ToFilters(slot)
             elseif
                 -- Include List
                 HotLoot:GetIncludeTable()[lootName] then 
+                    strFilterCaught = "Include List";
                     return true
             elseif
                 -- Poor
                 (HotLoot:GetLootPoor() == true) and (lootQuality == 0) and (CheckThreshold("z1Poor", itemSellPrice, lootQuantity)) --[[and (CheckILvl(itemLevel))]] then 
+                    strFilterCaught = "Poor Quality";
                     return true
             elseif
                 -- Common
                 (HotLoot:GetLootCommon() == true) and (lootQuality == 1) and (CheckThreshold("z2Common", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                    strFilterCaught = "Common Quality";
                     return true
             elseif
                 -- Uncommon
                 --[[(IsInGroup() == false) and ]](HotLoot:GetLootUncommon() == true) and (lootQuality == 2) and (CheckThreshold("z3Uncommon", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                    strFilterCaught = "Uncommon Quality";
                     return true
             elseif
                 -- Rare
                 --[[(IsInGroup() == false) and ]](HotLoot:GetLootRare() == true) and (lootQuality == 3) and (CheckThreshold("z4Rare", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                    strFilterCaught = "Rare Quality";
                     return true
             elseif
                 -- Epic
                 --[[(IsInGroup() == false) and ]](HotLoot:GetLootEpic() == true) and (lootQuality == 4) and (CheckThreshold("z5Epic", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                    strFilterCaught = "Epic Quality";
                     return true
             elseif
                 -- Legendary
                 --[[(IsInGroup() == false) and ]](HotLoot:GetLootLegendary() == true) and (lootQuality == 5) and (CheckThreshold("z6Legendary", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                    strFilterCaught = "Legendary Quality";
                     return true
             elseif
                 -- Artifact
                 --[[(IsInGroup() == false) and ]](HotLoot:GetLootArtifact() == true) and (lootQuality == 6) and (CheckThreshold("z7Artifact", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                    strFilterCaught = "Artifact Quality";
                     return true
             elseif
                 -- Heirloom
                 --[[(IsInGroup() == false) and ]](HotLoot:GetLootHeirloom() == true) and (lootQuality == 7) and (CheckThreshold("z8Heirloom", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                    strFilterCaught = "Heirloom Quality";
                     return true
             end
             
@@ -1684,7 +1715,7 @@ function HotLoot:LOOT_OPENED()
                 --HotLoot:dBug(incButtons[i])
             end
             if ToFilters(i) then
-                HotLoot:Debug("Item Looted in " .. ) -- TODO: Localize
+                HotLoot:Debug("Item Looted in " .. strFilterCaught .. " filter.") -- TODO: Localize
                 --local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(i)
                 --Toast:Spawn("Loot",lootName, lootIcon )
                     local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(i)

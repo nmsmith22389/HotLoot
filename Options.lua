@@ -668,8 +668,8 @@ local tableThemes = {
                             name = L["togglePotionFilterName"],
                             desc = L["togglePotionFilterDesc"],
                             type = "toggle",
-                            set = "SetLootPots",
-                            get = "GetLootPots",
+                            set = "SetPotionFilter",
+                            get = "GetPotionFilter",
                             order = 3
                         },
                         selectPotionType = {
@@ -926,7 +926,7 @@ local tableThemes = {
                     desc = L["toggleShowIncludeButtonDesc"],
                     type = "toggle",
                     set = "SetShowIncludeButton",
-                    get = "GetIncludeButton",
+                    get = "GetShowIncludeButton",
                     order = 5,
                 },
                 headerExcludeList = {
@@ -963,7 +963,7 @@ local tableThemes = {
                     desc = L["toggleShowExcludeButtonDesc"],
                     type = "toggle",
                     set = "SetShowExcludeButton",
-                    get = "GetExcludeButton",
+                    get = "GetShowExcludeButton",
                     order = 10,
                 },
             },
@@ -1189,12 +1189,12 @@ local tableThemes = {
                     },
                 },
                 groupThresh = {
-                    name = L["ThreshGroup"],
+                    name = L["groupValueThresholds"],
                     type = "group",
                     order = 5,
                     args = {
                         desc = {
-                            name = HotLoot:MakeColor("ctrl", L["selectThresholdTypeName"]).."\n"..L["ThreshHelp1"]..HotLoot:MakeColor("ctrl", L["selectThresholdValueName"]).."\n"..L["ThreshHelp2"]..HotLoot:MakeColor("ctrl", L["toggleUseQuantValueName"]).."\n"..L["ThreshHelp3"],          
+                            name = HotLoot:MakeColor("ctrl", L["selectThresholdTypeName"]).."\n"..L["ThreshHelp1"]..HotLoot:MakeColor("ctrl", L["inputThresholdValueName"]).."\n"..L["ThreshHelp2"]..HotLoot:MakeColor("ctrl", L["toggleUseQuantValueName"]).."\n"..L["ThreshHelp3"],          
                             type = "description",
                             order = 1,
                         },
@@ -2000,7 +2000,7 @@ end
 
 --buttonEnableAllFiltersCommon
 function HotLoot:buttonEnableAllFiltersCommon()
-    HotLoot:SetLootPots(nil, true);
+    HotLoot:SetPotionFilter(nil, true);
     HotLoot:SetFlaskFilter(nil, true);
     HotLoot:SetElixirFilter(nil, true);
     HotLoot:SetElementalFilter(nil, true);
@@ -2008,18 +2008,18 @@ end
 
 --buttonDisableAllFiltersCommon
 function HotLoot:buttonDisableAllFiltersCommon()
-    HotLoot:SetLootPots(nil, false);
+    HotLoot:SetPotionFilter(nil, false);
     HotLoot:SetFlaskFilter(nil, false);
     HotLoot:SetElixirFilter(nil, false);
     HotLoot:SetElementalFilter(nil, false);
 end
 
 -- togglePotionFilter
-function HotLoot:SetLootPots(info, value)
+function HotLoot:SetPotionFilter(info, value)
     self.db.profile.togglePotionFilter = value;
     HotLoot:DebugOption("togglePotionFilter", value);
 end
-function HotLoot:GetLootPots(info)
+function HotLoot:GetPotionFilter(info)
     return self.db.profile.togglePotionFilter;
 end
 
@@ -2260,7 +2260,7 @@ function HotLoot:SetShowIncludeButton(info, value)
     self.db.profile.toggleShowIncludeButton = value
     HotLoot:DebugOption("toggleShowIncludeButton", value)
 end
-function HotLoot:GetIncludeButton()
+function HotLoot:GetShowIncludeButton()
     return self.db.profile.toggleShowIncludeButton;
 end
 

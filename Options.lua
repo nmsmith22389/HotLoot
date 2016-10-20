@@ -1,39 +1,31 @@
 local L = LibStub("AceLocale-3.0"):GetLocale("HotLoot")
 
 watchListTable = {}
-local unitTable = {
-    ["rare"] = "Rare",
-    ["boss"] = "Boss",
-    ["chest"] = "Chest",
-    ["unitKeyword"] = "Unit Keyword"
-}
 
-local closeKeyTable = {
+local tableModifierKeys = {
     ["0"] = "None",
     ["ctrl"] = "Control",
     ["shift"] = "Shift",
     ["alt"] = "Alt"
 }
 
-local growthDirectionTable = {
+local tableDirectionVertical = {
     [1] = L["Up"],
     [-1] = L["Down"]
 }
 
--- SetTextSide
-local textSideTable = {
+local tableDirectionHorizontal = {
     [0] = L["Right"],
     [1] = L["Left"]
 }
 
---potionTypeTable
-local potionTypeTable = {
+local tablePotionType = {
     ["both"] = L["Both"],
     ["healing"] = L["Healing"],
     ["mana"] = L["Mana"],
 }
 
-local itemTypeTable = {
+local tableFilterTypes = {
     ["0None"] = L["None"],
     ["Quest"] = L["Quest Items"],
     --["Junk"] = L["Junk"],
@@ -59,12 +51,12 @@ local itemTypeTable = {
     ["Include"] = L["Include List"],
 }
 
-local themeTable = {
+local tableThemes = {
     --["classic"] = "Classic",
     --["minimal"] = "Minimal",
     --["holo"] = "Holo",
-    ["paper"] = "Paper (Large)",
     ["color"] = "Colored (Any)",
+    ["paper"] = "Paper (Large)",
     ["toast"] = "Toast (Large)",
 }
 -- options
@@ -75,206 +67,188 @@ local themeTable = {
     type = "group",
     childGroups = "tree",
     args = {
-        lootDesc = {
-            name = L["lootDesc"],           
+        descHotLoot = {
+            name = L["descHotLoot"],           
             type = "description",
-            order = 0
+            order = 1
         },
-        lootDesc3 = {
-            name = L["lootDesc3"],  
+        descHotLootNote = {
+            name = L["descHotLootNote"],  
             type = "description",
             order = 2
         },
-        enable = {
-            name = L["EnableName"],
-            desc = L["EnableDesc"],
-            type = "toggle",
-            set = "SetLootEnabled",
-            get = "GetLootEnabled",
-            hidden = true
-        },
-        debug = {
-            name = L["DebugName"],
-            desc = L["DebugDesc"],
-            type = "toggle",
-            set = "SetLootDebug",
-            get = "GetLootDebug",
-            hidden = true
-        },
-        autoclose = {
-            name = L["ACEnableName"],
-            desc = L["ACEnableDesc"],
-            type = "toggle",
-            set = "SetLootClose",
-            get = "GetLootClose",
-            hidden = true
-        },
-        skinmode = {
-            name = "Enable",
-            desc = "Skinning mode will pick up and delete any items left over after autolooting.\n|cFFFF0000(WARNING: use with caution this deletes items. HL is not responsible for lost items.)",
-            type = "toggle",
-            set = "SetLootSkinMode",
-            get = "GetLootSkinMode",
-            confirm = true,
-            hidden = true
-        },
-        monitor = {
-            name = "Enable Loot Monitor",
-            type = "toggle",
-            set = "SetLootEnableMonitor",
-            get = "GetLootEnableMonitor",
-            hidden = true
-        },
         groupSystem = {
-            name = "System",
+            name = L["groupSystem"],
             type = "group",
-            order = 4,
+            order = 3,
             
             args = {
-                lootEnabled = {
-                    name = L["EnableName"],
-                    desc = L["EnableDesc"],
+                toggleSystemEnable = {
+                    name = L["genEnable"],
+                    desc = L["toggleSystemEnableDesc"],
                     type = "toggle",
-                    set = "SetLootEnabled",
-                    get = "GetLootEnabled",
+                    set = "SetSystemEnable",
+                    get = "GetSystemEnable",
                     order = 1
                 },
-                lootDebug = {
-                    name = L["DebugName"],
-                    desc = L["DebugDesc"],
+                toggleHideMinimapButton = {
+                    name = L["toggleHideMinimapButtonName"],
+                    desc = L["toggleHideMinimapButtonDesc"],
                     type = "toggle",
-                    set = "SetLootDebug",
-                    get = "GetLootDebug",
-                    hidden = "Advanced",
-                    order = 5
-                },
-                lootAnnounce = {
-                    name = L["AnnounceName"],
-                    desc = L["AnnounceDesc"],
-                    type = "toggle",
-                    set = "SetLootAnnounce",
-                    get = "GetLootAnnounce",
-                    order = 3
-                },
-                lootMinimap = {
-                    name = L["HideMMName"],
-                    desc = L["HideMMDesc"],
-                    type = "toggle",
-                    set = "SetMinimap",
-                    get = "GetMinimap",
+                    set = "SetHideMinimapButton",
+                    get = "GetHideMinimapButton",
                     order = 2
                 },
-                lootAdvanced = {
-                    name = L["AdvancedName"],
-                    desc = L["AdvancedDesc"],
+                toggleAnnounceEvents = {
+                    name = L["toggleAnnounceEventsName"],
+                    desc = L["toggleAnnounceEventsDesc"],
                     type = "toggle",
-                    set = "SetLootAdvanced",
-                    get = "GetLootAdvanced",
+                    set = "SetAnnounceEvents",
+                    get = "GetAnnounceEvents",
+                    order = 3
+                },
+                toggleAdvancedOptions = {
+                    name = L["toggleAdvancedOptionsName"],
+                    desc = L["toggleAdvancedOptionsDesc"],
+                    type = "toggle",
+                    set = "SetAdvancedOptions",
+                    get = "GetAdvancedOptions",
                     order = 4
                 },
-                groupLWindow = {
-                    name = L["ACGroup"],
+                toggleDebugMode = {
+                    name = L["toggleDebugModegName"],
+                    desc = L["toggleDebugModegDesc"],
+                    type = "toggle",
+                    set = "SetDebugMode",
+                    get = "GetDebugMode",
+                    hidden = "GetAdvancedOptionsHidden",
+                    order = 5
+                },
+                -- TODO: Add Enable/Disable select option to decide which one the mod key does.
+                groupCloseLootWindow = {
+                    name = L["groupCloseLootWindow"],
                     type = "group",
-                    order = 50,
+                    order = 6,
                     inline = true,
                     args = {
-                        lootClose = {
-                            name = L["ACEnableName"],
-                            desc = L["ACEnableDesc"],
+                        toggleCloseLootWindow = {
+                            name = L["genEnable"],
+                            desc = L["toggleCloseLootWindowDesc"],
                             type = "toggle",
-                            set = "SetLootClose",
-                            get = "GetLootClose",
+                            set = "SetCloseLootWindow",
+                            get = "GetCloseLootWindow",
                             order = 1
                         },
-                        lootCloseKey = {
-                            name = L["ACKeyName"],
-                            desc = L["ACKeyDesc"],
+                        selectCloseLootWindowModifier = {
+                            name = L["genModifierKey"],
+                            desc = L["selectCloseLootWindowModifierDesc"],
                             type = "select",
-                            values = closeKeyTable,
-                            set = "SetLootCloseKey",
-                            get = "GetLootCloseKey",
+                            values = tableModifierKeys,
+                            set = "SetCloseLootWindowModifier",
+                            get = "GetCloseLootWindowModifier",
                             order = 2
                         },
                     },
                 },
-                groupSkinning = {
-                    name = L["SkinningGroup"],
+                -- TODO: Add Enable/Disable select option to decide which one the mod key does.
+                groupSkinningMode = {
+                    name = L["groupSkinningMode"],
                     type = "group",
-                    order = 100,
+                    order = 7,
                     inline = true,
-                    --hidden = "Advanced",
                     args = {
-                        lootSkinKey = {
-                            name = L["SkinningKeyName"],
-                            desc = L["SkinningKeyDesc"],
-                            type = "select",
-                            values = closeKeyTable,
-                            set = "SetLootSkinKey",
-                            get = "GetLootSkinKey",
-                            order = 2
-                        },
-                        skinmode = {
-                            name = L["SkinningEnableName"],
-                            desc = L["SkinningEnableDesc"],
+                        toggleSkinningMode = {
+                            name = L["genEnable"],
+                            desc = L["toggleSkinningModeDesc"],
                             type = "toggle",
-                            set = "SetLootSkinMode",
-                            get = "GetLootSkinMode",
-                            -- confirm = true,
+                            set = "SetSkinningMode",
+                            get = "GetSkinningMode",
                             order = 1
+                        },
+                        selectSkinningModeModifier = {
+                            name = L["genModifierKey"],
+                            desc = L["selectSkinningModeModifierDesc"],
+                            type = "select",
+                            values = tableModifierKeys,
+                            set = "SetSkinningModeModifier",
+                            get = "GetSkinningModeModifier",
+                            order = 2
                         },
                     },
                 },
             }, 
         },
         goupLootMonitor = {
-            name = L["LootMonGroup"], 
+            name = L["groupLootMonitor"], 
             type = "group", 
-            order = 5, 
+            order = 4, 
             childGroups = "tab",
             args = {
-                goupLootMonitor1 = {
-                    name = L["GeneralGroup"], 
+                descLootMonitorNote = {
+                    name = L["descLootMonitorNote"],
+                    type = "description",
+                    hidden = true,
+                    order = 1,
+                },
+                buttonTestLootMonitor = {
+                    name = L["buttonTestLootMonitor"],
+                    type = "execute",
+                    func = "buttonTestLootMonitor", 
+                    order = 2
+                },
+                buttonResetLootMonitor = {
+                    -- TODO: Maybe change text to say "Reset Loot Monitor Position"?
+                    --          or just add a description if possible
+                    name = L["buttonResetLootMonitorName"],
+                    desc = L["buttonResetLootMonitorDesc"],
+                    type = "execute",
+                    func = "buttonResetLootMonitor", 
+                    order = 3
+                },
+                goupLootMonitorSettings = {
+                    name = L["genSettings"], 
                     type = "group", 
-                    order = 5, 
+                    order = 4, 
                     args = {
-                        lootEnableMonitor = {
-                            name = L["LootMonName"],
-                            desc = L["LootMonDesc"],
+                        toggleEnableLootMonitor = {
+                            name = L["toggleEnableLootMonitorName"],
+                            desc = L["toggleEnableLootMonitorDesc"],
                             type = "toggle",
-                            set = "SetLootEnableMonitor",
-                            get = "GetLootEnableMonitor",
+                            set = "SetEnableLootMonitor",
+                            get = "GetEnableLootMonitor",
                             width = "double",
                             order = 1
                         },
-                        lootShowAnchor = {
-                            name = L["ShowAnchName"],
-                            desc = L["ShowAnchDesc"],
+                        toggleShowLootMonitorAnchor = {
+                            name = L["toggleShowLootMonitorAnchorName"],
+                            desc = L["toggleShowLootMonitorAnchorDesc"],
                             type = "toggle",
-                            set = "SetLootShowAnchor",
-                            get = "GetLootShowAnchor",
+                            set = "SetShowLootMonitorAnchor",
+                            get = "GetShowLootMonitorAnchor",
                             width = "double",
                             order = 2
                         },
-                        lootShowNames = {
-                            name = L["ShowNamesName"],
-                            desc = L["ShowNamesDesc"],
+                        toggleShowItemNames = {
+                            name = L["toggleShowItemNamesName"],
+                            desc = L["toggleShowItemNamesDesc"],
                             type = "toggle",
-                            set = "SetLootShowNames",
-                            get = "GetLootShowNames",
-                            disabled = "ToggleNamesDisable",
-                            hidden = true, --"Advanced",
+                            set = "SetShowItemNames",
+                            get = "GetShowItemNames",
+                            disabled = "GetShowItemNamesDisabled",
+                            hidden = true, --"GetAdvancedOptions",
                             width = "double",
                             order = 3
                         },
-                        lootShowQuantities = {
-                            name = L["ShowQuantName"],
-                            desc = L["ShowQuantDesc"],
+                        toggleShowItemQuant = {
+                            name = L["toggleShowItemQuantName"],
+                            desc = L["toggleShowItemQuantDesc"],
                             type = "toggle",
-                            set = "SetLootShowQuantities",
-                            get = "GetLootShowQuantities",
+                            set = "SetShowItemQuant",
+                            get = "GetShowItemQuant",
                             width = "double",
                             order = 4
                         },
+                        -- TODO: Rename Locals and Funcs
                         inlineQuant = {
                             name = L["InlineQuantName"],
                             desc = L["InlineQuantDesc"],
@@ -282,44 +256,46 @@ local themeTable = {
                             set = "SetInlineQuant",
                             get = "GetInlineQuant",
                             hidden = true,
-                            --hidden = "Advanced",
+                            --hidden = "GetAdvancedOptionsHidden",
                             width = "double",
                             order = 5
                         },
-                        lootShowTotal = {
-                            name = L["ShowTotName"],
-                            desc = L["ShowTotDesc"],
+                        toggleShowTotalQuant = {
+                            name = L["toggleShowTotalQuantName"],
+                            desc = L["toggleShowTotalQuantDesc"],
                             type = "toggle",
-                            set = "SetShowTotal",
-                            get = "GetShowTotal",
+                            set = "SetShowTotalQuant",
+                            get = "GetShowTotalQuant",
                             width = "double",
                             order = 6
                         },
-                        lootShowSellPrice = {
-                            name = L["ShowSellName"],
-                            desc = L["ShowSellDesc"],
+                        toggleShowSellPrice = {
+                            name = L["toggleShowSellPriceName"],
+                            desc = L["toggleShowSellPriceDesc"],
                             type = "toggle",
                             set = "SetShowSellPrice",
                             get = "GetShowSellPrice",
                             width = "double",
                             order = 7
                         },
-                        lootShowItemType = {
-                            name = L["ShowTypeName"],
-                            desc = L["ShowTypeDesc"],
+                        toggleShowItemType = {
+                            name = L["toggleShowItemTypeName"],
+                            desc = L["toggleShowItemTypeDesc"],
                             type = "toggle",
                             set = "SetShowItemType",
                             get = "GetShowItemType",
                             width = "double",
                             order = 8
                         },
+                        -- TODO: Rename Locals and Funcs
+                        -- NOTE: Remove?
                         groupGridMode = {
                             name = L["GridModeGroup"],
                             type = "group",
-                            order = 15,
+                            order = 9,
                             inline = true,
                             hidden = true,
-                            --hidden = "Advanced",
+                            --hidden = "GetAdvancedOptionsHidden",
                             disabled = "ToggleGridDisable",
                             args = {
                                 lootGridMode = {
@@ -345,191 +321,163 @@ local themeTable = {
                         }
                     }
                 },
-                goupLootMonitor2 = {
-                    name = L["Appearance"], 
+                goupLootMonitorAppearance = {
+                    name = L["genAppearance"], 
                     type = "group", 
-                    order = 6, 
+                    order = 5, 
                     args = {
-                        lootIconSize = {
-                            name = L["IconSizeName"],
-                            desc = L["IconSizeDesc"],
+                        rangeIconSize = {
+                            name = L["rangeIconSizeName"],
+                            desc = L["rangeIconSizeDesc"],
                             type = "range",
                             min = 16,
                             max = 32,
                             step = 8, 
                             bigStep = 8,
-                            disabled = "ToggleSizeDisable",
-                            set = "SetLootIconSize",
-                            get = "GetLootIconSize",
-                            hidden = "Advanced",
-                            order = 7
+                            disabled = "GetIconSizeDisabled",
+                            set = "SetIconSize",
+                            get = "GetIconSize",
+                            hidden = "GetAdvancedOptionsHidden",
+                            order = 1
                         },
-                        lootTransparency = {
-                            name = L["TransName"],
-                            desc = L["TransDesc"],
+                        rangeTransparency = {
+                            name = L["genTransparency"],
+                            desc = L["rangeTransparencyDesc"],
                             type = "range",
                             min = 0,
                             max = 1,
                             step = 0.1, 
                             bigStep = 0.1,
-                            set = "SetLootTrans",
-                            get = "GetLootTrans",
-                            --hidden = "Advanced",
-                            order = 8
+                            set = "SetTransparency",
+                            get = "GetTransparency",
+                            order = 2
                         },
-                        lootGrowthDirection = {
-                            name = L["GrowthDircName"],
-                            desc = L["GrowthDircDesc"],
+                        selectGrowthDirection = {
+                            name = L["selectGrowthDirectionName"],
+                            desc = L["selectGrowthDirectionDesc"],
                             type = "select",
-                            values = growthDirectionTable,
-                            set = "SetLootGrowthDirection",
-                            get = "GetLootGrowthDirection",
-                            order = 9
+                            values = tableDirectionVertical,
+                            set = "SetGrowthDirection",
+                            get = "GetGrowthDirection",
+                            order = 3
                         },
-                        textSide = {
-                            name = L["TxtSideName"],
-                            desc = L["TxtSideDesc"],
+                        selectTextSide = {
+                            name = L["selectTextSideName"],
+                            desc = L["selectTextSideDesc"],
                             type = "select",
-                            values = textSideTable,
+                            values = tableDirectionHorizontal,
                             set = "SetTextSide",
                             get = "GetTextSide",
-                            order = 10
+                            order = 4
                         },
                         
-                        themeSelect = {
-                            name = L["ThemeSelName"],
-                            desc = L["ThemeSelDesc"],
+                        selectTheme = {
+                            name = L["selectThemeName"],
+                            -- desc = L["selectThemeDesc"],
                             type = "select",
-                            values = themeTable,
-                            set = "SetThemeSelect",
-                            get = "GetThemeSelect",
-                            --disabled = true,
-                            order = 11
+                            values = tableThemes,
+                            set = "SetTheme",
+                            get = "GetTheme",
+                            order = 5
                         },
-                        colorQual = {
-                            name = L["ColorQualName"],
-                            desc = L["ColorQualDesc"],
+                        toggleColorByQuality = {
+                            name = L["toggleColorByQualityName"],
+                            desc = L["toggleColorByQualityDesc"],
                             type = "toggle",
-                            set = "SetColorQual",
-                            get = "GetColorQual",
-                            hidden = "ColorHide",
+                            set = "SetColorByQuality",
+                            get = "GetColorByQuality",
+                            hidden = "GetThemeColorDisabled",
                             --disabled = true,
-                            order = 12
+                            order = 6
                         },
-                        themeColorSelect = {
-                            name = L["ThemeColorSelect"],
+                        colorThemeBG = {
+                            name = L["colorThemeBGName"],
                             --desc = L["ThemeSelDesc"],
                             type = "color",
-                            set = "SetThemeColorSelect",
-                            get = "GetThemeColorSelect",
-                            hidden = "ColorHide",
+                            set = "SetThemeBG",
+                            get = "GetThemeBG",
+                            hidden = "GetThemeColorDisabled",
                             hasAlpha = true,
-                            --disabled = true,
-                            order = 13
+                            order = 7
                         },
-                        themeColorBorderSelect = {
-                            name = L["ThemeColorBorderSelect"],
+                        colorThemeBorder = {
+                            name = L["colorThemeBorderName"],
                             --desc = L["ThemeSelDesc"],
                             type = "color",
-                            set = "SetThemeColorBorderSelect",
-                            get = "GetThemeColorBorderSelect",
-                            hidden = "ColorHide",
+                            set = "SetThemeBorderColor",
+                            get = "GetThemeBorderColor",
+                            hidden = "GetThemeColorDisabled",
                             hasAlpha = true,
-                            --disabled = true,
-                            order = 14
+                            order = 8
                         },
-                        minWidth = {
-                            name = L["MinWidthName"],
-                            desc = L["MinWidthDesc"],
+                        inputMinWidth = {
+                            name = L["inputMinWidthName"],
+                            desc = L["inputMinWidthDesc"],
                             type = "input",
-                            --width = "half",
                             set = "SetMinWidth",
                             get = "GetMinWidth",
-                            hidden = "Advanced",
-                            order = 15
+                            hidden = "GetAdvancedOptionsHidden",
+                            order = 9
                         },
-                        initialDelay = {
-                            name = L["InitDelayName"],
-                            desc = L["InitDelayDesc"],
+                        rangeInitialDelay = {
+                            name = L["rangeInitialDelayName"],
+                            desc = L["rangeInitialDelayDesc"],
+                            type = "range",
+                            min = 1,
+                            max = 10,
+                            step = 1, 
+                            bigStep = 1,
+                            set = "SetInitialDelay",
+                            get = "GetInitialDelay",
+                            hidden = "GetAdvancedOptionsHidden",
+                            order = 10
+                        },
+                        rangeSecondaryDelay = {
+                            name = L["rangeSecondaryDelayName"],
+                            desc = L["rangeSecondaryDelayDesc"],
                             type = "range",
                             min = 1,
                             max = 10,
                             step = 1, 
                             bigStep = 1,
                             --width = "half",
-                            set = "SetIDelay",
-                            get = "GetIDelay",
-                            hidden = "Advanced",
-                            order = 16
+                            set = "SetSecondaryDelay",
+                            get = "GetSecondaryDelay",
+                            hidden = "GetAdvancedOptionsHidden",
+                            order = 11
                         },
-                        secondaryDelay = {
-                            name = L["SecDelayName"],
-                            desc = L["SecDelayDesc"],
-                            type = "range",
-                            min = 1,
-                            max = 10,
-                            step = 1, 
-                            bigStep = 1,
-                            --width = "half",
-                            set = "SetSDelay",
-                            get = "GetSDelay",
-                            hidden = "Advanced",
-                            order = 17
-                        },
-                        fadeSpeed = {
-                            name = L["FadeDelayName"],
-                            desc = L["FadeDelayDesc"],
+                        rangeFadeSpeed = {
+                            name = L["rangeFadeSpeedName"],
+                            desc = L["rangeFadeSpeedDesc"],
                             type = "range",
                             min = 5,
                             max = 15,
                             step = 1, 
                             bigStep = 1,
-                            hidden = "Advanced",
-                            set = "SetFSpeed",
-                            get = "GetFSpeed",
-                            order = 18
+                            hidden = "GetAdvancedOptionsHidden",
+                            set = "SetFadeSpeed",
+                            get = "GetFadeSpeed",
+                            order = 12
                         },
-                        showAnim = {
-                            name = L["ShowAnimationName"],
-                            desc = L["ShowAnimationDesc"],
+                        toggleShowAnimation = {
+                            name = L["toggleShowAnimationName"],
+                            desc = L["toggleShowAnimationDesc"], -- TODO: Needs to be updated for shines and etc.
                             type = "toggle",
                             set = "SetShowAnimation",
                             get = "GetShowAnimation",
-                            --hidden = "ColorHide",
-                            --disabled = true,
-                            order = 19
+                            order = 13
                         }
                     }
-                },
-                lootTestMonitor = {
-                    name = L["TestMonName"],
-                    --desc = " ",
-                    type = "execute",
-                    func = "TestMonitor", 
-                    order = 30
-                },
-                lootResetMonitor = {
-                    name = L["ResetMonName"],
-                    --desc = " ",
-                    type = "execute",
-                    func = "ResetMonitor", 
-                    order = 31
-                },
-                lootDesc = {
-                    name = L["MonDescName"],
-                    type = "description",
-                    hidden = true,
-                    order = 65,
                 }
             }
         },
-        groupFilters = {
-            name = L["FilterGroup"],
+        groupLootFilters = {
+            name = L["groupLootFilters"],
             type = "group",
-            order = 6,
+            order = 5,
             args = {
                 groupGeneral = {
-                    name = L["GeneralGroup"],
+                    name = L["groupGeneral"],
                     type = "group",
                     order = 1,
                     inline = true,
@@ -548,52 +496,52 @@ local themeTable = {
                             func = "buttonDisableAllFiltersGeneral", 
                             order = 2
                         },
-                        lootGold = {
-                            name = L["GoldFilterName"],
-                            desc = L["GoldFilterDesc"],
+                        toggleGoldFilter = {
+                            name = L["toggleGoldFilterName"],
+                            desc = L["toggleGoldFilterDesc"],
                             type = "toggle",
-                            set = "SetLootGold",
-                            get = "GetLootGold",
+                            set = "SetGoldFilter",
+                            get = "GetGoldFilter",
                             order = 3
                         },
-                        lootCurrency = {
-                            name = L["CurrFilterName"],
-                            desc = L["CurrFilterDesc"],
+                        toggleCurrencyFilter = {
+                            name = L["toggleCurrencyFilterName"],
+                            desc = L["toggleCurrencyFilterDesc"],
                             type = "toggle",
-                            set = "SetLootCurrency",
-                            get = "GetLootCurrency",
+                            set = "SetCurrencyFilter",
+                            get = "GetCurrencyFilter",
                             order = 4
                         },
-                        lootQuest = {
-                            name = L["QuestFilterName"],
-                            desc = L["QuestFilterDesc"],
+                        toggleQuestFilter = {
+                            name = L["toggleQuestFilterName"],
+                            desc = L["toggleQuestFilterDesc"],
                             type = "toggle",
-                            set = "SetLootQuest",
-                            get = "GetLootQuest",
+                            set = "SetQuestFilter",
+                            get = "GetQuestFilter",
                             order = 5
                         },
-                        lootJunk = {
-                            name = L["JunkFilterName"], 
-                            desc = L["JunkFilterDesc"],
+                        toggleJunkFilter = {
+                            name = L["toggleJunkFilterName"], 
+                            desc = L["toggleJunkFilterDesc"],
                             type = "toggle",
-                            set = "SetLootJunk",
-                            get = "GetLootJunk",
-                            order = 4,
+                            set = "SetJunkFilter",
+                            get = "GetJunkFilter",
+                            order = 6,
                             hidden = true
                         },
                         
-                        lootPick = {
-                            name = L["PickFilterName"], 
-                            desc = L["PickFilterName"],
+                        togglePickpocketFilter = {
+                            name = L["togglePickpocketFilterName"], 
+                            desc = L["togglePickpocketFilterName"],
                             type = "toggle",
-                            set = "SetLootPick",
-                            get = "GetLootPick",
+                            set = "SetPickpocketFilter",
+                            get = "GetPickpocketFilter",
                             order = 7
                         }
                     }
                 },
                 groupProfessions = {
-                    name = L["ProfessionsGroup"],
+                    name = L["groupProfessions"],
                     type = "group",
                     order = 2,
                     inline = true,
@@ -612,92 +560,92 @@ local themeTable = {
                             func = "buttonDisableAllFiltersProfessions", 
                             order = 2
                         },
-                        lootCloth = {
-                            name = L["ClothFilterName"],
-                            desc = L["ClothFilterDesc"],
+                        toggleClothFilter = {
+                            name = L["toggleClothFilterName"],
+                            desc = L["toggleClothFilterDesc"],
                             type = "toggle",
-                            set = "SetLootCloth",
-                            get = "GetLootCloth",
+                            set = "SetClothFilter",
+                            get = "GetClothFilter",
                             order = 3
                         },
-                        lootMining = {
-                            name = L["OreFilterName"],
-                            desc = L["OreFilterDesc"],
+                        toggleMiningFilter = {
+                            name = L["toggleMiningFilterName"],
+                            desc = L["toggleMiningFilterDesc"],
                             type = "toggle",
-                            set = "SetLootMining",
-                            get = "GetLootMining",
+                            set = "SetMiningFilter",
+                            get = "GetMiningFilter",
                             order = 4
                         },
-                        lootGems = {
-                            name = L["GemFilterName"],
-                            desc = L["GemFilterDesc"],
+                        toggleGemFilter = {
+                            name = L["toggleGemFilterName"],
+                            desc = L["toggleGemFilterDesc"],
                             type = "toggle",
-                            set = "SetLootGems",
-                            get = "GetLootGems",
+                            set = "SetGemFilter",
+                            get = "GetGemFilter",
                             order = 5
                         },
-                        lootHerbs = {
-                            name = L["HerbFilterName"],
-                            desc = L["HerbFilterDesc"],
+                        toggleHerbFilter = {
+                            name = L["toggleHerbFilterName"],
+                            desc = L["toggleHerbFilterDesc"],
                             type = "toggle",
-                            set = "SetLootHerbs",
-                            get = "GetLootHerbs",
+                            set = "SetHerbFilter",
+                            get = "GetHerbFilter",
                             order = 6
                         },
-                        lootSkinning = {
-                            name = L["LeatherFilterName"],
-                            desc = L["LeatherFilterDesc"],
+                        toggleLeatherFilter = {
+                            name = L["toggleLeatherFilterName"],
+                            desc = L["toggleLeatherFilterDesc"],
                             type = "toggle",
-                            set = "SetLootSkinning",
-                            get = "GetLootSkinning",
+                            set = "SetLeatherFilter",
+                            get = "GetLeatherFilter",
                             order = 7
                         },
-                        lootFishing = {
-                            name = L["FishingFilterName"],
-                            desc = L["FishingFilterDesc"],
+                        toggleFishingFilter = {
+                            name = L["toggleFishingFilterName"],
+                            desc = L["toggleFishingFilterDesc"],
                             type = "toggle",
-                            set = "SetLootFishing",
-                            get = "GetLootFishing",
+                            set = "SetFishingFilter",
+                            get = "GetFishingFilter",
                             order = 8
                         },
-                        lootEnchanting = {
-                            name = L["EnchantingFilterName"],
-                            desc = L["EnchantingFilterDesc"],
+                        toggleEnchantingFilter = {
+                            name = L["toggleEnchantingFilterName"],
+                            desc = L["toggleEnchantingFilterDesc"],
                             type = "toggle",
-                            set = "SetLootEnchanting",
-                            get = "GetLootEnchanting",
+                            set = "SetEnchantingFilter",
+                            get = "GetEnchantingFilter",
                             order = 9
                         },
-                        lootPigments = {
-                            name = L["PigmentsFilterName"],
-                            desc = L["PigmentsFilterDesc"],
+                        togglePigmentsFilter = {
+                            name = L["togglePigmentsFilterName"],
+                            desc = L["togglePigmentsFilterDesc"],
                             type = "toggle",
-                            set = "SetLootPigments",
-                            get = "GetLootPigments",
+                            set = "SetPigmentsFilter",
+                            get = "GetPigmentsFilter",
                             order = 10
                         },
-                        lootCooking = {
-                            name = L["CookingFilterName"],
-                            desc = L["CookingFilterDesc"],
+                        toggleCookingFilter = {
+                            name = L["toggleCookingFilterName"],
+                            desc = L["toggleCookingFilterDesc"],
                             --\n\n|cff1eff00Note: Blizzard has cooking ingredients spread all over different categories but this should get most of them.|r
                             type = "toggle",
-                            set = "SetLootCooking",
-                            get = "GetLootCooking",
+                            set = "SetCookingFilter",
+                            get = "GetCookingFilter",
                             width = "full",
-                            order = 12
+                            order = 11
                         },
-                        lootRecipes = {
-                            name = L["RecipeFilterName"],
-                            desc = L["RecipeFilterDesc"],
+                        toggleRecipeFilter = {
+                            name = L["toggleRecipeFilterName"],
+                            desc = L["toggleRecipeFilterDesc"],
                             type = "toggle",
-                            set = "SetLootRecipes",
-                            get = "GetLootRecipes",
-                            order = 13
+                            set = "SetRecipeFilter",
+                            get = "GetRecipeFilter",
+                            order = 12
                         }
                     }
                 },
-                groupDrops = {
-                    name = L["DropsGroup"],
+                groupCommonDrops = {
+                    name = L["groupCommonDrops"],
                     type = "group",
                     order = 3,
                     inline = true,
@@ -716,44 +664,45 @@ local themeTable = {
                             func = "buttonDisableAllFiltersCommon", 
                             order = 2
                         },
-                        lootPots = {
-                            name = L["PotionFilterName"],
-                            desc = L["PotionFilterDesc"],
+                        togglePotionFilter = {
+                            name = L["togglePotionFilterName"],
+                            desc = L["togglePotionFilterDesc"],
                             type = "toggle",
                             set = "SetLootPots",
                             get = "GetLootPots",
                             order = 3
                         },
-                        potionType = {
-                            name = L["PotionType"],
+                        selectPotionType = {
+                            name = L["selectPotionTypeName"],
+                            desc = L["selectPotionTypeDesc"],
                             type = "select",
                             set = "SetPotionType",
                             get = "GetPotionType",
-                            values = potionTypeTable,
+                            values = tablePotionType,
                             order = 4
                         },
-                        lootFlasks = {
-                            name = L["FlaskFilterName"],
-                            desc = L["FlaskFilterDesc"],
+                        toggleFlaskFilter = {
+                            name = L["toggleFlaskFilterName"],
+                            desc = L["toggleFlaskFilterDesc"],
                             type = "toggle",
-                            set = "SetLootFlasks",
-                            get = "GetLootFlasks",
+                            set = "SetFlaskFilter",
+                            get = "GetFlaskFilter",
                             order = 5
                         },
-                        lootElixirs = {
-                            name = L["ElixirFilterName"],
-                            desc = L["ElixirFilterDesc"],
+                        toggleElixirFilter = {
+                            name = L["toggleElixirFilterName"],
+                            desc = L["toggleElixirFilterDesc"],
                             type = "toggle",
-                            set = "SetLootElixirs",
-                            get = "GetLootElixirs",
+                            set = "SetElixirFilter",
+                            get = "GetElixirFilter",
                             order = 6
                         },
-                        lootElemental = {
-                            name = L["EleFilterName"],
-                            desc = L["EleFilterDesc"],
+                        toggleElementalFilter = {
+                            name = L["toggleElementalFilterName"],
+                            desc = L["toggleElementalFilterDesc"],
                             type = "toggle",
-                            set = "SetLootElemental",
-                            get = "GetLootElemental",
+                            set = "SetElementalFilter",
+                            get = "GetElementalFilter",
                             order = 7
                         }
                     }
@@ -824,19 +773,19 @@ local themeTable = {
         --      },
         --  },
         -- },
-        groupQuality = {
-            name = L["ItemQualityGroup"],
+        groupItemQualityFilters = {
+            name = L["groupItemQualityFilters"],
             type = "group",
-            order = 10,
+            order = 6,
             args = {
-                magicDesc1 = {
-                    name = L["ItemQualityDesc"].."\n",
+                descItemQualityFilters = {
+                    name = L["descItemQualityFilters"].."\n",
                     type = "description",
                     order = 0,
                 },
                 buttonEnableAllFiltersQuality = {
                     name = L["buttonEnableAll"],
-                    desc = L["buttonEnableAllFiltersQualityDesc"],,
+                    desc = L["buttonEnableAllFiltersQualityDesc"],
                     type = "execute",
                     func = "buttonEnableAllFiltersQuality", 
                     order = 1
@@ -848,312 +797,274 @@ local themeTable = {
                     func = "buttonDisableAllFiltersQuality", 
                     order = 2
                 },
-                lootPoor = {
-                    name = L["PoorFilterName"],
-                    desc = L["PoorFilterDesc"],
+                togglePoorQualityFilter = {
+                    name = L["togglePoorQualityFilterName"],
+                    desc = L["togglePoorQualityFilterDesc"],
                     type = "toggle",
-                    set = "SetLootPoor",
-                    get = "GetLootPoor",
+                    set = "SetPoorQualityFilter",
+                    get = "GetPoorQualityFilter",
                     width = "full",
                     order = 3,
                 },
-                sellPoor = {
-                    name = L["PoorSellName"],
-                    desc = L["PoorSellDesc"],
+                toggleSellPoorItems = {
+                    name = L["toggleSellPoorItemsName"],
+                    desc = L["toggleSellPoorItemsDesc"],
                     type = "toggle",
-                    set = "SetSellGreys",
-                    get = "GetSellGreys",
+                    set = "SetSellPoorItems",
+                    get = "GetSellPoorItems",
                     width = "full",
                     order = 4,
                 },
-                spacerQ1 = {
-                    name = "",          
-                    type = "description",
-                    order = 5,
-                },
-                lootCommon = {
-                    name = L["CommonFilterName"],
-                    desc = L["CommonFilterDesc"],
+                toggleCommonQualityFilter = {
+                    name = L["toggleCommonQualityFilterName"],
+                    desc = L["toggleCommonQualityFilterDesc"],
                     type = "toggle",
-                    set = "SetLootCommon",
-                    get = "GetLootCommon",
+                    set = "SetCommonQualityFilter",
+                    get = "GetCommonQualityFilter",
                     width = "full",
                     order = 6,
                 },
-                spacerQ2 = {
-                    name = "",          
-                    type = "description",
-                    order = 7,
-                },
-                lootUncommon = {
-                    name = L["UncommonFilterName"],
-                    desc = L["UncommonFilterDesc"],
+                toggleUncommonQualityFilter = {
+                    name = L["toggleUncommonQualityFilterName"],
+                    desc = L["toggleUncommonQualityFilterDesc"],
                     type = "toggle",
-                    set = "SetLootUncommon",
-                    get = "GetLootUncommon",
+                    set = "SetUncommonQualityFilter",
+                    get = "GetUncommonQualityFilter",
                     order = 8,
                     width = "full",
                 },  
-                spacerQ3 = {
-                    name = "",          
-                    type = "description",
-                    order = 9,
-                },
-                lootRare = {
-                    name = L["RareFilterName"],
-                    desc = L["RareFilterDesc"],
+                toggleRareQualityFilter = {
+                    name = L["toggleRareQualityFilterName"],
+                    desc = L["toggleRareQualityFilterDesc"],
                     type = "toggle",
-                    set = "SetLootRare",
-                    get = "GetLootRare",
+                    set = "SetRareQualityFilter",
+                    get = "GetRareQualityFilter",
                     width = "full",
                     order = 10,
                 },
-                spacerQ4 = {
-                    name = "",          
-                    type = "description",
-                    order = 11,
-                },
-                lootEpic = {
-                    name = L["EpicFilterName"],
-                    desc = L["EpicFilterDesc"],
+                toggleEpicQualityFilter = {
+                    name = L["toggleEpicQualityFilterName"],
+                    desc = L["toggleEpicQualityFilterDesc"],
                     type = "toggle",
-                    set = "SetLootEpic",
-                    get = "GetLootEpic",
+                    set = "SetEpicQualityFilter",
+                    get = "GetEpicQualityFilter",
                     width = "full",
                     order = 12,
                 },
-                spacerQ5 = {
-                    name = "",          
-                    type = "description",
-                    order = 13,
-                },
-                lootLegendary = {
-                    name = L["LegendaryFilterName"],
-                    desc = L["LegendaryFilterDesc"],
+                toggleLegendaryQualityFilter = {
+                    name = L["toggleLegendaryQualityFilterName"],
+                    desc = L["toggleLegendaryQualityFilterDesc"],
                     type = "toggle",
-                    set = "SetLootLegendary",
-                    get = "GetLootLegendary",
+                    set = "SetLegendaryQualityFilter",
+                    get = "GetLegendaryQualityFilter",
                     width = "full",
                     order = 14,
                 },
-                spacerQ6 = {
-                    name = "",          
-                    type = "description",
-                    order = 15,
-                },
-                lootArtifact = {
-                    name = L["ArtifactFilterName"],
-                    desc = L["ArtifactFilterDesc"],
+                toggleArtifactQualityFilter = {
+                    name = L["toggleArtifactQualityFilterName"],
+                    desc = L["toggleArtifactQualityFilterDesc"],
                     type = "toggle",
-                    set = "SetLootArtifact",
-                    get = "GetLootArtifact",
+                    set = "SetArtifactQualityFilter",
+                    get = "GetArtifactQualityFilter",
                     width = "full",
                     order = 16,
                 },
-                spacerQ7 = {
-                    name = "",          
-                    type = "description",
-                    order = 17,
-                },
-                lootHeirloom = {
-                    name = L["HeirloomFilterName"],
-                    desc = L["HeirloomFilterDesc"],
+                toggleHeirloomQualityFilter = {
+                    name = L["toggleHeirloomQualityFilterName"],
+                    desc = L["toggleHeirloomQualityFilterDesc"],
                     type = "toggle",
-                    set = "SetLootHeirloom",
-                    get = "GetLootHeirloom",
+                    set = "SetHeirloomQualityFilter",
+                    get = "GetHeirloomQualityFilter",
                     width = "full",
                     order = 18,
                 },
-                minILvl = {
-                    name = L["MinimumItemLevelName"],
-                    desc = L["MinimumItemLevelDesc"],           
+                inputMinItemLevel = {
+                    name = L["inputMinItemLevelName"],
+                    desc = L["inputMinItemLevelDesc"],           
                     type = "input",
                     -- pattern = "%d+",
-                    set = "SetMinILvl",
-                    get = "GetMinILvl",
+                    set = "SetMinItemLevel",
+                    get = "GetMinItemLevel",
                     order = 19,
                 },
             },
         },
-        groupInclude = {
-            name = L["InExGroup"],
+        groupIncludeExclude = {
+            name = L["groupIncludeExclude"],
             type = "group",
-            order = 11,
+            order = 7,
             args = {
-                includeHeader = {
-                    name = L["IncludeHeader"],
+                headerIncludeList = {
+                    name = L["headerIncludeList"],
                     type = "header",
-                    order = 0,
-                },
-                includeDrop = {
-                    name = L["IncludeListName"],
-                    type = "select",
-                    set = "SetIncludeDrop",
-                    get = "GetIncludeDrop",
-                    values = "GetIncludeTable",
                     order = 1,
                 },
-                includeList = {
-                    name = L["IncludeInputName"],
-                    --multiline = 10,
+                selectIncludeList = {
+                    name = L["selectIncludeListName"],
+                    type = "select",
+                    set = "SetIncludeListSelect",
+                    get = "GetIncludeListSelect",
+                    values = "GetIncludeList",
+                    order = 2,
+                },
+                inputIncludeListAdd = {
+                    name = L["inputIncludeListAddName"],
+                    desc = L["inputIncludeListAddDesc"],
                     type = "input",
-                    set = "SetIncludeList",
-                    get = "GetIncludeList",
-                    --width = "full",
-                    order = 2
+                    set = "SetIncludeListAdd",
+                    get = "GetIncludeListAdd",
+                    order = 3
                 },
-                includeRemove = {
-                    name = L["IncludeRemoveName"],
+                buttonRemoveFromIncludeList = {
+                    name = L["buttonRemoveFromIncludeListName"],
                     type = "execute",
-                    func = "RemoveIList",
-                    order = 3,
-                },
-                includeButton = {
-                    name = L["IncludeButtonName"],
-                    desc = L["IncludeButtonDesc"],
-                    type = "toggle",
-                    set = "SetIncludeButton",
-                    get = "GetIncludeButton",
+                    func = "RemoveFromIncludeList",
                     order = 4,
-                    --hidden = true
                 },
-                excludeHeader = {
-                    name = L["ExcludeHeader"],
-                    type = "header",
+                toggleShowIncludeButton = {
+                    name = L["toggleShowIncludeButtonName"],
+                    desc = L["toggleShowIncludeButtonDesc"],
+                    type = "toggle",
+                    set = "SetShowIncludeButton",
+                    get = "GetIncludeButton",
                     order = 5,
                 },
-                excludeDrop = {
-                    name = L["ExcludeListName"],
-                    type = "select",
-                    set = "SetExcludeDrop",
-                    get = "GetExcludeDrop",
-                    values = "GetExcludeTable",
+                headerExcludeList = {
+                    name = L["headerExcludeList"],
+                    type = "header",
                     order = 6,
                 },
-                excludeList = {
-                    name = L["ExcludeInputName"],
+                selectExcludeList = {
+                    name = L["selectExcludeListName"],
+                    type = "select",
+                    set = "SetExcludeListSelect",
+                    get = "GetExcludeListSelect",
+                    values = "GetExcludeList",
+                    order = 7,
+                },
+                inputExcludeListAdd = {
+                    name = L["inputExcludeListAddName"],
+                    desc = L["inputExcludeListAddDesc"],
                     --multiline = 10,
                     type = "input",
-                    set = "SetExcludeList",
-                    get = "GetExcludeList",
+                    set = "SetExcludeListAdd",
+                    get = "GetExcludeListAdd",
                     --width = "full",
-                    order = 7
+                    order = 8
                 },
-                excludeRemove = {
-                    name = L["ExcludeRemoveName"],
+                buttonRemoveFromExcludeList = {
+                    name = L["buttonRemoveFromExcludeListName"],
                     type = "execute",
-                    func = "RemoveEList",
-                    order = 8,
-                },
-                excludeButton = {
-                    name = L["ExcludeButtonName"],
-                    desc = L["ExcludeButtonDesc"],
-                    type = "toggle",
-                    set = "SetExcludeButton",
-                    get = "GetExcludeButton",
+                    func = "RemoveFromExcludeList",
                     order = 9,
+                },
+                toggleShowExcludeButton = {
+                    name = L["toggleShowExcludeButtonName"],
+                    desc = L["toggleShowExcludeButtonDesc"],
+                    type = "toggle",
+                    set = "SetShowExcludeButton",
+                    get = "GetExcludeButton",
+                    order = 10,
                 },
             },
         },
-        groupThresholds = {
-            name = L["ThreshGroup"],
+        groupValueThresholds = {
+            name = L["groupValueThresholds"],
             type = "group",
-            order = 13,
+            order = 8,
             args = {
-                lootDesc = {
-                    name = "See the help section for details.".."\n",
+                descValueThresholds = {
+                    name = L["descValueThresholds"].."\n",
                     type = "description",
                     order = 0
                 },
-                groupT1 = {
-                    name = L["Thresh1Group"],
+                groupThreshold1 = {
+                    name = L["groupThreshold1"],
                     type = "group",
                     order = 1,
                     inline = true,
                     args = {
-                        type1 = {
-                            name = L["Thresh1TypeName"],
-                            desc = L["Thresh1TypeDesc"],
+                        selectThresholdType1 = {
+                            name = L["selectThresholdTypeName"],
+                            desc = L["selectThresholdTypeDesc"],
                             type = "select",
-                            values = itemTypeTable,
-                            set = "SetType1",
-                            get = "GetType1",
-                            order = 2
+                            values = tableFilterTypes,
+                            set = "SetThresholdType1",
+                            get = "GetThresholdType1",
+                            order = 1
                         },
-                        value1 = {
-                            name = L["Thresh1ValueName"],
+                        inputThresholdValue1 = {
+                            name = L["inputThresholdValueName"],
                             type = "input",
-                            set = "SetValue1",
-                            get = "GetValue1",
+                            set = "SetThresholdValue1",
+                            get = "GetThresholdValue1",
+                            -- TODO: accept more than 2 digits each? (technically at least gold)
                             pattern = "(%d?%d?)[gsc]?%s*(%d?%d?)[gsc]?%s*(%d?%d)[gsc]",
-                            usage = L["Thresh1ValueDesc"],
-                            --usage = "Value is entered in gold.",
-                            order = 3
+                            usage = L["inputThresholdValueDesc"],
+                            order = 2
                         },
                     },
                 },
-                groupT2 = {
-                    name = L["Thresh2Group"],
+                groupThreshold2 = {
+                    name = L["groupThreshold2"],
                     type = "group",
                     order = 2,
                     inline = true,
                     args = {
-                        type2 = {
-                            name = L["Thresh2TypeName"],
-                            desc = L["Thresh2TypeDesc"],
+                        selectThresholdType2 = {
+                            name = L["selectThresholdTypeName"],
+                            desc = L["selectThresholdTypeDesc"],
                             type = "select",
-                            values = itemTypeTable,
-                            set = "SetType2",
-                            get = "GetType2",
-                            order = 5
+                            values = tableFilterTypes,
+                            set = "SetThresholdType2",
+                            get = "GetThresholdType2",
+                            order = 1
                         },
-                        value2 = {
-                            name = L["Thresh2ValueName"],
+                        inputThresholdValue2 = {
+                            name = L["inputThresholdValueName"],
                             type = "input",
-                            set = "SetValue2",
-                            get = "GetValue2",
+                            set = "SetThresholdValue2",
+                            get = "GetThresholdValue2",
                             pattern = "(%d?%d?)[gsc]?%s*(%d?%d?)[gsc]?%s*(%d?%d)[gsc]",
-                            usage = L["Thresh2ValueDesc"],
-                            --usage = "Value is entered in gold.",
-                            order = 6
+                            usage = L["inputThresholdValueDesc"],
+                            order = 2
                         },
                     },
                 },
-                groupT3 = {
-                    name = L["Thresh3Group"],
+                groupThreshold3 = {
+                    name = L["groupThreshold3"],
                     type = "group",
                     order = 3,
                     inline = true,
                     args = {
-                        type3 = {
-                            name = L["Thresh3TypeName"],
-                            desc = L["Thresh3TypeDesc"],
+                        selectThresholdType3 = {
+                            name = L["selectThresholdTypeName"],
+                            desc = L["selectThresholdTypeDesc"],
                             type = "select",
-                            values = itemTypeTable,
-                            set = "SetType3",
-                            get = "GetType3",
-                            order = 8
+                            values = tableFilterTypes,
+                            set = "SetThresholdType3",
+                            get = "GetThresholdType3",
+                            order = 1
                         },
-                        value3 = {
-                            name = L["Thresh3ValueName"],
+                        inputThresholdValue3 = {
+                            name = L["inputThresholdValueName"],
                             type = "input",
-                            set = "SetValue3",
-                            get = "GetValue3",
+                            set = "SetThresholdValue3",
+                            get = "GetThresholdValue3",
                             pattern = "(%d?%d?)[gsc]?%s*(%d?%d?)[gsc]?%s*(%d?%d)[gsc]",
-                            usage = L["Thresh3ValueDesc"],
-                            --usage = "Value is entered in gold.",
-                            order = 9
+                            usage = L["inputThresholdValueDesc"],
+                            order = 2
                         },
                     },
                 },
-                useQuant = {
-                    name = L["UseQuantValName"],
-                    desc = L["UseQuantValDesc"],
+                toggleUseQuantValue = {
+                    name = L["toggleUseQuantValueName"],
+                    desc = L["toggleUseQuantValueDesc"],
                     type = "toggle",
-                    set = "SetUseQuant",
-                    get = "GetUseQuant",
-                    hidden = "Advanced",
-                    order = 10
+                    set = "SetUseQuantValue",
+                    get = "GetUseQuantValue",
+                    hidden = "GetAdvancedOptionsHidden",
+                    order = 4
                 },
             },
         },
@@ -1216,62 +1127,6 @@ local themeTable = {
                 },]]
             }
         },
-        groupUnit = {
-            name = "Unit Filter",
-            type = "group",
-            order = 14,
-            disabled = false,
-            hidden = true,
-            args = {
-                unitEnable = {
-                    name = "Enable",
-                    desc = "Skinning mode will pick up and delete any items left over after autolooting.\n|cFFFF0000(WARNING: use with caution this deletes items. HL is not responsible for lost items.)",
-                    type = "toggle",
-                    set = "SetUnitEnable",
-                    get = "GetUnitEnable",
-                    order = 0
-                },
-                typeSelect = {
-                    name = "Unit Select",
-                    desc = "Here you can choose the modifier key to temporarily disable auto closing the loot window if it is enabled.",
-                    type = "multiselect",
-                    values = unitTable,
-                    set = "SetTypeSelect",
-                    get = "GetTypeSelect",
-                    order = 1
-                },
-                unitKeyword = {
-                    name = "Unit Keyword",
-                    desc = "Here you can choose the modifier key to temporarily enable Skinning Mode.",
-                    type = "input",
-                    set = "SetUnitKeyword",
-                    get = "GetUnitKeyword",
-                    hidden = "ToggleKeywordHide",
-                    order = 2
-                },
-                spacer2 = {
-                    name = "",          
-                    type = "description",
-                    order = 3,
-                },
-                unitLoot = {
-                    name = "Autoloot",
-                    desc = "Skinning mode will pick up and delete any items left over after autolooting.\n|cFFFF0000(WARNING: use with caution this deletes items. HL is not responsible for lost items.)",
-                    type = "toggle",
-                    set = "SetUnitLoot",
-                    get = "GetUnitLoot",
-                    order = 4
-                },
-                unitClose = {
-                    name = "Autoclose",
-                    desc = "Skinning mode will pick up and delete any items left over after autolooting.\n|cFFFF0000(WARNING: use with caution this deletes items. HL is not responsible for lost items.)",
-                    type = "toggle",
-                    set = "SetUnitClose",
-                    get = "GetUnitClose",
-                    order = 5
-                },
-            },
-        },
         groupHelp = {
             name = L["HelpGroup"],
             type = "group",
@@ -1289,14 +1144,14 @@ local themeTable = {
                     order = 1,
                     args = {
                         desc = {
-                            name = HotLoot:MakeColor("ctrl", L["ACGroup"]).."\n"..L["SysHelp1"]..HotLoot:MakeColor("ctrl", L["SkinningGroup"]).."\n"..L["SysHelp2"],            
+                            name = HotLoot:MakeColor("ctrl", L["groupCloseLootWindow"]).."\n"..L["SysHelp1"]..HotLoot:MakeColor("ctrl", L["groupSkinningMode"]).."\n"..L["SysHelp2"],            
                             type = "description",
                             order = 1,
                         },
                     },
                 },
                 groupLM = {
-                    name = L["LootMonGroup"],
+                    name = L["groupLootMonitor"],
                     type = "group",
                     order = 2,
                     args = {
@@ -1309,12 +1164,12 @@ local themeTable = {
                     },
                 },
                 groupIQ = {
-                    name = L["ItemQualityGroup"],
+                    name = L["groupItemQualityFilters"],
                     type = "group",
                     order = 3,
                     args = {
                         desc = {
-                            name = L["IQHelp1"]..HotLoot:MakeColor("ctrl", L["PoorFilterName"]).."\n"..L["IQHelp2"],            
+                            name = L["IQHelp1"]..HotLoot:MakeColor("ctrl", L["togglePoorQualityFilterName"]).."\n"..L["IQHelp2"],            
                             type = "description",
                             order = 1,
                         },
@@ -1339,7 +1194,7 @@ local themeTable = {
                     order = 5,
                     args = {
                         desc = {
-                            name = HotLoot:MakeColor("ctrl", L["Thresh1TypeName"]).."\n"..L["ThreshHelp1"]..HotLoot:MakeColor("ctrl", L["Thresh1ValueName"]).."\n"..L["ThreshHelp2"]..HotLoot:MakeColor("ctrl", L["UseQuantValName"]).."\n"..L["ThreshHelp3"],          
+                            name = HotLoot:MakeColor("ctrl", L["selectThresholdTypeName"]).."\n"..L["ThreshHelp1"]..HotLoot:MakeColor("ctrl", L["selectThresholdValueName"]).."\n"..L["ThreshHelp2"]..HotLoot:MakeColor("ctrl", L["toggleUseQuantValueName"]).."\n"..L["ThreshHelp3"],          
                             type = "description",
                             order = 1,
                         },
@@ -1453,83 +1308,90 @@ hlDefaults = {
             radius = 80,
             minimapPos = 270,
         },
-        lootEnabled = true,
-        lootDebug = false,
-        lootAnnounce = true,
-        lootAdvanced = false,
-        lootClose = false,
-        lootCloseKey = "0",
-        lootSkinMode = false,
-        lootSkinKey = "0", 
-        lootEnableMonitor = true,
-        lootShowAnchor = true,
-        lootShowNames = true, 
-        lootShowQuantities = true, 
-        showSellPrice = true,
-        showItemType = true,
-        lootIconSize = 16, 
-        lootTrans = 1,
-        inlineQuant = true,
-        lootShowTotal = true,
-        lootGrowthDirection = -1, 
-        textSide = 0,
-        minWidth = "145",
-        initialDelay = 5,
-        secondaryDelay = 1,
-        fadeSpeed = 5,
-        colorQual = true,
-        showAnimation = true,
-        themeSelect = "toast",
-        themeColorR = 0,
-        themeColorG = 0,
-        themeColorB = 0,
-        themeColorA = 0.82,
-        themeColorBorderR = 1,
-        themeColorBorderG = 1,
-        themeColorBorderB = 1,
-        themeColorBorderA = 1,
+        toggleSystemEnable = true,
+        toggleDebugMode = false,
+        toggleAnnounceEvents = true,
+        toggleAdvancedOptions = false,
+        toggleCloseLootWindow = false,
+        selectCloseLootWindowModifier = "0",
+        toggleSkinningMode = false,
+        selectSkinningModeModifier = "0", 
+        toggleEnableLootMonitor = true,
+        toggleShowLootMonitorAnchor = true,
+        -- toggleShowItemNames = true, 
+        toggleShowItemQuant = true, 
+        toggleShowSellPrice = true,
+        toggleShowItemType = true,
+        rangeIconSize = 16, 
+        rangeTransparency = 1,
+        -- inlineQuant = true,
+        toggleShowTotalQuant = true,
+        selectGrowthDirection = -1, 
+        selectTextSide = 0,
+        inputMinWidth = "145",
+        rangeInitialDelay = 5,
+        rangeSecondaryDelay = 1,
+        rangeFadeSpeed = 5,
+        toggleColorByQuality = true,
+        toggleShowAnimation = true,
+        selectTheme = "toast",
+        fThemeColorR = 0,
+        fThemeColorG = 0,
+        fThemeColorB = 0,
+        fThemeColorA = 0.82,
+        fThemeBorderColorR = 1,
+        fThemeBorderColorG = 1,
+        fThemeBorderColorB = 1,
+        fThemeBorderColorA = 1,
         lootGridMode = false,
         lootGridNumColumns = 4,
-        lootGold = true,
-        lootQuest = true,
-        lootCurrency = true,
-        lootJunk = false,
-        lootPick = true,
-        lootCloth = false,
-        lootMining = false,
-        lootGems = false,
-        lootHerbs = false,
-        lootSkinning = false,
-        lootFishing = false,
-        lootEnchanting = false,
-        lootCooking = false,
-        lootRecipes = false,
-        lootPots = false,
-        potionType = "both",
-        lootFlasks = false,
-        lootElixirs = false,
-        lootElemental = false,
+        toggleGoldFilter = true,
+        toggleQuestFilter = true,
+        toggleCurrencyFilter = true,
+        toggleJunkFilter = false,
+        togglePickpocketFilter = true,
+        toggleClothFilter = false,
+        toggleMiningFilter = false,
+        toggleGemFilter = false,
+        toggleHerbFilter = false,
+        toggleLeatherFilter = false,
+        toggleFishingFilter = false,
+        toggleEnchantingFilter = false,
+        togglePigmentsFilter = false,
+        toggleCookingFilter = false,
+        toggleRecipeFilter = false,
+        togglePotionFilter = false,
+        selectPotionType = "both",
+        toggleFlaskFilter = false,
+        toggleElixirFilter = false,
+        toggleElementalFilter = false,
         -- lootBotA = true,
         -- lootDoEM = true,
         -- lootSC = true,
         -- lootRepMeat = true,
-        lootPoor = false,
-        sellGreys = false,
-        lootCommon = false,
-        lootUncommon = true,
-        lootRare = true,
-        lootEpic = true,
-        lootLegendary = true,
-        lootArtifact = true,
-        lootHeirloom = true,
-        minILvl = 0,
-        eList = { },
-        iList = { },
+        togglePoorQualityFilter = false,
+        toggleSellPoorItems = false,
+        toggleCommonQualityFilter = false,
+        toggleUncommonQualityFilter = true,
+        toggleRareQualityFilter = true,
+        toggleEpicQualityFilter = true,
+        toggleLegendaryQualityFilter = true,
+        toggleArtifactQualityFilter = true,
+        toggleHeirloomQualityFilter = true,
+        inputMinItemLevel = 0,
+
+        -- Include List
+        tableIncludeList = { },
+        toggleShowIncludeButton = false,
+
+        -- Exclude List
+        tableExcludeList = { },
+        toggleShowExcludeButton = false,
         
-        type1 = "0None",
-        type2 = "0None",
-        type3 = "0None",
-        useQuant = false,
+        selectThresholdType1 = "0None",
+        selectThresholdType2 = "0None",
+        selectThresholdType3 = "0None",
+        toggleUseQuantValue = false,
         
         -- Loot History
         
@@ -1558,56 +1420,56 @@ hlDefaults = {
 --#############################
 --      Set/Get Functions
 --#############################
--- lootEnabled
-function HotLoot:SetLootEnabled(info, value)
-    self.db.profile.lootEnabled = value;
-    HotLoot:dBug("lootEnabled", value);
+-- toggleSystemEnable
+function HotLoot:SetSystemEnable(info, value)
+    self.db.profile.toggleSystemEnable = value;
+    HotLoot:DebugOption("toggleSystemEnable", value);
 end
-function HotLoot:GetLootEnabled(info)
-    return self.db.profile.lootEnabled;
-end
-
--- lootEnableMonitor
-function HotLoot:SetLootEnableMonitor(info, value)
-    self.db.profile.lootEnableMonitor = value;
-    HotLoot:dBug("lootEnableMonitor", value);
-end
-function HotLoot:GetLootEnableMonitor(info)
-    return self.db.profile.lootEnableMonitor;
+function HotLoot:GetSystemEnable(info)
+    return self.db.profile.toggleSystemEnable;
 end
 
--- lootShowAnchor
-function HotLoot:SetLootShowAnchor(info, value)
-    self.db.profile.lootShowAnchor = value;
-    HotLoot:dBug("lootShowAnchor", value);
+-- toggleEnableLootMonitor
+function HotLoot:SetEnableLootMonitor(info, value)
+    self.db.profile.toggleEnableLootMonitor = value;
+    HotLoot:DebugOption("toggleEnableLootMonitor", value);
+end
+function HotLoot:GetEnableLootMonitor(info)
+    return self.db.profile.toggleEnableLootMonitor;
+end
+
+-- toggleShowLootMonitorAnchor
+function HotLoot:SetShowLootMonitorAnchor(info, value)
+    self.db.profile.toggleShowLootMonitorAnchor = value;
+    HotLoot:DebugOption("toggleShowLootMonitorAnchor", value);
     HotLoot:ToggleAnchor(value);
 end
-function HotLoot:GetLootShowAnchor(info)
-    return self.db.profile.lootShowAnchor;
+function HotLoot:GetShowLootMonitorAnchor(info)
+    return self.db.profile.toggleShowLootMonitorAnchor;
 end
 
--- lootShowNames
-function HotLoot:SetLootShowNames(info, value)
-    self.db.profile.lootShowNames = value;
-    HotLoot:dBug("lootShowNames", value);
+-- toggleShowItemNames
+function HotLoot:SetShowItemNames(info, value)
+    self.db.profile.toggleShowItemNames = value;
+    HotLoot:DebugOption("toggleShowItemNames", value);
 end
-function HotLoot:GetLootShowNames(info)
-    return self.db.profile.lootShowNames;
+function HotLoot:GetShowItemNames(info)
+    return self.db.profile.toggleShowItemNames;
 end
 
--- lootShowQuantities
-function HotLoot:SetLootShowQuantities(info, value)
-    self.db.profile.lootShowQuantities = value;
-    HotLoot:dBug("lootShowQuantities", value);
+-- toggleShowItemQuant
+function HotLoot:SetShowItemQuant(info, value)
+    self.db.profile.toggleShowItemQuant = value;
+    HotLoot:DebugOption("toggleShowItemQuant", value);
 end
-function HotLoot:GetLootShowQuantities(info)
-    return self.db.profile.lootShowQuantities;
+function HotLoot:GetShowItemQuant(info)
+    return self.db.profile.toggleShowItemQuant;
 end
 
 --SetShowSellPrice
 function HotLoot:SetShowSellPrice(info, value)
     self.db.profile.showSellPrice = value;
-    HotLoot:dBug("showSellPrice", value);
+    HotLoot:DebugOption("showSellPrice", value);
 end
 function HotLoot:GetShowSellPrice(info)
     return self.db.profile.showSellPrice;
@@ -1615,175 +1477,165 @@ end
 
 --SetShowItemType
 function HotLoot:SetShowItemType(info, value)
-    self.db.profile.showItemType = value;
-    HotLoot:dBug("showItemType", value);
+    self.db.profile.toggleShowItemType = value;
+    HotLoot:DebugOption("toggleShowItemType", value);
 end
 function HotLoot:GetShowItemType(info)
-    return self.db.profile.showItemType;
+    return self.db.profile.toggleShowItemType;
 end
 
--- HotLoot:GetShowTotal()
-function HotLoot:SetShowTotal(info, value)
-    self.db.profile.lootShowTotal = value
-    HotLoot:dBug("lootShowTotal", value)
+-- HotLoot:GetShowTotalQuant()
+function HotLoot:SetShowTotalQuant(info, value)
+    self.db.profile.toggleShowTotalQuant = value
+    HotLoot:DebugOption("toggleShowTotalQuant", value)
 end
-function HotLoot:GetShowTotal(info)
-    return self.db.profile.lootShowTotal
-end
-
--- lootIconSize
-function HotLoot:SetLootIconSize(info, value)
-    self.db.profile.lootIconSize = value;
-    HotLoot:dBug("lootIconSize", value);
-end
-function HotLoot:GetLootIconSize(info)
-    return self.db.profile.lootIconSize;
+function HotLoot:GetShowTotalQuant(info)
+    return self.db.profile.toggleShowTotalQuant
 end
 
--- SetLootTrans
-function HotLoot:SetLootTrans(info, value)
-    self.db.profile.lootTrans = value;
-    HotLoot:dBug("lootTrans", value);
+-- rangeIconSize
+function HotLoot:SetIconSize(info, value)
+    self.db.profile.rangeIconSize = value;
+    HotLoot:DebugOption("rangeIconSize", value);
 end
-function HotLoot:GetLootTrans(info)
-    return self.db.profile.lootTrans;
+function HotLoot:GetIconSize(info)
+    return self.db.profile.rangeIconSize;
 end
 
--- lootGrowthDirection
-function HotLoot:SetLootGrowthDirection(info, value)
-    self.db.profile.lootGrowthDirection = value;
-    HotLoot:dBug("lootGrowthDirection", value);
+-- SetTransparency
+function HotLoot:SetTransparency(info, value)
+    self.db.profile.rangeTransparency = value;
+    HotLoot:DebugOption("rangeTransparency", value);
 end
-function HotLoot:GetLootGrowthDirection(info)
-    return self.db.profile.lootGrowthDirection;
+function HotLoot:GetTransparency(info)
+    return self.db.profile.rangeTransparency;
+end
+
+-- selectGrowthDirection
+function HotLoot:SetGrowthDirection(info, value)
+    self.db.profile.selectGrowthDirection = value;
+    HotLoot:DebugOption("selectGrowthDirection", value);
+end
+function HotLoot:GetGrowthDirection(info)
+    return self.db.profile.selectGrowthDirection;
 end
 
 -- HotLoot:GetTextSide()
 function HotLoot:SetTextSide(info, value)
-    self.db.profile.textSide = value;
-    HotLoot:dBug("textSide", value);
+    self.db.profile.selectTextSide = value;
+    HotLoot:DebugOption("selectTextSide", value);
 end
 function HotLoot:GetTextSide(info)
-    return self.db.profile.textSide;
+    return self.db.profile.selectTextSide;
 end
 
 -- SetInlineQuant
 function HotLoot:SetInlineQuant(info, value)
     self.db.profile.inlineQuant = value;
-    HotLoot:dBug("inlineQuant", value);
+    HotLoot:DebugOption("inlineQuant", value);
 end
 function HotLoot:GetInlineQuant(info)
     return self.db.profile.inlineQuant;
 end
 
--- HotLoot:GetThemeSelect()
-function HotLoot:SetThemeSelect(info, value)
-    self.db.profile.themeSelect = value;
-    HotLoot:dBug("themeSelect", value);
+-- HotLoot:GetTheme()
+function HotLoot:SetTheme(info, value)
+    self.db.profile.selectTheme = value;
+    HotLoot:DebugOption("selectTheme", value);
     HotLoot:LoadTheme(value);
 end
-function HotLoot:GetThemeSelect(info)
-    return self.db.profile.themeSelect;
+function HotLoot:GetTheme(info)
+    return self.db.profile.selectTheme;
 end
 
--- HotLoot:GetColorQual()
-function HotLoot:SetColorQual(info, value)
-    self.db.profile.colorQual = value;
-    HotLoot:dBug("GetColorQual", value);
+-- HotLoot:GetColorByQuality()
+function HotLoot:SetColorByQuality(info, value)
+    self.db.profile.toggleColorByQuality = value;
+    HotLoot:DebugOption("toggleColorByQuality", value);
 end
-function HotLoot:GetColorQual(info)
-    return self.db.profile.colorQual;
+function HotLoot:GetColorByQuality(info)
+    return self.db.profile.toggleColorByQuality;
 end
--- LoadTheme(HotLoot:GetThemeSelect());
+-- LoadTheme(HotLoot:GetTheme());
 -- SetThemeColor
-function HotLoot:SetThemeColorSelect(info, r, g, b, a)
-    self.db.profile.themeColorR = r;
-    self.db.profile.themeColorG = g;
-    self.db.profile.themeColorB = b;
-    self.db.profile.themeColorA = a;
-    HotLoot:dBug("themeColor", r..", "..g..", "..b..", "..a);
+function HotLoot:SetThemeBG(info, r, g, b, a)
+    self.db.profile.fThemeColorR = r;
+    self.db.profile.fThemeColorG = g;
+    self.db.profile.fThemeColorB = b;
+    self.db.profile.fThemeColorA = a;
+    HotLoot:DebugOption("colorThemeBG", r..", "..g..", "..b..", "..a);
 end
-function HotLoot:GetThemeColorSelect(info)
-    return self.db.profile.themeColorR, self.db.profile.themeColorG, self.db.profile.themeColorB, self.db.profile.themeColorA;
-end
-
-function HotLoot:SetThemeColorBorderSelect(info, r, g, b, a)
-    self.db.profile.themeColorBorderR = r;
-    self.db.profile.themeColorBorderG = g;
-    self.db.profile.themeColorBorderB = b;
-    self.db.profile.themeColorBorderA = a;
-    HotLoot:dBug("themeColor", r..", "..g..", "..b..", "..a);
-end
-function HotLoot:GetThemeColorBorderSelect(info)
-    return self.db.profile.themeColorBorderR, self.db.profile.themeColorBorderG, self.db.profile.themeColorBorderB, self.db.profile.themeColorBorderA;
+function HotLoot:GetThemeBG(info)
+    return self.db.profile.fThemeColorR, self.db.profile.fThemeColorG, self.db.profile.fThemeColorB, self.db.profile.fThemeColorA;
 end
 
-function HotLoot:ToggleThemeColorHide()
-    local tc = HotLoot:GetThemeSelect();
-    if tc == 2 or tc == 3 then
-        --HotLoot:SetLootGridMode(false);
-        return false;
-    else
-        return true;
-    end
+function HotLoot:SetThemeBorderColor(info, r, g, b, a)
+    self.db.profile.fThemeBorderColorR = r;
+    self.db.profile.fThemeBorderColorG = g;
+    self.db.profile.fThemeBorderColorB = b;
+    self.db.profile.fThemeBorderColorA = a;
+    HotLoot:DebugOption("colorThemeBorder", r..", "..g..", "..b..", "..a);
+end
+function HotLoot:GetThemeBorderColor(info)
+    return self.db.profile.fThemeBorderColorR, self.db.profile.fThemeBorderColorG, self.db.profile.fThemeBorderColorB, self.db.profile.fThemeBorderColorA;
 end
 
--- minWidth
+-- inputMinWidth
 function HotLoot:SetMinWidth(info, value)
-    self.db.profile.minWidth = value;
-    HotLoot:dBug("minWidth", value);
+    self.db.profile.inputMinWidth = value;
+    HotLoot:DebugOption("inputMinWidth", value);
 end
 function HotLoot:GetMinWidth(info)
-    return self.db.profile.minWidth;
+    return self.db.profile.inputMinWidth;
 end
 
 -- iDelay
-function HotLoot:SetIDelay(info, value)
-    self.db.profile.initialDelay = value;
-    HotLoot:dBug("initialDelay", value);
+function HotLoot:SetInitialDelay(info, value)
+    self.db.profile.rangeInitialDelay = value;
+    HotLoot:DebugOption("rangeInitialDelay", value);
 end
-function HotLoot:GetIDelay(info)
-    return self.db.profile.initialDelay;
+function HotLoot:GetInitialDelay(info)
+    return self.db.profile.rangeInitialDelay;
 end
 
--- sDelay
-function HotLoot:SetSDelay(info, value)
-    self.db.profile.secondaryDelay = value;
-    HotLoot:dBug("secondaryDelay", value);
+-- SecondaryDelay
+function HotLoot:SetSecondaryDelay(info, value)
+    self.db.profile.rangeSecondaryDelay = value;
+    HotLoot:DebugOption("rangeSecondaryDelay", value);
 end
-function HotLoot:GetSDelay(info)
-    return self.db.profile.secondaryDelay;
+function HotLoot:GetSecondaryDelay(info)
+    return self.db.profile.rangeSecondaryDelay;
 end
 
 -- fSpeed
-function HotLoot:SetFSpeed(info, value)
-    self.db.profile.fadeSpeed = value;
-    HotLoot:dBug("fadeSpeed", value);
+function HotLoot:SetFadeSpeed(info, value)
+    self.db.profile.rangeFadeSpeed = value;
+    HotLoot:DebugOption("rangeFadeSpeed", value);
 end
-function HotLoot:GetFSpeed(info)
-    return self.db.profile.fadeSpeed;
+function HotLoot:GetFadeSpeed(info)
+    return self.db.profile.rangeFadeSpeed;
 end
 
 -- fSpeed
 function HotLoot:SetShowAnimation(info, value)
-    self.db.profile.showAnimation = value;
-    HotLoot:dBug("showAnimation", value);
+    self.db.profile.toggleShowAnimation = value;
+    HotLoot:DebugOption("toggleShowAnimation", value);
 end
 function HotLoot:GetShowAnimation(info)
-    return self.db.profile.showAnimation;
+    return self.db.profile.toggleShowAnimation;
 end
 
 -- lootGridMode
 function HotLoot:SetLootGridMode(info, value)
     self.db.profile.lootGridMode = value;
-    HotLoot:dBug("lootGridMode", value);
+    HotLoot:DebugOption("lootGridMode", value);
 end
 function HotLoot:GetLootGridMode(info)
     return self.db.profile.lootGridMode;
 end
 
 function HotLoot:ToggleGridDisable()
-    local namesChecked = HotLoot:GetLootShowNames();
+    local namesChecked = HotLoot:GetShowItemNames();
     if namesChecked == true then
         --self.options.args.goupLootMonitor.lootGridMode:SetDisabled(true);
         HotLoot:SetLootGridMode(false);
@@ -1798,7 +1650,7 @@ end
 -- lootGridNumColumns
 function HotLoot:SetLootGridNumColumns(info, value)
     self.db.profile.lootGridNumColumns = value;
-    HotLoot:dBug("lootGridNumColumns", value);
+    HotLoot:DebugOption("lootGridNumColumns", value);
 end
 function HotLoot:GetLootGridNumColumns(info)
     return self.db.profile.lootGridNumColumns;
@@ -1806,8 +1658,8 @@ end
 
 
 
--- ResetMonitor
-function HotLoot:ResetMonitor()
+-- buttonResetLootMonitor
+function HotLoot:buttonResetLootMonitor()
     HotLoot.mainFrame:ClearAllPoints();
     HotLoot.mainFrame:SetPoint("CENTER", 0, 0);
     --HotLoot:UpdateMonitor();
@@ -1816,63 +1668,63 @@ end
 
 --buttonEnableAllFiltersGeneral
 function HotLoot:buttonEnableAllFiltersGeneral()
-    HotLoot:SetLootGold(nil, true);
-    HotLoot:SetLootCurrency(nil, true);
-    HotLoot:SetLootQuest(nil, true);
-    HotLoot:SetLootJunk(nil, true);
-    HotLoot:SetLootPick(nil, true);
+    HotLoot:SetGoldFilter(nil, true);
+    HotLoot:SetCurrencyFilter(nil, true);
+    HotLoot:SetQuestFilter(nil, true);
+    HotLoot:SetJunkFilter(nil, true);
+    HotLoot:SetPickpocketFilter(nil, true);
 end
 
 --buttonDisableAllFiltersGeneral
 function HotLoot:buttonDisableAllFiltersGeneral()
-    HotLoot:SetLootGold(nil, false);
-    HotLoot:SetLootCurrency(nil, false);
-    HotLoot:SetLootQuest(nil, false);
-    HotLoot:SetLootJunk(nil, false);
-    HotLoot:SetLootPick(nil, false);
+    HotLoot:SetGoldFilter(nil, false);
+    HotLoot:SetCurrencyFilter(nil, false);
+    HotLoot:SetQuestFilter(nil, false);
+    HotLoot:SetJunkFilter(nil, false);
+    HotLoot:SetPickpocketFilter(nil, false);
 end
 
--- lootGold
-function HotLoot:SetLootGold(info, value)
-    self.db.profile.lootGold = value;
-    HotLoot:dBug("lootGold", value);
+-- toggleGoldFilter
+function HotLoot:SetGoldFilter(info, value)
+    self.db.profile.toggleGoldFilter = value;
+    HotLoot:DebugOption("toggleGoldFilter", value);
 end
-function HotLoot:GetLootGold(info)
-    return self.db.profile.lootGold;
-end
-
--- lootQuest
-function HotLoot:SetLootQuest(info, value)
-    self.db.profile.lootQuest = value;
-    HotLoot:dBug("lootQuest", value);
-end
-function HotLoot:GetLootQuest(info)
-    return self.db.profile.lootQuest;
+function HotLoot:GetGoldFilter(info)
+    return self.db.profile.toggleGoldFilter;
 end
 
--- lootJunk
-function HotLoot:SetLootJunk(info, value)
-    self.db.profile.lootJunk = value;
-    HotLoot:dBug("lootJunk", value);
+-- toggleQuestFilter
+function HotLoot:SetQuestFilter(info, value)
+    self.db.profile.toggleQuestFilter = value;
+    HotLoot:DebugOption("toggleQuestFilter", value);
 end
-function HotLoot:GetLootJunk(info)
-    return self.db.profile.lootJunk;
+function HotLoot:GetQuestFilter(info)
+    return self.db.profile.toggleQuestFilter;
+end
+
+-- toggleJunkFilter
+function HotLoot:SetJunkFilter(info, value)
+    self.db.profile.toggleJunkFilter = value;
+    HotLoot:DebugOption("toggleJunkFilter", value);
+end
+function HotLoot:GetJunkFilter(info)
+    return self.db.profile.toggleJunkFilter;
 end
 
 -- lootJunkDel
-function HotLoot:SetLootPick(info, value)
-    self.db.profile.lootPick = value;
-    HotLoot:dBug("lootPick", value);
+function HotLoot:SetPickpocketFilter(info, value)
+    self.db.profile.togglePickpocketFilter = value;
+    HotLoot:DebugOption("togglePickpocketFilter", value);
 end
-function HotLoot:GetLootPick(info)
-    return self.db.profile.lootPick;
+function HotLoot:GetPickpocketFilter(info)
+    return self.db.profile.togglePickpocketFilter;
 end
 
 -- SetUnitEnable    SetTypeSelect   SetUnitKeyword  SetUnitLoot SetUnitClose
 
 function HotLoot:SetUnitEnable(info, value)
     self.db.profile.unitEnable = value;
-    HotLoot:dBug("GetUnitEnable", value);
+    HotLoot:DebugOption("GetUnitEnable", value);
 end
 function HotLoot:GetUnitEnable(info)
     return self.db.profile.unitEnable;
@@ -1880,7 +1732,7 @@ end
 
 function HotLoot:SetTypeSelect(info, key, value)
     self.db.profile[key] = value;
-    HotLoot:dBug(key, value);
+    HotLoot:DebugOption(key, value);
 end
 function HotLoot:GetTypeSelect(info, key)
     return self.db.profile[key];
@@ -1888,7 +1740,7 @@ end
 
 function HotLoot:SetUnitKeyword(info, value)
     self.db.profile.unitKeyword = value;
-    HotLoot:dBug("UnitKeyword", value);
+    HotLoot:DebugOption("UnitKeyword", value);
 end
 function HotLoot:GetUnitKeyword(info)
     return self.db.profile.unitKeyword;
@@ -1906,7 +1758,7 @@ end
 
 function HotLoot:SetUnitLoot(info, value)
     self.db.profile.unitLoot = value;
-    HotLoot:dBug("UnitLoot", value);
+    HotLoot:DebugOption("UnitLoot", value);
 end
 function HotLoot:GetUnitLoot(info)
     return self.db.profile.unitLoot;
@@ -1914,157 +1766,152 @@ end
 
 function HotLoot:SetUnitClose(info, value)
     self.db.profile.unitClose = value;
-    HotLoot:dBug("UnitClose", value);
+    HotLoot:DebugOption("UnitClose", value);
 end
 function HotLoot:GetUnitClose(info)
     return self.db.profile.unitClose;
 end
 
--- lootDebug
-function HotLoot:SetLootDebug(info, value)
-    self.db.profile.lootDebug = value;
-    HotLoot:dBug("lootDebug", value);
+-- toggleDebugMode
+function HotLoot:SetDebugMode(info, value)
+    self.db.profile.toggleDebugMode = value;
+    HotLoot:DebugOption("toggleDebugMode", value);
 end
-function HotLoot:GetLootDebug(info)
-    return self.db.profile.lootDebug;
+function HotLoot:GetDebugMode(info)
+    return self.db.profile.toggleDebugMode;
 end
 
---lootAnnounce
-function HotLoot:SetLootAnnounce(info, value)
-    self.db.profile.lootAnnounce = value;
-    HotLoot:dBug("lootAnnounce", value);
+--toggleAnnounceEvents
+function HotLoot:SetAnnounceEvents(info, value)
+    self.db.profile.toggleAnnounceEvents = value;
+    HotLoot:DebugOption("toggleAnnounceEvents", value);
 end
-function HotLoot:GetLootAnnounce(info)
-    return self.db.profile.lootAnnounce;
+function HotLoot:GetAnnounceEvents(info)
+    return self.db.profile.toggleAnnounceEvents;
 end
 
 --Minimap
-function HotLoot:SetMinimap(info, value)
+function HotLoot:SetHideMinimapButton(info, value)
     self.db.profile.minimapIcon.hide = value;
-    HotLoot:dBug("minimapIcon.hide", value);
+    HotLoot:DebugOption("minimapIcon.hide", value);
     if value then
         hIcon:Hide("HotLoot")
-    elseif not value then
+    else
         hIcon:Show("HotLoot")
     end
 end
-function HotLoot:GetMinimap(info)
+function HotLoot:GetHideMinimapButton(info)
     return self.db.profile.minimapIcon.hide;
 end
 
---SetLootAdvanced
-function HotLoot:SetLootAdvanced(info, value)
-    self.db.profile.lootAdvanced = value;
-    HotLoot:dBug("lootAdvanced", value);
+--SettoggleAdvancedOptions
+function HotLoot:SetAdvancedOptions(info, value)
+    self.db.profile.toggleAdvancedOptions = value;
+    HotLoot:DebugOption("toggleAdvancedOptions", value);
 end
-function HotLoot:GetLootAdvanced(info)
-    return self.db.profile.lootAdvanced;
+function HotLoot:GetAdvancedOptions(info)
+    return self.db.profile.toggleAdvancedOptions;
 end
-
-function HotLoot:Advanced()
-    if HotLoot:GetLootAdvanced() then
-        return false;
-    else
-        return true;
-    end
+function HotLoot:GetAdvancedOptionsHidden(info)
+    return not self.db.profile.toggleAdvancedOptions;
 end
 
--- lootClose
-function HotLoot:SetLootClose(info, value)
-    self.db.profile.lootClose = value;
-    HotLoot:dBug("lootClose", value);
+-- toggleCloseLootWindow
+function HotLoot:SetCloseLootWindow(info, value)
+    self.db.profile.toggleCloseLootWindow = value;
+    HotLoot:DebugOption("toggleCloseLootWindow", value);
 end
-function HotLoot:GetLootClose(info)
-    return self.db.profile.lootClose;
-end
-
--- lootCloseKey
-function HotLoot:SetLootCloseKey(info, value)
-    self.db.profile.lootCloseKey = value;
-    HotLoot:dBug("lootCloseKey", value);
-end
-function HotLoot:GetLootCloseKey(info)
-    return self.db.profile.lootCloseKey;
+function HotLoot:GetCloseLootWindow(info)
+    return self.db.profile.toggleCloseLootWindow;
 end
 
--- lootSkinKey
-function HotLoot:SetLootSkinKey(info, value)
-    self.db.profile.lootSkinKey = value;
-    HotLoot:dBug("lootSkinKey", value);
+-- selectCloseLootWindowModifier
+function HotLoot:SetCloseLootWindowModifier(info, value)
+    self.db.profile.selectCloseLootWindowModifier = value;
+    HotLoot:DebugOption("selectCloseLootWindowModifier", value);
 end
-function HotLoot:GetLootSkinKey(info)
-    return self.db.profile.lootSkinKey;
+function HotLoot:GetCloseLootWindowModifier(info)
+    return self.db.profile.selectCloseLootWindowModifier;
 end
 
--- lootSkinMode
-function HotLoot:SetLootSkinMode(info, value)
+-- selectSkinningModeModifier
+function HotLoot:SetSkinningModeModifier(info, value)
+    self.db.profile.selectSkinningModeModifier = value;
+    HotLoot:DebugOption("selectSkinningModeModifier", value);
+end
+function HotLoot:GetSkinningModeModifier(info)
+    return self.db.profile.selectSkinningModeModifier;
+end
+
+-- toggleSkinningMode
+function HotLoot:SetSkinningMode(info, value)
     if value == true then
         GameTooltip:Hide();
         LibStub("AceConfigDialog-3.0"):Close("HotLoot");
         GameTooltip:Show();
         StaticPopup_Show("CONFIRM_SKINNING_MODE");
     elseif value == "confirmed" then
-        self.db.profile.lootSkinMode = true;
-        HotLoot:dBug("lootSkinMode", true);
+        self.db.profile.toggleSkinningMode = true;
+        HotLoot:DebugOption("toggleSkinningMode", true);
     else
-        self.db.profile.lootSkinMode = value;
-        HotLoot:dBug("lootSkinMode", value);
+        self.db.profile.toggleSkinningMode = value;
+        HotLoot:DebugOption("toggleSkinningMode", value);
     end
 end
-function HotLoot:GetLootSkinMode(info)
-    return self.db.profile.lootSkinMode;
+function HotLoot:GetSkinningMode(info)
+    return self.db.profile.toggleSkinningMode;
 end
 
 --buttonEnableAllFiltersProfessions
 function HotLoot:buttonEnableAllFiltersProfessions()
-    HotLoot:SetLootCloth(nil, true);
-    HotLoot:SetLootMining(nil, true);
-    HotLoot:SetLootGems(nil, true);
-    HotLoot:SetLootHerbs(nil, true);
-    HotLoot:SetLootSkinning(nil, true);
-    HotLoot:SetLootFishing(nil, true);
-    HotLoot:SetLootEnchanting(nil, true);
-    HotLoot:SetLootPigments(nil, true);
-    HotLoot:SetLootCooking(nil, true);
-    HotLoot:SetLootRecipes(nil, true);
+    HotLoot:SetClothFilter(nil, true);
+    HotLoot:SetMiningFilter(nil, true);
+    HotLoot:SetGemFilter(nil, true);
+    HotLoot:SetHerbFilter(nil, true);
+    HotLoot:SetLeatherFilter(nil, true);
+    HotLoot:SetFishingFilter(nil, true);
+    HotLoot:SetEnchantingFilter(nil, true);
+    HotLoot:SetPigmentsFilter(nil, true);
+    HotLoot:SetCookingFilter(nil, true);
+    HotLoot:SetRecipeFilter(nil, true);
 end
 
 --buttonDisableAllFiltersProfessions
 function HotLoot:buttonDisableAllFiltersProfessions()
-    HotLoot:SetLootCloth(nil, false);
-    HotLoot:SetLootMining(nil, false);
-    HotLoot:SetLootGems(nil, false);
-    HotLoot:SetLootHerbs(nil, false);
-    HotLoot:SetLootSkinning(nil, false);
-    HotLoot:SetLootFishing(nil, false);
-    HotLoot:SetLootEnchanting(nil, false);
-    HotLoot:SetLootPigments(nil, false);
-    HotLoot:SetLootCooking(nil, false);
-    HotLoot:SetLootRecipes(nil, false);
+    HotLoot:SetClothFilter(nil, false);
+    HotLoot:SetMiningFilter(nil, false);
+    HotLoot:SetGemFilter(nil, false);
+    HotLoot:SetHerbFilter(nil, false);
+    HotLoot:SetLeatherFilter(nil, false);
+    HotLoot:SetFishingFilter(nil, false);
+    HotLoot:SetEnchantingFilter(nil, false);
+    HotLoot:SetPigmentsFilter(nil, false);
+    HotLoot:SetCookingFilter(nil, false);
+    HotLoot:SetRecipeFilter(nil, false);
 end
 
---lootCloth
-function HotLoot:SetLootCloth(info, value)
-    self.db.profile.lootCloth = value;
-    HotLoot:dBug("lootCloth", value);
+--toggleClothFilter
+function HotLoot:SetClothFilter(info, value)
+    self.db.profile.toggleClothFilter = value;
+    HotLoot:DebugOption("toggleClothFilter", value);
 end
-function HotLoot:GetLootCloth(info)
-    return self.db.profile.lootCloth;
+function HotLoot:GetClothFilter(info)
+    return self.db.profile.toggleClothFilter;
 end
 
---lootMining
-function HotLoot:SetLootMining(info, value)
-    self.db.profile.lootMining = value;
-    HotLoot:dBug("lootMining", value);
+--toggleMiningFilter
+function HotLoot:SetMiningFilter(info, value)
+    self.db.profile.toggleMiningFilter = value;
+    HotLoot:DebugOption("toggleMiningFilter", value);
 end
-function HotLoot:GetLootMining(info)
-    return self.db.profile.lootMining;
+function HotLoot:GetMiningFilter(info)
+    return self.db.profile.toggleMiningFilter;
 end
 
 --lootOre
 --[[function HotLoot:SetLootOre(info, value)
     self.db.profile.lootOre = value;
-    HotLoot:dBug("lootOre", value);
+    HotLoot:DebugOption("lootOre", value);
 end
 function HotLoot:GetLootOre(info)
     return self.db.profile.lootOre;
@@ -2073,215 +1920,149 @@ end
 --lootStone
 function HotLoot:SetLootStone(info, value)
     self.db.profile.lootStone = value;
-    HotLoot:dBug("lootStone", value);
+    HotLoot:DebugOption("lootStone", value);
 end
 function HotLoot:GetLootStone(info)
     return self.db.profile.lootStone;
 end
 ]]
---lootGems
-function HotLoot:SetLootGems(info, value)
-    self.db.profile.lootGems = value;
-    HotLoot:dBug("lootGems", value);
+--toggleGemFilter
+function HotLoot:SetGemFilter(info, value)
+    self.db.profile.toggleGemFilter = value;
+    HotLoot:DebugOption("toggleGemFilter", value);
 end
-function HotLoot:GetLootGems(info)
-    return self.db.profile.lootGems;
-end
-
---lootHerbs
-function HotLoot:SetLootHerbs(info, value)
-    self.db.profile.lootHerbs = value;
-    HotLoot:dBug("lootHerbs", value);
-end
-function HotLoot:GetLootHerbs(info)
-    return self.db.profile.lootHerbs;
+function HotLoot:GetGemFilter(info)
+    return self.db.profile.toggleGemFilter;
 end
 
---lootSkinning
-function HotLoot:SetLootSkinning(info, value)
-    self.db.profile.lootSkinning = value;
-    HotLoot:dBug("lootSkinning", value);
+--toggleHerbFilter
+function HotLoot:SetHerbFilter(info, value)
+    self.db.profile.toggleHerbFilter = value;
+    HotLoot:DebugOption("toggleHerbFilter", value);
 end
-function HotLoot:GetLootSkinning(info)
-    return self.db.profile.lootSkinning;
-end
-
--- lootFishing
-function HotLoot:SetLootFishing(info, value)
-    self.db.profile.lootFishing = value;
-    HotLoot:dBug("lootFishing", value);
-end
-function HotLoot:GetLootFishing(info)
-    return self.db.profile.lootFishing;
+function HotLoot:GetHerbFilter(info)
+    return self.db.profile.toggleHerbFilter;
 end
 
--- lootEnchanting
-function HotLoot:SetLootEnchanting(info, value)
-    self.db.profile.lootEnchanting = value;
-    HotLoot:dBug("lootEnchanting", value);
+--toggleLeatherFilter
+function HotLoot:SetLeatherFilter(info, value)
+    self.db.profile.toggleLeatherFilter = value;
+    HotLoot:DebugOption("toggleLeatherFilter", value);
 end
-function HotLoot:GetLootEnchanting(info)
-    return self.db.profile.lootEnchanting;
-end
-
--- lootCooking
-function HotLoot:SetLootCooking(info, value)
-    self.db.profile.lootCooking = value;
-    HotLoot:dBug("lootCooking", value);
-end
-function HotLoot:GetLootCooking(info)
-    return self.db.profile.lootCooking;
+function HotLoot:GetLeatherFilter(info)
+    return self.db.profile.toggleLeatherFilter;
 end
 
---SetLootRecipes
-function HotLoot:SetLootRecipes(info, value)
-    self.db.profile.lootRecipes = value;
-    HotLoot:dBug("lootRecipes", value);
+-- toggleFishingFilter
+function HotLoot:SetFishingFilter(info, value)
+    self.db.profile.toggleFishingFilter = value;
+    HotLoot:DebugOption("toggleFishingFilter", value);
 end
-function HotLoot:GetLootRecipes(info)
-    return self.db.profile.lootRecipes;
+function HotLoot:GetFishingFilter(info)
+    return self.db.profile.toggleFishingFilter;
 end
 
---SetLootPigments
-function HotLoot:SetLootPigments(info, value)
-    self.db.profile.lootPigments = value;
-    HotLoot:dBug("lootPigments", value);
+-- toggleEnchantingFilter
+function HotLoot:SetEnchantingFilter(info, value)
+    self.db.profile.toggleEnchantingFilter = value;
+    HotLoot:DebugOption("toggleEnchantingFilter", value);
 end
-function HotLoot:GetLootPigments(info)
-    return self.db.profile.lootPigments;
+function HotLoot:GetEnchantingFilter(info)
+    return self.db.profile.toggleEnchantingFilter;
+end
+
+-- toggleCookingFilter
+function HotLoot:SetCookingFilter(info, value)
+    self.db.profile.toggleCookingFilter = value;
+    HotLoot:DebugOption("toggleCookingFilter", value);
+end
+function HotLoot:GetCookingFilter(info)
+    return self.db.profile.toggleCookingFilter;
+end
+
+--SetRecipeFilter
+function HotLoot:SetRecipeFilter(info, value)
+    self.db.profile.toggleRecipeFilter = value;
+    HotLoot:DebugOption("toggleRecipeFilter", value);
+end
+function HotLoot:GetRecipeFilter(info)
+    return self.db.profile.toggleRecipeFilter;
+end
+
+--SetPigmentsFilter
+function HotLoot:SetPigmentsFilter(info, value)
+    self.db.profile.togglePigmentsFilter = value;
+    HotLoot:DebugOption("togglePigmentsFilter", value);
+end
+function HotLoot:GetPigmentsFilter(info)
+    return self.db.profile.togglePigmentsFilter;
 end
 
 --buttonEnableAllFiltersCommon
 function HotLoot:buttonEnableAllFiltersCommon()
     HotLoot:SetLootPots(nil, true);
-    HotLoot:SetLootFlasks(nil, true);
-    HotLoot:SetLootElixirs(nil, true);
-    HotLoot:SetLootElemental(nil, true);
+    HotLoot:SetFlaskFilter(nil, true);
+    HotLoot:SetElixirFilter(nil, true);
+    HotLoot:SetElementalFilter(nil, true);
 end
 
 --buttonDisableAllFiltersCommon
 function HotLoot:buttonDisableAllFiltersCommon()
     HotLoot:SetLootPots(nil, false);
-    HotLoot:SetLootFlasks(nil, false);
-    HotLoot:SetLootElixirs(nil, false);
-    HotLoot:SetLootElemental(nil, false);
+    HotLoot:SetFlaskFilter(nil, false);
+    HotLoot:SetElixirFilter(nil, false);
+    HotLoot:SetElementalFilter(nil, false);
 end
 
--- lootPots
+-- togglePotionFilter
 function HotLoot:SetLootPots(info, value)
-    self.db.profile.lootPots = value;
-    HotLoot:dBug("lootPots", value);
+    self.db.profile.togglePotionFilter = value;
+    HotLoot:DebugOption("togglePotionFilter", value);
 end
 function HotLoot:GetLootPots(info)
-    return self.db.profile.lootPots;
+    return self.db.profile.togglePotionFilter;
 end
 
 --SetPotionType
 function HotLoot:SetPotionType(info, value)
-    self.db.profile.potionType = value;
-    HotLoot:dBug("potionType", value);
+    self.db.profile.selectPotionType = value;
+    HotLoot:DebugOption("selectPotionType", value);
 end
 function HotLoot:GetPotionType(info)
-    return self.db.profile.potionType;
+    return self.db.profile.selectPotionType;
 end
 
--- lootFlasks
-function HotLoot:SetLootFlasks(info, value)
-    self.db.profile.lootFlasks = value;
-    HotLoot:dBug("lootFlasks", value);
+-- toggleFlaskFilter
+function HotLoot:SetFlaskFilter(info, value)
+    self.db.profile.toggleFlaskFilter = value;
+    HotLoot:DebugOption("toggleFlaskFilter", value);
 end
-function HotLoot:GetLootFlasks(info)
-    return self.db.profile.lootFlasks;
-end
-
--- lootElixirs
-function HotLoot:SetLootElixirs(info, value)
-    self.db.profile.lootElixirs = value;
-    HotLoot:dBug("lootElixirs", value);
-end
-function HotLoot:GetLootElixirs(info)
-    return self.db.profile.lootElixirs;
+function HotLoot:GetFlaskFilter(info)
+    return self.db.profile.toggleFlaskFilter;
 end
 
--- excludeList
-function HotLoot:SetExcludeList(info, value)
-    --self.db.profile.excludeList = value
-    HotLoot:dBug("excludeList", value)
-    HotLoot:AddEList(value)
+-- toggleElixirFilter
+function HotLoot:SetElixirFilter(info, value)
+    self.db.profile.toggleElixirFilter = value;
+    HotLoot:DebugOption("toggleElixirFilter", value);
 end
-function HotLoot:GetExcludeList(info)
-    --return self.db.profile.includeList;
-end
-
-function HotLoot:SetExcludeDrop(info, value)
-    self.db.profile.excludeDrop = value
-    HotLoot:dBug("excludeDrop", value)
-end
-function HotLoot:GetExcludeDrop(info)
-    return self.db.profile.excludeDrop;
-end
-function HotLoot:SetExcludeTable(value)
-    self.db.profile.eList[value] = value
-    HotLoot:dBug("eList", value)
-end
-function HotLoot:GetExcludeTable()
-    return self.db.profile.eList;
-end
--- includeList
-function HotLoot:SetIncludeList(info, value)
-    --self.db.profile.includeList = value
-    HotLoot:dBug("includeList", value)
-    HotLoot:AddIList(value)
-end
-function HotLoot:GetIncludeList(info)
-    --return self.db.profile.includeList;
+function HotLoot:GetElixirFilter(info)
+    return self.db.profile.toggleElixirFilter;
 end
 
-function HotLoot:SetIncludeDrop(info, value)
-    self.db.profile.includeDrop = value
-    HotLoot:dBug("includeDrop", value)
+-- SetElementalFilter
+function HotLoot:SetElementalFilter(info, value)
+    self.db.profile.toggleElementalFilter = value;
+    HotLoot:DebugOption("toggleElementalFilter", value);
 end
-function HotLoot:GetIncludeDrop(info)
-    return self.db.profile.includeDrop;
-end
-
-function HotLoot:SetIncludeTable(value)
-    self.db.profile.iList[value] = value
-    HotLoot:dBug("iList", value)
-end
-function HotLoot:GetIncludeTable()
-    return self.db.profile.iList;
-end
---includeButton
-function HotLoot:SetIncludeButton(info, value)
-    self.db.profile.includeButton = value
-    HotLoot:dBug("includeButton", value)
-end
-function HotLoot:GetIncludeButton()
-    return self.db.profile.includeButton;
-end
---excludeButton
-function HotLoot:SetExcludeButton(info, value)
-    self.db.profile.excludeButton = value
-    HotLoot:dBug("excludeButton", value)
-end
-function HotLoot:GetExcludeButton()
-    return self.db.profile.excludeButton;
-end
-
--- SetLootElemental
-function HotLoot:SetLootElemental(info, value)
-    self.db.profile.lootElemental = value;
-    HotLoot:dBug("lootElemental", value);
-end
-function HotLoot:GetLootElemental(info)
-    return self.db.profile.lootElemental;
+function HotLoot:GetElementalFilter(info)
+    return self.db.profile.toggleElementalFilter;
 end
 
 --SetLootBotA
 -- function HotLoot:SetLootBotA(info, value)
 --  self.db.profile.lootBotA = value;
---  HotLoot:dBug("lootBotA", value);
+--  HotLoot:DebugOption("lootBotA", value);
 -- end
 -- function HotLoot:GetLootBotA(info)
 --  return self.db.profile.lootBotA;
@@ -2290,7 +2071,7 @@ end
 --SetLootDoEM
 -- function HotLoot:SetLootDoEM(info, value)
 --  self.db.profile.lootDoEM = value;
---  HotLoot:dBug("lootDoEM", value);
+--  HotLoot:DebugOption("lootDoEM", value);
 -- end
 -- function HotLoot:GetLootDoEM(info)
 --  return self.db.profile.lootDoEM;
@@ -2299,7 +2080,7 @@ end
 --SetLootSC
 -- function HotLoot:SetLootSC(info, value)
 --  self.db.profile.lootSC = value;
---  HotLoot:dBug("lootSC", value);
+--  HotLoot:DebugOption("lootSC", value);
 -- end
 -- function HotLoot:GetLootSC(info)
 --  return self.db.profile.lootSC;
@@ -2308,7 +2089,7 @@ end
 --SetLootRepMeat
 -- function HotLoot:SetLootRepMeat(info, value)
 --  self.db.profile.lootRepMeat = value;
---  HotLoot:dBug("lootRepMeat", value);
+--  HotLoot:DebugOption("lootRepMeat", value);
 -- end
 -- function HotLoot:GetLootRepMeat(info)
 --  return self.db.profile.lootRepMeat;
@@ -2316,130 +2097,130 @@ end
 
 --buttonEnableAllFiltersQuality
 function HotLoot:buttonEnableAllFiltersQuality()
-    HotLoot:SetLootPoor(nil, true);
-    HotLoot:SetLootCommon(nil, true);
-    HotLoot:SetLootUncommon(nil, true);
-    HotLoot:SetLootRare(nil, true);
-    HotLoot:SetLootEpic(nil, true);
-    HotLoot:SetLootLegendary(nil, true);
-    HotLoot:SetLootArtifact(nil, true);
-    HotLoot:SetLootHeirloom(nil, true);
+    HotLoot:SetPoorQualityFilter(nil, true);
+    HotLoot:SetCommonQualityFilter(nil, true);
+    HotLoot:SetUncommonQualityFilter(nil, true);
+    HotLoot:SetRareQualityFilter(nil, true);
+    HotLoot:SetEpicQualityFilter(nil, true);
+    HotLoot:SetLegendaryQualityFilter(nil, true);
+    HotLoot:SetArtifactQualityFilter(nil, true);
+    HotLoot:SetHeirloomQualityFilter(nil, true);
 end
 
 --buttonDisableAllFiltersQuality
 function HotLoot:buttonDisableAllFiltersQuality()
-    HotLoot:SetLootPoor(nil, false);
-    HotLoot:SetLootCommon(nil, false);
-    HotLoot:SetLootUncommon(nil, false);
-    HotLoot:SetLootRare(nil, false);
-    HotLoot:SetLootEpic(nil, false);
-    HotLoot:SetLootLegendary(nil, false);
-    HotLoot:SetLootArtifact(nil, false);
-    HotLoot:SetLootHeirloom(nil, false);
+    HotLoot:SetPoorQualityFilter(nil, false);
+    HotLoot:SetCommonQualityFilter(nil, false);
+    HotLoot:SetUncommonQualityFilter(nil, false);
+    HotLoot:SetRareQualityFilter(nil, false);
+    HotLoot:SetEpicQualityFilter(nil, false);
+    HotLoot:SetLegendaryQualityFilter(nil, false);
+    HotLoot:SetArtifactQualityFilter(nil, false);
+    HotLoot:SetHeirloomQualityFilter(nil, false);
 end
 
---lootPoor
-function HotLoot:SetLootPoor(info, value)
-    self.db.profile.lootPoor = value;
-    HotLoot:dBug("lootPoor", value);
+--togglePoorQualityFilter
+function HotLoot:SetPoorQualityFilter(info, value)
+    self.db.profile.togglePoorQualityFilter = value;
+    HotLoot:DebugOption("togglePoorQualityFilter", value);
 end
-function HotLoot:GetLootPoor(info)
-    return self.db.profile.lootPoor;
-end
-
---SetSellGreys
-function HotLoot:SetSellGreys(info, value)
-    self.db.profile.sellGreys = value;
-    HotLoot:dBug("sellGreys", value);
-end
-function HotLoot:GetSellGreys(info)
-    return self.db.profile.sellGreys;
+function HotLoot:GetPoorQualityFilter(info)
+    return self.db.profile.togglePoorQualityFilter;
 end
 
---lootCommon
-function HotLoot:SetLootCommon(info, value)
-    self.db.profile.lootCommon = value;
-    HotLoot:dBug("lootCommon", value);
+--SetSellPoorItems
+function HotLoot:SetSellPoorItems(info, value)
+    self.db.profile.toggleSellPoorItems = value;
+    HotLoot:DebugOption("toggleSellPoorItems", value);
 end
-function HotLoot:GetLootCommon(info)
-    return self.db.profile.lootCommon;
-end
-
---lootUncommon
-function HotLoot:SetLootUncommon(info, value)
-    self.db.profile.lootUncommon = value;
-    HotLoot:dBug("lootUncommon", value);
-end
-function HotLoot:GetLootUncommon(info)
-    return self.db.profile.lootUncommon;
+function HotLoot:GetSellPoorItems(info)
+    return self.db.profile.toggleSellPoorItems;
 end
 
---lootRare
-function HotLoot:SetLootRare(info, value)
-    self.db.profile.lootRare = value;
-    HotLoot:dBug("lootRare", value);
+--toggleCommonQualityFilter
+function HotLoot:SetCommonQualityFilter(info, value)
+    self.db.profile.toggleCommonQualityFilter = value;
+    HotLoot:DebugOption("toggleCommonQualityFilter", value);
 end
-function HotLoot:GetLootRare(info)
-    return self.db.profile.lootRare;
-end
-
---lootEpic
-function HotLoot:SetLootEpic(info, value)
-    self.db.profile.lootEpic = value;
-    HotLoot:dBug("lootEpic", value);
-end
-function HotLoot:GetLootEpic(info)
-    return self.db.profile.lootEpic;
+function HotLoot:GetCommonQualityFilter(info)
+    return self.db.profile.toggleCommonQualityFilter;
 end
 
---lootLegendary
-function HotLoot:SetLootLegendary(info, value)
-    self.db.profile.lootLegendary = value;
-    HotLoot:dBug("lootLegendary", value);
+--toggleUncommonQualityFilter
+function HotLoot:SetUncommonQualityFilter(info, value)
+    self.db.profile.toggleUncommonQualityFilter = value;
+    HotLoot:DebugOption("toggleUncommonQualityFilter", value);
 end
-function HotLoot:GetLootLegendary(info)
-    return self.db.profile.lootLegendary;
-end
-
---lootArtifact
-function HotLoot:SetLootArtifact(info, value)
-    self.db.profile.lootArtifact = value;
-    HotLoot:dBug("lootArtifact", value);
-end
-function HotLoot:GetLootArtifact(info)
-    return self.db.profile.lootArtifact;
+function HotLoot:GetUncommonQualityFilter(info)
+    return self.db.profile.toggleUncommonQualityFilter;
 end
 
---lootHeirloom
-function HotLoot:SetLootHeirloom(info, value)
-    self.db.profile.lootHeirloom = value;
-    HotLoot:dBug("lootHeirloom", value);
+--toggleRareQualityFilter
+function HotLoot:SetRareQualityFilter(info, value)
+    self.db.profile.toggleRareQualityFilter = value;
+    HotLoot:DebugOption("toggleRareQualityFilter", value);
 end
-function HotLoot:GetLootHeirloom(info)
-    return self.db.profile.lootHeirloom;
+function HotLoot:GetRareQualityFilter(info)
+    return self.db.profile.toggleRareQualityFilter;
 end
 
---minILvl
-function HotLoot:SetMinILvl(info, value)
+--toggleEpicQualityFilter
+function HotLoot:SetEpicQualityFilter(info, value)
+    self.db.profile.toggleEpicQualityFilter = value;
+    HotLoot:DebugOption("toggleEpicQualityFilter", value);
+end
+function HotLoot:GetEpicQualityFilter(info)
+    return self.db.profile.toggleEpicQualityFilter;
+end
+
+--toggleLegendaryQualityFilter
+function HotLoot:SetLegendaryQualityFilter(info, value)
+    self.db.profile.toggleLegendaryQualityFilter = value;
+    HotLoot:DebugOption("toggleLegendaryQualityFilter", value);
+end
+function HotLoot:GetLegendaryQualityFilter(info)
+    return self.db.profile.toggleLegendaryQualityFilter;
+end
+
+--toggleArtifactQualityFilter
+function HotLoot:SetArtifactQualityFilter(info, value)
+    self.db.profile.toggleArtifactQualityFilter = value;
+    HotLoot:DebugOption("toggleArtifactQualityFilter", value);
+end
+function HotLoot:GetArtifactQualityFilter(info)
+    return self.db.profile.toggleArtifactQualityFilter;
+end
+
+--toggleHeirloomQualityFilter
+function HotLoot:SetHeirloomQualityFilter(info, value)
+    self.db.profile.toggleHeirloomQualityFilter = value;
+    HotLoot:DebugOption("toggleHeirloomQualityFilter", value);
+end
+function HotLoot:GetHeirloomQualityFilter(info)
+    return self.db.profile.toggleHeirloomQualityFilter;
+end
+
+--inputMinItemLevel
+function HotLoot:SetMinItemLevel(info, value)
     if value == '' or not tonumber(value) then
-        self.db.profile.minILvl = 0;
-        HotLoot:dBug("minILvl not set (defaulting to 0)");
+        self.db.profile.inputMinItemLevel = 0;
+        HotLoot:Debug("inputMinItemLevel not set (defaulting to 0)");
     else
-        self.db.profile.minILvl = value;
-        HotLoot:dBug("minILvl", value);
+        self.db.profile.inputMinItemLevel = value;
+        HotLoot:DebugOption("inputMinItemLevel", value);
     end
 end
-function HotLoot:GetMinILvl(info)
-    return self.db.profile.minILvl;
+function HotLoot:GetMinItemLevel(info)
+    return self.db.profile.inputMinItemLevel;
 end
 
---lootCurrency
-function HotLoot:SetLootCurrency(info, value)
-    self.db.profile.lootCurrency = value;
-    HotLoot:dBug("lootCurrency", value);
+--toggleCurrencyFilter
+function HotLoot:SetCurrencyFilter(info, value)
+    self.db.profile.toggleCurrencyFilter = value;
+    HotLoot:DebugOption("toggleCurrencyFilter", value);
 end
-function HotLoot:GetLootCurrency(info)
-    return self.db.profile.lootCurrency;
+function HotLoot:GetCurrencyFilter(info)
+    return self.db.profile.toggleCurrencyFilter;
 end
 function HotLoot:ToCopper(input)
     local gold = tonumber(string.match(input,"(%d+)%s?[gG]")) or 0;
@@ -2449,68 +2230,137 @@ function HotLoot:ToCopper(input)
     return total;
 end
 
---type1 
-function HotLoot:SetType1(info, value)
-    self.db.profile.type1 = value;
-    HotLoot:dBug("type1", value);
+-- inputIncludeListAdd
+function HotLoot:SetIncludeListAdd(info, value)
+    --self.db.profile.inputIncludeListAdd = value
+    HotLoot:DebugOption("inputIncludeListAdd", value)
+    HotLoot:AddToIncludeList(value)
 end
-function HotLoot:GetType1(info)
-    return self.db.profile.type1;
-end
-
---value1
-function HotLoot:SetValue1(info, value)
-    self.db.profile.value1 = value;
-    HotLoot:dBug("value1 to copper", tonumber(HotLoot:ToCopper(value)));
+function HotLoot:GetIncludeListAdd(info)
+    --return self.db.profile.inputIncludeListAdd;
 end
 
-function HotLoot:GetValue1(info)
-    return self.db.profile.value1;
+function HotLoot:SetIncludeListSelect(info, value)
+    self.db.profile.selectIncludeList = value
+    HotLoot:DebugOption("selectIncludeList", value)
+end
+function HotLoot:GetIncludeListSelect(info)
+    return self.db.profile.selectIncludeList;
 end
 
---type2
-function HotLoot:SetType2(info, value)
-    self.db.profile.type2 = value;
-    HotLoot:dBug("type2", value);
+function HotLoot:SetIncludeList(value)
+    self.db.profile.tableIncludeList[value] = value
+    HotLoot:DebugOption("tableIncludeList", value)
 end
-function HotLoot:GetType2(info)
-    return self.db.profile.type2;
+function HotLoot:GetIncludeList()
+    return self.db.profile.tableIncludeList;
 end
-
---value2
-function HotLoot:SetValue2(info, value)
-    self.db.profile.value2 = value;
-    HotLoot:dBug("value2", value);
+--toggleShowIncludeButton
+function HotLoot:SetShowIncludeButton(info, value)
+    self.db.profile.toggleShowIncludeButton = value
+    HotLoot:DebugOption("toggleShowIncludeButton", value)
 end
-function HotLoot:GetValue2(info)
-    return self.db.profile.value2;
+function HotLoot:GetIncludeButton()
+    return self.db.profile.toggleShowIncludeButton;
 end
 
---type3
-function HotLoot:SetType3(info, value)
-    self.db.profile.type3 = value;
-    HotLoot:dBug("type3", value);
+-- inputExcludeListAdd
+function HotLoot:SetExcludeListAdd(info, value)
+    --self.db.profile.inputExcludeListAdd = value
+    HotLoot:DebugOption("inputExcludeListAdd", value)
+    HotLoot:AddEList(value)
 end
-function HotLoot:GetType3(info)
-    return self.db.profile.type3;
-end
-
---value3
-function HotLoot:SetValue3(info, value)
-    self.db.profile.value3 = value;
-    HotLoot:dBug("value3", value);
-end
-function HotLoot:GetValue3(info)
-    return self.db.profile.value3;
+function HotLoot:GetExcludeListAdd(info)
+    --return self.db.profile.includeList;
 end
 
--- useQuant
-function HotLoot:SetUseQuant(info, value)
-    self.db.profile.useQuant = value;
-    HotLoot:dBug("useQuant", value);
+function HotLoot:SetExcludeListSelect(info, value)
+    self.db.profile.selectExcludeList = value
+    HotLoot:DebugOption("selectExcludeList", value)
 end
-function HotLoot:GetUseQuant(info)
-    return self.db.profile.useQuant;
+function HotLoot:GetExcludeListSelect(info)
+    return self.db.profile.selectExcludeList;
+end
+
+function HotLoot:SetExcludeList(value)
+    self.db.profile.tableExcludeList[value] = value
+    HotLoot:DebugOption("tableExcludeList", value)
+end
+function HotLoot:GetExcludeList()
+    return self.db.profile.tableExcludeList;
+end
+
+--excludeButton
+function HotLoot:SetShowExcludeButton(info, value)
+    self.db.profile.toggleShowExcludeButton = value
+    HotLoot:DebugOption("toggleShowExcludeButton", value)
+end
+function HotLoot:GetShowExcludeButton()
+    return self.db.profile.toggleShowExcludeButton;
+end
+
+--selectThresholdType1 
+function HotLoot:SetThresholdType1(info, value)
+    self.db.profile.selectThresholdType1 = value;
+    HotLoot:DebugOption("selectThresholdType1", value);
+end
+function HotLoot:GetThresholdType1(info)
+    return self.db.profile.selectThresholdType1;
+end
+
+--inputThresholdValue1
+function HotLoot:SetThresholdValue1(info, value)
+    self.db.profile.inputThresholdValue1 = value;
+    HotLoot:DebugOption("inputThresholdValue1 to copper", tonumber(HotLoot:ToCopper(value)));
+end
+
+function HotLoot:GetThresholdValue1(info)
+    return self.db.profile.inputThresholdValue1;
+end
+
+--selectThresholdType2
+function HotLoot:SetThresholdType2(info, value)
+    self.db.profile.selectThresholdType2 = value;
+    HotLoot:DebugOption("selectThresholdType2", value);
+end
+function HotLoot:GetThresholdType2(info)
+    return self.db.profile.selectThresholdType2;
+end
+
+--inputThresholdValue2
+function HotLoot:SetThresholdValue2(info, value)
+    self.db.profile.inputThresholdValue2 = value;
+    HotLoot:DebugOption("inputThresholdValue2", value);
+end
+function HotLoot:GetThresholdValue2(info)
+    return self.db.profile.inputThresholdValue2;
+end
+
+--selectThresholdType3
+function HotLoot:SetThresholdType3(info, value)
+    self.db.profile.selectThresholdType3 = value;
+    HotLoot:DebugOption("selectThresholdType3", value);
+end
+function HotLoot:GetThresholdType3(info)
+    return self.db.profile.selectThresholdType3;
+end
+
+--inputThresholdValue3
+function HotLoot:SetThresholdValue3(info, value)
+    self.db.profile.inputThresholdValue3 = value;
+    HotLoot:DebugOption("inputThresholdValue3", value);
+end
+function HotLoot:GetThresholdValue3(info)
+    return self.db.profile.inputThresholdValue3;
+end
+
+-- toggleUseQuantValue
+function HotLoot:SetUseQuantValue(info, value)
+    self.db.profile.toggleUseQuantValue = value;
+    HotLoot:DebugOption("toggleUseQuantValue", value);
+end
+function HotLoot:GetUseQuantValue(info)
+    return self.db.profile.toggleUseQuantValue;
 end
 
 
@@ -2519,7 +2369,7 @@ end
 --SetTrackerEnable
 function HotLoot:SetTrackerEnable(info, value)
     self.db.profile.trackerEnable = value;
-    HotLoot:dBug("trackerEnable", value);
+    HotLoot:DebugOption("trackerEnable", value);
     if value then
         HotLoot.lootTracker:Show()
     else
@@ -2533,7 +2383,7 @@ end
 --SetWatchList
 function HotLoot:SetWatchList(info, value)
     self.db.profile.watchListD = value;
-    HotLoot:dBug("watchList", value);
+    HotLoot:DebugOption("watchList", value);
 end
 function HotLoot:GetWatchList(info)
     return self.db.profile.watchListD;
@@ -2541,7 +2391,7 @@ end
 
 function HotLoot:SetTrackerName(info, value)
     self.db.profile.trackerName = value;
-    HotLoot:dBug("trackerName", value);
+    HotLoot:DebugOption("trackerName", value);
 end
 function HotLoot:GetTrackerName(info)
     return self.db.profile.trackerName;
@@ -2549,7 +2399,7 @@ end
 
 function HotLoot:SetTrackerGoal(info, value)
     self.db.profile.trackerGoal = value;
-    HotLoot:dBug("trackerGoal", value);
+    HotLoot:DebugOption("trackerGoal", value);
 end
 function HotLoot:GetTrackerGoal(info)
     return self.db.profile.trackerGoal;

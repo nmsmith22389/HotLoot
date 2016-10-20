@@ -1,7 +1,7 @@
 -- =================== --
 --        TODO         --
 -------------------------
--- * Add L[] strings for all the Enable/Disable All buttons
+-- * Add Enable/Disable select option to decide which one the mod key does.
 -- * Make Include & Exclude button look better (texture)
 -- * Export and update localizations (for artifact and heirloom qualities and other stuff maybe)
 -- * Optimize Code
@@ -41,10 +41,10 @@ function HotLoot:ProcessTooltip(tooltip, name, link)
     --HotLoot:dBug("name", name)
     --HotLoot:dBug("link", link)
     local iName = select(1,GetItemInfo(name))
-    if HotLoot:GetIncludeTable()[iName] then
+    if HotLoot:GetIncludeList()[iName] then
         GameTooltip:AddLine("|cFFCD6600HotLoot|r: "..L["Included"])
         
-    elseif HotLoot:GetExcludeTable()[iName] then
+    elseif HotLoot:GetExcludeList()[iName] then
         GameTooltip:AddLine("|cFFCD6600HotLoot|r: "..L["Excluded"])
     end
     GameTooltip:Show()
@@ -145,7 +145,7 @@ end
 --******************ANNOUNCE FUNCTION********************
 
 function HotLoot:Announce(input)
-    if HotLoot:GetLootAnnounce() then
+    if HotLoot:GetAnnounceEvents() then
         print("|cFFCD6600HotLoot|r: " .. tostring(input))
     end
 end
@@ -247,15 +247,15 @@ local function LoadThemeInit(theme)
 
 end
 -- disNamesC
-function HotLoot:ToggleNamesDisable()
+function HotLoot:GetShowItemNamesDisabled()
     return disNamesC
 end
 -- disIconSizeCurrent
-function HotLoot:ToggleSizeDisable()
+function HotLoot:GetIconSizeDisabled()
     return disIconSizeCurrent
 end
-function HotLoot:ColorHide()
-    if HotLoot:GetThemeSelect() == "color" then
+function HotLoot:GetThemeColorDisabled()
+    if HotLoot:GetTheme() == "color" then
         return false
     else
         return true
@@ -304,11 +304,11 @@ function HotLoot:OnInitialize()
         button1 = "Yes",
         button2 = "No",
         OnAccept = function()
-            HotLoot:SetLootSkinMode(nil, "confirmed");
+            HotLoot:SetSkinningMode(nil, "confirmed");
             LibStub("AceConfigDialog-3.0"):Open("HotLoot");
         end,
         OnCancel = function ()
-            HotLoot:SetLootSkinMode(nil, false);
+            HotLoot:SetSkinningMode(nil, false);
             LibStub("AceConfigDialog-3.0"):Open("HotLoot");
         end,
         timeout = 25,
@@ -324,13 +324,13 @@ end
 function HotLoot:OnEnable()
     TipHooker:Hook(HotLoot.ProcessTooltip, "item")
     
-    if not HotLoot:GetThemeSelect() then
+    if not HotLoot:GetTheme() then
         HotLoot:SetThemeSelect(self,"classic")
     end
     
     tStart = 0
-    HotLoot:ToggleAnchor(HotLoot:GetLootShowAnchor())
-    LoadThemeInit(HotLoot:GetThemeSelect())
+    HotLoot:ToggleAnchor(HotLoot:GetShowLootMonitorAnchor())
+    LoadThemeInit(HotLoot:GetTheme())
     HotLoot:RegisterEvent("LOOT_OPENED")
     HotLoot:RegisterEvent("LOOT_CLOSED")
     HotLoot:RegisterEvent("LOOT_SLOT_CLEARED")
@@ -384,13 +384,13 @@ end
 --      Debug Mode
 --==========================
 function HotLoot:Debug(string)
-    if (HotLoot:GetLootDebug() == true) then
+    if (HotLoot:GetDebugMode() == true) then
         print("<|c"..HotLoot:GetColor("alert").."HotLoot Debug|r> " .. tostring(string));
         -- Old HL color was --> |cFFCD6600HotLoot|r
     end
 end
 function HotLoot:DebugOption(name, value)
-    if (HotLoot:GetLootDebug() == true) then
+    if (HotLoot:GetDebugMode() == true) then
         local toPrint
         if value then
             toPrint = tostring(name) .. " = " .. tostring(value)
@@ -409,7 +409,7 @@ end
 --==========================
 --      Test Monitor
 --==========================
-function HotLoot:TestMonitor()
+function HotLoot:buttonTestLootMonitor()
     local itemName, itemLink, _, itemLevel, _, itemType, itemSubType, _, _, itemTexture, itemSellPrice = GetItemInfo(6948)
     local itoadd = HotLoot:addLootIcon(itemTexture, itemName, itemLink, 5)
     table.insert(icons, 1, itoadd)
@@ -431,57 +431,50 @@ end
 --==========================
 local function CloseKeyDown()
     local keyDown
-    local modKey = HotLoot:GetLootCloseKey()
-    if (modKey == "ctrl") then 
-        keyDown = IsControlKeyDown()
-    elseif (modKey == "shift") then 
-        keyDown = IsShiftKeyDown()
-    elseif (modKey == "alt") then 
-        keyDown = IsAltKeyDown()
+    local modKey = HotLoot:GetCloseLootWindowModifier()
+    if     (modKey == "ctrl")  then keyDown = IsControlKeyDown()
+    elseif (modKey == "shift") then keyDown = IsShiftKeyDown()
+    elseif (modKey == "alt")   then keyDown = IsAltKeyDown()
     end
-    --HotLoot:dBug("keyDown",keyDown)
     return keyDown
 end
 local function SkinKeyDown()
-    local sKeyDown
-    local modKey = HotLoot:GetLootSkinKey()
-    if (modKey == "ctrl") then 
-        sKeyDown = IsControlKeyDown()
-    elseif (modKey == "shift") then 
-        sKeyDown = IsShiftKeyDown()
-    elseif (modKey == "alt") then 
-        sKeyDown = IsAltKeyDown()
+    local keyDown
+    local modKey = HotLoot:GetSkinningModeModifier()
+    if     (modKey == "ctrl")  then keyDown = IsControlKeyDown()
+    elseif (modKey == "shift") then keyDown = IsShiftKeyDown()
+    elseif (modKey == "alt")   then keyDown = IsAltKeyDown()
     end
-    return sKeyDown
+    return keyDown
 end
 --==========================
 --      Add to I List
 --==========================
-function HotLoot:AddIList(value)
+function HotLoot:AddToIncludeList(value)
     if GetItemInfo(value) then
         local iName = select(1,GetItemInfo(value))
-        HotLoot:SetIncludeTable(iName)
+        HotLoot:SetIncludeList(iName)
     else
-        HotLoot:SetIncludeTable(value)
+        HotLoot:SetIncludeList(value)
     end
 end
-function HotLoot:RemoveIList()
-    HotLoot:GetIncludeTable()[HotLoot:GetIncludeDrop()] = nil
+function HotLoot:RemoveFromIncludeList()
+    HotLoot:GetIncludeList()[HotLoot:GetIncludeListSelect()] = nil
 end
 
 --==========================
 --      Add to E List
 --==========================
-function HotLoot:AddEList(value)
+function HotLoot:AddToExcludeList(value)
     if GetItemInfo(tostring(value)) then
         local iName = select(1,GetItemInfo(value))
-        HotLoot:SetExcludeTable(iName)
+        HotLoot:SetExcludeList(iName)
     else
-        HotLoot:SetExcludeTable(value)
+        HotLoot:SetExcludeList(value)
     end
 end
-function HotLoot:RemoveEList()
-    HotLoot:GetExcludeTable()[HotLoot:GetExcludeDrop()] = nil
+function HotLoot:RemoveFromExcludeList()
+    HotLoot:GetExcludeList()[HotLoot:GetExcludeListSelect()] = nil
 end
 
     
@@ -490,34 +483,26 @@ end
 --==========================
 local function ToSkin(slot)
     local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(slot)
-    --HotLoot:dBug("lootName", lootName)
-    --HotLoot:dBug("lootQuantity", lootQuantity)
-    if  (HotLoot:GetLootSkinMode() or SkinKeyDown()) and (lootQuantity > 0) then
+    if  (HotLoot:GetSkinningMode() or SkinKeyDown()) and (lootQuantity > 0) then
         itemsToDelete = itemsToDelete .. " " .. lootName
         --itemsToDelete[curSlot] = itemLink
         LootSlot(slot)
         HotLoot:Debug("|c" .. HotLoot:GetColor("alert") .. lootName .. " is set to be deleted!|r")
         skinModeTrigger = 1
-        --HotLoot:dBug("skinModeTrigger", skinModeTrigger)
     end
 end
 --#############################
 --      Skinning Mode
 --#############################
 local function DeleteLeftovers()
-    if (HotLoot:GetLootSkinMode() == true) or (skinModeTrigger == 1) then
+    if (HotLoot:GetSkinningMode() == true) or (skinModeTrigger == 1) then
         skinModeTrigger = 0
          HotLoot:Announce(L["SkinAnnounce1"])
-        --HotLoot:dBug("itemsToDelete", itemsToDelete)
         for b = 0, 4 do 
             for s = 1, GetContainerNumSlots(b) do 
                 local dLink = GetContainerItemLink(b, s)
-                --HotLoot:dBug("dLink", dLink)
                 if dLink then
                     local dName = select(1, GetItemInfo(dLink))
-                    --HotLoot:dBug(itemsToDelete, dName)
-                    --HotLoot:dBug("string.find", string.find(itemsToDelete, dName))
-                --for i = 1, #itemsToDelete do
                     if string.find(itemsToDelete, dName) ~= nil then 
                         PickupContainerItem(b, s)
                         if CursorHasItem() then
@@ -535,12 +520,12 @@ end
 --  Is it Gold or Currency?
 --==========================
 local function IsGold(slot)
-    if GetLootSlotType(slot) == 2 and HotLoot:GetLootGold() then 
+    if GetLootSlotType(slot) == 2 and HotLoot:GetGoldFilter() then 
         return true
     end
 end
 local function IsCurrency(slot)
-    if GetLootSlotType(slot) == 3 and HotLoot:GetLootCurrency() then 
+    if GetLootSlotType(slot) == 3 and HotLoot:GetCurrencyFilter() then 
         return true
     end
 end
@@ -590,26 +575,26 @@ end
 local function CheckThreshold(iType, sellAmount, lootQuant)
     local value, quant
     quant = lootQuant
-    if HotLoot:GetUseQuant() then
+    if HotLoot:GetUseQuantValue() then
         value = quant * sellAmount
     else
         value = sellAmount
     end
     
-    if HotLoot:GetType1() == iType then
-        if tonumber(HotLoot:ToCopper(HotLoot:GetValue1())) <= value then
+    if HotLoot:GetThresholdType1() == iType then
+        if tonumber(HotLoot:ToCopper(HotLoot:GetThresholdValue1())) <= value then
             return true
         else
             return false
         end
-    elseif HotLoot:GetType2() == iType then
-        if tonumber(HotLoot:ToCopper(HotLoot:GetValue2())) <= value then
+    elseif HotLoot:GetThresholdType2() == iType then
+        if tonumber(HotLoot:ToCopper(HotLoot:GetThresholdValue2())) <= value then
             return true
         else
             return false
         end
-    elseif HotLoot:GetType3() == iType then
-        if tonumber(HotLoot:ToCopper(HotLoot:GetValue3())) <= value then
+    elseif HotLoot:GetThresholdType3() == iType then
+        if tonumber(HotLoot:ToCopper(HotLoot:GetThresholdValue3())) <= value then
             return true
         else
             return false
@@ -622,8 +607,8 @@ end
 --      iLvl Check
 --==========================
 local function CheckILvl(iLvl)
-    if HotLoot:GetMinILvl() then
-        if tonumber(iLvl) >= tonumber(HotLoot:GetMinILvl()) then
+    if HotLoot:GetMinItemLevel() then
+        if tonumber(iLvl) >= tonumber(HotLoot:GetMinItemLevel()) then
             return true
         else
             return false
@@ -645,7 +630,7 @@ end
 --==========================
 --          Round
 --==========================
-function HotLoot:SellGreys()
+function HotLoot:SellPoorItems()
     local bag, slot
     local totalPrice=0
     for bag=0, NUM_BAG_SLOTS do
@@ -693,74 +678,74 @@ function HotLoot:CheckFilter(itemID)
     local itemName, itemLink, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice = GetItemInfo(itemID)
     if
         -- Quest
-        HotLoot:GetLootQuest() and (itemType == L["Quest"]) --[[or ScanTip(slot, L["Quest Item"]))]] and CheckThreshold("Quest", itemSellPrice, lootQuantity) then 
+        HotLoot:GetQuestFilter() and (itemType == L["Quest"]) --[[or ScanTip(slot, L["Quest Item"]))]] and CheckThreshold("Quest", itemSellPrice, lootQuantity) then 
             wasLooted = true
             whereLooted = "Quest"
     -- Commented out to remove "junk" option
     --elseif
         -- Junk
-    --  (itemSubType == L["Junk"]) and HotLoot:GetLootJunk() and CheckThreshold("Junk", itemSellPrice, lootQuantity) then 
+    --  (itemSubType == L["Junk"]) and HotLoot:GetJunkFilter() and CheckThreshold("Junk", itemSellPrice, lootQuantity) then 
     --      wasLooted = true
     elseif
-        -- HotLoot:GetLootPick(
-        (IsStealthed()) and (lootQuality ~= 0) and HotLoot:GetLootPick() then 
+        -- HotLoot:GetPickpocketFilter(
+        (IsStealthed()) and (lootQuality ~= 0) and HotLoot:GetPickpocketFilter() then 
             wasLooted = true
             whereLooted = "PickPocket"
     elseif
         -- Cloth
         -- TODO: Change ALL Trade Goods to Tradeskill
-        (itemSubType == L["Cloth"]) and (itemType == L["Tradeskill"]) and HotLoot:GetLootCloth() and CheckThreshold("Cloth", itemSellPrice, lootQuantity) then 
+        (itemSubType == L["Cloth"]) and (itemType == L["Tradeskill"]) and HotLoot:GetClothFilter() and CheckThreshold("Cloth", itemSellPrice, lootQuantity) then 
             wasLooted = true
             whereLooted = "Cloth"
     elseif
         -- Mining
-        (itemSubType == L["Metal & Stone"]) and HotLoot:GetLootMining() and CheckThreshold("Metal & Stone", itemSellPrice, lootQuantity) then 
+        (itemSubType == L["Metal & Stone"]) and HotLoot:GetMiningFilter() and CheckThreshold("Metal & Stone", itemSellPrice, lootQuantity) then 
             wasLooted = true
             whereLooted = "Mining"
     elseif
         -- Gems
-        (itemType == L["Gem"]) and HotLoot:GetLootGems() and CheckThreshold("Gem", itemSellPrice, lootQuantity) then 
+        (itemType == L["Gem"]) and HotLoot:GetGemFilter() and CheckThreshold("Gem", itemSellPrice, lootQuantity) then 
             wasLooted = true
             whereLooted = "Gems"
     elseif
         -- Herbs
-        (itemSubType == L["Herb"]) and HotLoot:GetLootHerbs() and CheckThreshold("Herb", itemSellPrice, lootQuantity) then 
+        (itemSubType == L["Herb"]) and HotLoot:GetHerbFilter() and CheckThreshold("Herb", itemSellPrice, lootQuantity) then 
             wasLooted = true
             whereLooted = "Herbs"
     elseif
         -- Leather
-        (itemSubType == L["Leather"]) and (itemType == L["Tradeskill"]) and HotLoot:GetLootSkinning() and CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
+        (itemSubType == L["Leather"]) and (itemType == L["Tradeskill"]) and HotLoot:GetLeatherFilter() and CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
             wasLooted = true
             whereLooted = "Leather"
     elseif
         -- Fishing (-junk)
-        IsFishingLoot() and HotLoot:GetLootFishing() and (itemSubType ~= L["Junk"]) then 
+        IsFishingLoot() and HotLoot:GetFishingFilter() and (itemSubType ~= L["Junk"]) then 
             wasLooted = true
             whereLooted = "Fishing"
     elseif
         -- enchanting
-        HotLoot:GetLootEnchanting() and (itemSubType == L["Enchanting"]) and CheckThreshold("Enchanting", itemSellPrice, lootQuantity) then 
+        HotLoot:GetEnchantingFilter() and (itemSubType == L["Enchanting"]) and CheckThreshold("Enchanting", itemSellPrice, lootQuantity) then 
             wasLooted = true
             whereLooted = "Enchanting"
     
     elseif
-        -- GetLootCooking
-        HotLoot:GetLootCooking() and (itemSubType == L["Cooking"]) and CheckThreshold("Cooking Ingredient", itemSellPrice, lootQuantity) then 
+        -- GetCookingFilter
+        HotLoot:GetCookingFilter() and (itemSubType == L["Cooking"]) and CheckThreshold("Cooking Ingredient", itemSellPrice, lootQuantity) then 
             wasLooted = true
             whereLooted = "Cooking"
     elseif
-        -- GetLootRecipes
-        HotLoot:GetLootRecipes() and (itemType == L["Recipe"]) then 
+        -- GetRecipeFilter
+        HotLoot:GetRecipeFilter() and (itemType == L["Recipe"]) then 
             wasLooted = true
             whereLooted = "Recipes"
     elseif
-        --HotLoot:GetLootPigments(info)
-        HotLoot:GetLootPigments() and (string.find(lootName, "Pigment")) then 
+        --HotLoot:GetPigmentsFilter()
+        HotLoot:GetPigmentsFilter() and (string.find(lootName, "Pigment")) then 
             wasLooted = true
             whereLooted = "Pigments"
     elseif
         -- Pots
-        (itemSubType == L["Potion"]) and HotLoot:GetLootPots() and CheckThreshold("Potion", itemSellPrice, lootQuantity) then 
+        (itemSubType == L["Potion"]) and HotLoot:GetPotionFilter() and CheckThreshold("Potion", itemSellPrice, lootQuantity) then 
             if HotLoot:GetPotionType() == "both" then
                 wasLooted = true
                 whereLooted = "Potion"
@@ -775,17 +760,17 @@ function HotLoot:CheckFilter(itemID)
             end
     elseif
         -- Flasks
-        (itemSubType == L["Flask"]) and HotLoot:GetLootFlasks() and CheckThreshold("Flask", itemSellPrice, lootQuantity) then 
+        (itemSubType == L["Flask"]) and HotLoot:GetFlaskFilter() and CheckThreshold("Flask", itemSellPrice, lootQuantity) then 
             wasLooted = true
             whereLooted = "Flask"
     elseif
         -- Elixirs
-        (itemSubType == L["Elixir"]) and HotLoot:GetLootElixirs() and CheckThreshold("Elixir", itemSellPrice, lootQuantity) then 
+        (itemSubType == L["Elixir"]) and HotLoot:GetElixirFilter() and CheckThreshold("Elixir", itemSellPrice, lootQuantity) then 
             wasLooted = true
             whereLooted = "Elixer"
     elseif
         -- Motes
-        (itemSubType == L["Elemental"]) and HotLoot:GetLootElemental() and CheckThreshold("Elemental", itemSellPrice, lootQuantity) then 
+        (itemSubType == L["Elemental"]) and HotLoot:GetElementalFilter() and CheckThreshold("Elemental", itemSellPrice, lootQuantity) then 
             wasLooted = true
             whereLooted = "Elemental"
     elseif
@@ -826,47 +811,47 @@ function HotLoot:CheckFilter(itemID)
             wasLooted = true
     elseif
         -- Include List
-        HotLoot:GetIncludeTable()[lootName] then 
+        HotLoot:GetIncludeList()[lootName] then 
             wasLooted = true
             whereLooted = "INCLUDE"
     elseif
         -- Poor
-        (HotLoot:GetLootPoor() == true) and (lootQuality == 0) and (CheckThreshold("z1Poor", itemSellPrice, lootQuantity)) --[[and (CheckILvl(itemLevel))]] then 
+        (HotLoot:GetPoorQualityFilter() == true) and (lootQuality == 0) and (CheckThreshold("z1Poor", itemSellPrice, lootQuantity)) --[[and (CheckILvl(itemLevel))]] then 
             wasLooted = true
             whereLooted = "Poor"
     elseif
         -- Common
-        (HotLoot:GetLootCommon() == true) and (lootQuality == 1) and (CheckThreshold("z2Common", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+        (HotLoot:GetCommonQualityFilter() == true) and (lootQuality == 1) and (CheckThreshold("z2Common", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
             wasLooted = true
             whereLooted = "Common"
     elseif
         -- Uncommon
-        --[[(IsInGroup() == false) and ]](HotLoot:GetLootUncommon() == true) and (lootQuality == 2) and (CheckThreshold("z3Uncommon", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+        --[[(IsInGroup() == false) and ]](HotLoot:GetUncommonQualityFilter() == true) and (lootQuality == 2) and (CheckThreshold("z3Uncommon", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
             wasLooted = true
             whereLooted = "Uncommon"
     elseif
         -- Rare
-        --[[(IsInGroup() == false) and ]](HotLoot:GetLootRare() == true) and (lootQuality == 3) and (CheckThreshold("z4Rare", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+        --[[(IsInGroup() == false) and ]](HotLoot:GetRareQualityFilter() == true) and (lootQuality == 3) and (CheckThreshold("z4Rare", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
             wasLooted = true
             whereLooted = "Rare"
     elseif
         -- Epic
-        --[[(IsInGroup() == false) and ]](HotLoot:GetLootEpic() == true) and (lootQuality == 4) and (CheckThreshold("z5Epic", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+        --[[(IsInGroup() == false) and ]](HotLoot:GetEpicQualityFilter() == true) and (lootQuality == 4) and (CheckThreshold("z5Epic", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
             wasLooted = true
             whereLooted = "Epic"
     elseif
         -- Legendary
-        --[[(IsInGroup() == false) and ]](HotLoot:GetLootLegendary() == true) and (lootQuality == 5) and (CheckThreshold("z6Legendary", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+        --[[(IsInGroup() == false) and ]](HotLoot:GetLegendaryQualityFilter() == true) and (lootQuality == 5) and (CheckThreshold("z6Legendary", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
             wasLooted = true
             whereLooted = "Legendary"
     elseif
         -- Artifact
-        --[[(IsInGroup() == false) and ]](HotLoot:GetLootArtifact() == true) and (lootQuality == 6) and (CheckThreshold("z7Artifact", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+        --[[(IsInGroup() == false) and ]](HotLoot:GetArtifactQualityFilter() == true) and (lootQuality == 6) and (CheckThreshold("z7Artifact", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
             wasLooted = true
             whereLooted = "Artifact"
     elseif
         -- Heirloom
-        --[[(IsInGroup() == false) and ]](HotLoot:GetLootHeirloom() == true) and (lootQuality == 7) and (CheckThreshold("z8Heirloom", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+        --[[(IsInGroup() == false) and ]](HotLoot:GetHeirloomQualityFilter() == true) and (lootQuality == 7) and (CheckThreshold("z8Heirloom", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
             wasLooted = true
             whereLooted = "Heirloom"
     end
@@ -891,7 +876,7 @@ local function ToFilters(slot)
     local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(slot)
     local lootLink = GetLootSlotLink(slot)
     
-    if HotLoot:GetExcludeTable()[lootName] then
+    if HotLoot:GetExcludeList()[lootName] then
         -- Don't Loot
          HotLoot:Announce(lootLink .. L["ExcludeAnnounce1"])
         return false
@@ -904,9 +889,9 @@ local function ToFilters(slot)
         return true
     end
     -- NOTE: Commented out because it appears to not be needed.
-    -- if IsGold(slot) and not HotLoot:GetLootGold() then
+    -- if IsGold(slot) and not HotLoot:GetGoldFilter() then
     --     return false
-    -- elseif IsCurrency(slot) and not HotLoot:GetLootCurrency() then
+    -- elseif IsCurrency(slot) and not HotLoot:GetCurrencyFilter() then
     --     return false
     -- end
     if lootLink then
@@ -920,74 +905,74 @@ local function ToFilters(slot)
             HotLoot:Debug(strFilterDebug);
             if
                 -- Quest
-                HotLoot:GetLootQuest() and (itemType == L["Quest"] or ScanTip(slot, L["Quest Item"])) and CheckThreshold("Quest", itemSellPrice, lootQuantity) then 
+                HotLoot:GetQuestFilter() and (itemType == L["Quest"] or ScanTip(slot, L["Quest Item"])) and CheckThreshold("Quest", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Quest Item";
                     return true
             -- Commented out to remove "junk" option
             --elseif
                 -- Junk
-            --  (itemSubType == L["Junk"]) and HotLoot:GetLootJunk() and CheckThreshold("Junk", itemSellPrice, lootQuantity) then 
+            --  (itemSubType == L["Junk"]) and HotLoot:GetJunkFilter() and CheckThreshold("Junk", itemSellPrice, lootQuantity) then 
             --      return true
             elseif
-                -- HotLoot:GetLootPick(
-                (IsStealthed()) and (lootQuality ~= 0) and HotLoot:GetLootPick() then 
+                -- HotLoot:GetPickpocketFilter(
+                (IsStealthed()) and (lootQuality ~= 0) and HotLoot:GetPickpocketFilter() then 
                     strFilterCaught = "PickPocket";
                     return true
             elseif
                 -- Cloth
                 -- TODO: Change ALL Trade Goods to Tradeskill
-                (itemSubType == L["Cloth"]) and (itemType == L["Tradeskill"]) and HotLoot:GetLootCloth() and CheckThreshold("Cloth", itemSellPrice, lootQuantity) then 
+                (itemSubType == L["Cloth"]) and (itemType == L["Tradeskill"]) and HotLoot:GetClothFilter() and CheckThreshold("Cloth", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Cloth";
                     return true
             elseif
                 -- Mining
-                (itemSubType == L["Metal & Stone"]) and HotLoot:GetLootMining() and CheckThreshold("Metal & Stone", itemSellPrice, lootQuantity) then 
+                (itemSubType == L["Metal & Stone"]) and HotLoot:GetMiningFilter() and CheckThreshold("Metal & Stone", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Metal & Stone";
                     return true
             elseif
                 -- Gems
-                (itemType == L["Gem"]) and HotLoot:GetLootGems() and CheckThreshold("Gem", itemSellPrice, lootQuantity) then 
+                (itemType == L["Gem"]) and HotLoot:GetGemFilter() and CheckThreshold("Gem", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Gem";
                     return true
             elseif
                 -- Herbs
-                (itemSubType == L["Herb"]) and HotLoot:GetLootHerbs() and CheckThreshold("Herb", itemSellPrice, lootQuantity) then 
+                (itemSubType == L["Herb"]) and HotLoot:GetHerbFilter() and CheckThreshold("Herb", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Herb";
                     return true
             elseif
                 -- Leather
-                (itemSubType == L["Leather"]) and (itemType == L["Tradeskill"]) and HotLoot:GetLootSkinning() and CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
+                (itemSubType == L["Leather"]) and (itemType == L["Tradeskill"]) and HotLoot:GetLeatherFilter() and CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Leather";
                     return true
             elseif
                 -- Fishing (-junk)
-                IsFishingLoot() and HotLoot:GetLootFishing() and (itemSubType ~= L["Junk"]) then 
+                IsFishingLoot() and HotLoot:GetFishingFilter() and (itemSubType ~= L["Junk"]) then 
                     strFilterCaught = "Fishing";
                     return true
             elseif
                 -- enchanting
-                HotLoot:GetLootEnchanting() and (itemSubType == L["Enchanting"]) and CheckThreshold("Enchanting", itemSellPrice, lootQuantity) then 
+                HotLoot:GetEnchantingFilter() and (itemSubType == L["Enchanting"]) and CheckThreshold("Enchanting", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Enchanting";
                     return true
             
             elseif
-                -- GetLootCooking
-                HotLoot:GetLootCooking() and (itemSubType == L["Cooking"]) and CheckThreshold("Cooking Ingredient", itemSellPrice, lootQuantity) then 
+                -- GetCookingFilter
+                HotLoot:GetCookingFilter() and (itemSubType == L["Cooking"]) and CheckThreshold("Cooking Ingredient", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Cooking";
                     return true
             elseif
-                -- GetLootRecipes
-                HotLoot:GetLootRecipes() and (itemType == L["Recipe"]) then 
+                -- GetRecipeFilter
+                HotLoot:GetRecipeFilter() and (itemType == L["Recipe"]) then 
                     strFilterCaught = "Recipe";
                     return true
             elseif
-                --HotLoot:GetLootPigments(info)
-                HotLoot:GetLootPigments() and (string.find(lootName, "Pigment")) then 
+                --HotLoot:GetPigmentsFilter(info)
+                HotLoot:GetPigmentsFilter() and (string.find(lootName, "Pigment")) then 
                     strFilterCaught = "Pigment";
                     return true
             elseif
                 -- Pots
-                (itemSubType == L["Potion"]) and HotLoot:GetLootPots() and CheckThreshold("Potion", itemSellPrice, lootQuantity) then 
+                (itemSubType == L["Potion"]) and HotLoot:GetPotionFilter() and CheckThreshold("Potion", itemSellPrice, lootQuantity) then 
                     if HotLoot:GetPotionType() == "both" then
                         strFilterCaught = "Potion";
                         return true
@@ -1002,17 +987,17 @@ local function ToFilters(slot)
                     end
             elseif
                 -- Flasks
-                (itemSubType == L["Flask"]) and HotLoot:GetLootFlasks() and CheckThreshold("Flask", itemSellPrice, lootQuantity) then 
+                (itemSubType == L["Flask"]) and HotLoot:GetFlaskFilter() and CheckThreshold("Flask", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Flask";
                     return true
             elseif
                 -- Elixirs
-                (itemSubType == L["Elixir"]) and HotLoot:GetLootElixirs() and CheckThreshold("Elixir", itemSellPrice, lootQuantity) then 
+                (itemSubType == L["Elixir"]) and HotLoot:GetElixirFilter() and CheckThreshold("Elixir", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Elixir";
                     return true
             elseif
                 -- Motes
-                (itemSubType == L["Elemental"]) and HotLoot:GetLootElemental() and CheckThreshold("Elemental", itemSellPrice, lootQuantity) then 
+                (itemSubType == L["Elemental"]) and HotLoot:GetElementalFilter() and CheckThreshold("Elemental", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Elemental";
                     return true
             --[[elseif
@@ -1053,47 +1038,47 @@ local function ToFilters(slot)
                     return true]]
             elseif
                 -- Include List
-                HotLoot:GetIncludeTable()[lootName] then 
+                HotLoot:GetIncludeList()[lootName] then 
                     strFilterCaught = "Include List";
                     return true
             elseif
                 -- Poor
-                (HotLoot:GetLootPoor() == true) and (lootQuality == 0) and (CheckThreshold("z1Poor", itemSellPrice, lootQuantity)) --[[and (CheckILvl(itemLevel))]] then 
+                (HotLoot:GetPoorQualityFilter() == true) and (lootQuality == 0) and (CheckThreshold("z1Poor", itemSellPrice, lootQuantity)) --[[and (CheckILvl(itemLevel))]] then 
                     strFilterCaught = "Poor Quality";
                     return true
             elseif
                 -- Common
-                (HotLoot:GetLootCommon() == true) and (lootQuality == 1) and (CheckThreshold("z2Common", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                (HotLoot:GetCommonQualityFilter() == true) and (lootQuality == 1) and (CheckThreshold("z2Common", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
                     strFilterCaught = "Common Quality";
                     return true
             elseif
                 -- Uncommon
-                --[[(IsInGroup() == false) and ]](HotLoot:GetLootUncommon() == true) and (lootQuality == 2) and (CheckThreshold("z3Uncommon", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                --[[(IsInGroup() == false) and ]](HotLoot:GetUncommonQualityFilter() == true) and (lootQuality == 2) and (CheckThreshold("z3Uncommon", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
                     strFilterCaught = "Uncommon Quality";
                     return true
             elseif
                 -- Rare
-                --[[(IsInGroup() == false) and ]](HotLoot:GetLootRare() == true) and (lootQuality == 3) and (CheckThreshold("z4Rare", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                --[[(IsInGroup() == false) and ]](HotLoot:GetRareQualityFilter() == true) and (lootQuality == 3) and (CheckThreshold("z4Rare", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
                     strFilterCaught = "Rare Quality";
                     return true
             elseif
                 -- Epic
-                --[[(IsInGroup() == false) and ]](HotLoot:GetLootEpic() == true) and (lootQuality == 4) and (CheckThreshold("z5Epic", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                --[[(IsInGroup() == false) and ]](HotLoot:GetEpicQualityFilter() == true) and (lootQuality == 4) and (CheckThreshold("z5Epic", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
                     strFilterCaught = "Epic Quality";
                     return true
             elseif
                 -- Legendary
-                --[[(IsInGroup() == false) and ]](HotLoot:GetLootLegendary() == true) and (lootQuality == 5) and (CheckThreshold("z6Legendary", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                --[[(IsInGroup() == false) and ]](HotLoot:GetLegendaryQualityFilter() == true) and (lootQuality == 5) and (CheckThreshold("z6Legendary", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
                     strFilterCaught = "Legendary Quality";
                     return true
             elseif
                 -- Artifact
-                --[[(IsInGroup() == false) and ]](HotLoot:GetLootArtifact() == true) and (lootQuality == 6) and (CheckThreshold("z7Artifact", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                --[[(IsInGroup() == false) and ]](HotLoot:GetArtifactQualityFilter() == true) and (lootQuality == 6) and (CheckThreshold("z7Artifact", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
                     strFilterCaught = "Artifact Quality";
                     return true
             elseif
                 -- Heirloom
-                --[[(IsInGroup() == false) and ]](HotLoot:GetLootHeirloom() == true) and (lootQuality == 7) and (CheckThreshold("z8Heirloom", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
+                --[[(IsInGroup() == false) and ]](HotLoot:GetHeirloomQualityFilter() == true) and (lootQuality == 7) and (CheckThreshold("z8Heirloom", itemSellPrice, lootQuantity)) and (CheckILvl(itemLevel)) then 
                     strFilterCaught = "Heirloom Quality";
                     return true
             end
@@ -1101,7 +1086,7 @@ local function ToFilters(slot)
             
     else
         HotLoot:Announce(L["BagsFull"])
-        HotLoot:Debug("Bags are full.");
+        HotLoot:Debug(ERR_INV_FULL);
         return false
     end
     else
@@ -1130,9 +1115,9 @@ end
 
 function HotLoot:MMToggleAnchor()
     if HotLoot.mainFrame:IsVisible() then
-        HotLoot:SetLootShowAnchor(self, false)
+        HotLoot:SetShowLootMonitorAnchor(self, false)
     else
-        HotLoot:SetLootShowAnchor(self, true)
+        HotLoot:SetShowLootMonitorAnchor(self, true)
     end
 end
 
@@ -1154,11 +1139,11 @@ function HotLoot:UpdateMonitor()
     local yOffset
     local xOffset
     local row, column = 0, 0
-    if (HotLoot:GetLootGridMode() == true) and (HotLoot:GetLootShowNames() == false) then
+    if (HotLoot:GetLootGridMode() == true) and (HotLoot:GetShowItemNames() == false) then
         while i <= #icons do
             
-            xOffset = column * HotLoot:GetLootIconSize() --0, 32, 64, 96
-            yOffset = ((row + 1) * (HotLoot:GetLootIconSize() * HotLoot:GetLootGrowthDirection())) --0, 0, 0, 0, 
+            xOffset = column * HotLoot:GetIconSize() --0, 32, 64, 96
+            yOffset = ((row + 1) * (HotLoot:GetIconSize() * HotLoot:GetGrowthDirection())) --0, 0, 0, 0, 
             icons[i]:SetPoint("CENTER", HotLoot.mainFrame, "CENTER", xOffset, yOffset+5)
             i = i + 1
             if column < (HotLoot:GetLootGridNumColumns() - 1) then
@@ -1171,9 +1156,9 @@ function HotLoot:UpdateMonitor()
     else
         while i <= #icons do
             if themeSize == "large" then
-                yOffset = (i * ((32 + 18) * HotLoot:GetLootGrowthDirection()))
+                yOffset = (i * ((32 + 18) * HotLoot:GetGrowthDirection()))
             else
-                yOffset = (i * ((HotLoot:GetLootIconSize() + 3) * HotLoot:GetLootGrowthDirection()))
+                yOffset = (i * ((HotLoot:GetIconSize() + 3) * HotLoot:GetGrowthDirection()))
             end
             if HotLoot:GetTextSide() == 0 then
                 icons[i]:SetPoint("LEFT", HotLoot.mainFrame, "LEFT", 0, yOffset)
@@ -1255,7 +1240,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
     --local lmIcon = CreateFrame("Frame", iName, lmBackground)
     local lmBackground = CreateFrame("frame", "lmBG")
     local e = CreateFrame("button", "ExButtonFrame", lmBackground)
-    local size = HotLoot:GetLootIconSize()
+    local size = HotLoot:GetIconSize()
     local texture = lmBackground:CreateTexture(iName.."Icon","OVERLAY")
     local count = lmBackground:CreateFontString(nil, "OVERLAY")
     local name = lmBackground:CreateFontString(nil, "OVERLAY")
@@ -1276,7 +1261,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
     --Icon
     
         
-        lmIcon:SetAlpha(HotLoot:GetLootTrans())
+        lmIcon:SetAlpha(HotLoot:GetTransparency())
         
         lmIcon.texture:SetSize(lmIcon.size, lmIcon.size)
         lmIcon.texture:SetTexture(iPath)
@@ -1307,7 +1292,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         end
 
     --Count
-    if HotLoot:GetLootShowQuantities() then
+    if HotLoot:GetShowItemQuant() then
         if HotLoot:GetTextSide() == 0 then
             lmIcon.count:SetPoint("LEFT", lmIcon.name, "RIGHT", 2, 0)
         else
@@ -1317,7 +1302,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         lmIcon.count:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
         
         if iCount > 0 then
-            if HotLoot:GetShowTotal() then
+            if HotLoot:GetShowTotalQuant() then
                 local inBags = InBags(iName, iCount)
                 lmIcon.count:SetText("x"..iCount.." ["..inBags.."]")
             else
@@ -1337,9 +1322,9 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             tile = tileCurrent, tileSize = tileSizeCurrent, edgeSize = edgeSizeCurrent, 
             insets = insetsCurrent})
         
-        local r, g, b, a = HotLoot:GetThemeColorSelect()
-        local br, bg, bb, ba = HotLoot:GetThemeColorBorderSelect()
-        if HotLoot:GetColorQual() and iCount > 0 then
+        local r, g, b, a = HotLoot:GetThemeBG()
+        local br, bg, bb, ba = HotLoot:GetThemeBorderColor()
+        if HotLoot:GetColorByQuality() and iCount > 0 then
             local quality = select(3, GetItemInfo(iLink))
             if quality then
                 br, bg, bb = GetItemQualityColor(quality)
@@ -1360,10 +1345,10 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         
             animation1:SetDuration(1.5)
             animation1:SetSmoothing("IN")
-            if HotLoot:GetLootGrowthDirection() == 1 then
-                animation1:SetOffset(0, 200*HotLoot:GetFSpeed())
+            if HotLoot:GetGrowthDirection() == 1 then
+                animation1:SetOffset(0, 200*HotLoot:GetFadeSpeed())
             else
-                animation1:SetOffset(0, -200*HotLoot:GetFSpeed())
+                animation1:SetOffset(0, -200*HotLoot:GetFadeSpeed())
             end
             lmBackground.a = AnimationGroup
         end
@@ -1395,7 +1380,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
     --Icon
         
         
-        lmIcon:SetAlpha(HotLoot:GetLootTrans())
+        lmIcon:SetAlpha(HotLoot:GetTransparency())
         
         lmIcon.texture:SetSize(32, 32)
         lmIcon.texture:SetTexture(iPath)
@@ -1425,7 +1410,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         end
 
     --Count
-    if HotLoot:GetLootShowQuantities() then
+    if HotLoot:GetShowItemQuant() then
         if HotLoot:GetTextSide() == 0 then
             lmIcon.count:SetPoint("BOTTOMRIGHT", lmBackground, "BOTTOMRIGHT", -6, 8)
         else
@@ -1435,7 +1420,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         lmIcon.count:SetFont(STANDARD_TEXT_FONT, 7, "OUTLINE")
         
         if iCount > 0 then
-            if HotLoot:GetShowTotal() then
+            if HotLoot:GetShowTotalQuant() then
                 local inBags = InBags(iName, iCount)
                 lmIcon.count:SetText("x"..iCount.." ["..inBags.."]")
             else
@@ -1492,13 +1477,13 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             tile = tileCurrent, tileSize = tileSizeCurrent, edgeSize = edgeSizeCurrent, 
             insets = insetsCurrent})
         local r, g, b, a
-        if HotLoot:GetThemeSelect() == "toast" then 
+        if HotLoot:GetTheme() == "toast" then 
             r, g, b, a = 0,0,0,0.8
         else
-            r, g, b, a = 1,1,1,1 --HotLoot:GetThemeColorSelect()
+            r, g, b, a = 1,1,1,1 --HotLoot:GetThemeBG()
         end
-        local br, bg, bb, ba = 1,1,1,1 --HotLoot:GetThemeColorBorderSelect()
-        if HotLoot:GetColorQual() and iCount > 0 then
+        local br, bg, bb, ba = 1,1,1,1 --HotLoot:GetThemeBorderColor()
+        if HotLoot:GetColorByQuality() and iCount > 0 then
             local quality = select(3, GetItemInfo(iLink))
             if quality then
                 br, bg, bb = GetItemQualityColor(quality)
@@ -1560,10 +1545,10 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             
             animation1:SetDuration(1.5)
             animation1:SetSmoothing("IN")
-            if HotLoot:GetLootGrowthDirection() == 1 then
-                animation1:SetOffset(0, 100*HotLoot:GetFSpeed())
+            if HotLoot:GetGrowthDirection() == 1 then
+                animation1:SetOffset(0, 100*HotLoot:GetFadeSpeed())
             else
-                animation1:SetOffset(0, -100*HotLoot:GetFSpeed())
+                animation1:SetOffset(0, -100*HotLoot:GetFadeSpeed())
             end
             lmBackground.a = AnimationGroup
             lmBackground.glow.a = GlowAnimationGroup
@@ -1572,7 +1557,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             lmBackground.glow.a:Play()
         end
     end
-    if iCount > 0  and HotLoot:GetExcludeButton() then
+    if iCount > 0  and HotLoot:GetShowExcludeButton() then
         if HotLoot:GetTextSide() == 0 then
             e:SetPoint("RIGHT", lmBackground, "LEFT", -1, 0)
         else
@@ -1600,7 +1585,7 @@ end
 local function IButtonClicked(slot)
     incButtons[slot]:Hide()
     local iLink = GetLootSlotLink(slot)
-    HotLoot:AddIList(iLink)
+    HotLoot:AddToIncludeList(iLink)
     LootSlot(slot)
 end
 
@@ -1664,9 +1649,9 @@ function hlFadeItems()
     -- Main Fade Section
     --====================
     local iframe, alpha, fDelay, iDelay, sDelay, fSpeed
-    iDelay = HotLoot:GetIDelay()
-    sDelay = HotLoot:GetSDelay()
-    fSpeed = HotLoot:GetFSpeed() * 0.01
+    iDelay = HotLoot:GetInitialDelay()
+    sDelay = HotLoot:GetSecondaryDelay()
+    fSpeed = HotLoot:GetFadeSpeed() * 0.01
     if (isFirst == 0) then
         --isFirst = 0
         fDelay = iDelay -- 5
@@ -1703,14 +1688,14 @@ end
 --==========================
 
 function HotLoot:LOOT_OPENED()
-    if HotLoot:GetLootEnabled() then
+    if HotLoot:GetSystemEnable() then
     
     mFocus = GetMouseFocus():GetName()
     skinModeTrigger = 0
         for i=1, GetNumLootItems() do
             local _, lootName = GetLootSlotInfo(i)
             --table.insert(lootSlots, HotLoot:CreatLootSlot(i))
-            if HotLoot:GetIncludeButton() and not HotLoot:GetIncludeTable()[lootName] then
+            if HotLoot:GetShowIncludeButton() and not HotLoot:GetIncludeList()[lootName] then
                 incButtons[i] = HotLoot:CreateILootButton(i)
                 --HotLoot:dBug(incButtons[i])
             end
@@ -1721,7 +1706,7 @@ function HotLoot:LOOT_OPENED()
                     local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(i)
                     local itemLink = GetLootSlotLink(i)
                 --HotLoot:AddToCount(lootName, lootQuantity)
-                if (HotLoot:GetLootEnableMonitor() == true) then
+                if (HotLoot:GetEnableLootMonitor() == true) then
                     if IsGold(i) then
                         lootName = GetCoinTextureString(HotLoot:ToCopper(lootName))
                     end
@@ -1751,7 +1736,7 @@ function HotLoot:LOOT_OPENED()
             mFocus = "nil"
         end
         --HotLoot:dBug("mFocus", mFocus)
-        if HotLoot:GetLootClose() and not CloseKeyDown() and string.find(mFocus, "WorldFrame") then     
+        if HotLoot:GetCloseLootWindow() and not CloseKeyDown() and string.find(mFocus, "WorldFrame") then     
             closeEL = 1
             CloseLoot()
         end
@@ -1786,9 +1771,9 @@ function HotLoot:BAG_UPDATE(...)
 end
 
 function HotLoot:MERCHANT_SHOW(...)
-    if HotLoot:GetLootEnabled() and HotLoot:GetSellGreys() then
+    if HotLoot:GetSystemEnable() and HotLoot:GetSellPoorItems() then
     HotLoot:Debug("Merchant Window Opened")
-        HotLoot:SellGreys()
+        HotLoot:SellPoorItems()
     end
 end
 
@@ -1811,7 +1796,7 @@ end
 
 function HotLoot:START_LOOT_ROLL(...)
     local event, rollID, rollTime = ...
-    if HotLoot:GetLootEnabled() and IsAddOnLoaded("HotLoot_Group") then
+    if HotLoot:GetSystemEnable() and IsAddOnLoaded("HotLoot_Group") then
         HotLoot:StartRoll(rollID, rollTime)
     end
 end

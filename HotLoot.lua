@@ -280,6 +280,88 @@ function HotLoot:GetColor(color)
     end
 end
 
+--=========================
+--   Transfer Settings
+--=========================
+local function TransferOldSetting(oldKey, newKey)
+    if HotLoot.db.profile[oldKey] ~= nil then
+        HotLoot.db.profile[newKey] = HotLoot.db.profile[oldKey];
+        HotLoot.db.profile[oldKey] = nil;
+    end
+end
+function HotLoot:TransferAllSettings()
+    HotLoot:Announce("Settings have changed and need to be transferred.");
+    HotLoot:Announce("Transfering old settings now...");
+
+    TransferOldSetting("lootEnabled",         "toggleSystemEnable");
+    TransferOldSetting("lootDebug",           "toggleDebugMode");
+    TransferOldSetting("lootAnnounce",        "toggleAnnounceEvents");
+    TransferOldSetting("lootAdvanced",        "toggleAdvancedOptions");
+    TransferOldSetting("lootClose",           "toggleCloseLootWindow");
+    TransferOldSetting("lootCloseKey",        "selectCloseLootWindowModifier");
+    TransferOldSetting("lootSkinMode",        "toggleSkinningMode");
+    TransferOldSetting("lootSkinKey",         "selectSkinningModeModifier");
+    TransferOldSetting("lootEnableMonitor",   "toggleEnableLootMonitor");
+    TransferOldSetting("lootShowAnchor",      "toggleShowLootMonitorAnchor");
+    TransferOldSetting("lootShowQuantities",  "toggleShowItemQuant");
+    TransferOldSetting("showSellPrice",       "toggleShowSellPrice");
+    TransferOldSetting("showItemType",        "toggleShowItemType");
+    TransferOldSetting("lootIconSize",        "rangeIconSize");
+    TransferOldSetting("lootTrans",           "rangeTransparency");
+    TransferOldSetting("lootShowTotal",       "toggleShowTotalQuant");
+    TransferOldSetting("lootGrowthDirection", "selectGrowthDirection");
+    TransferOldSetting("textSide",            "selectTextSide");
+    TransferOldSetting("minWidth",            "inputMinWidth");
+    TransferOldSetting("initialDelay",        "rangeInitialDelay");
+    TransferOldSetting("secondaryDelay",      "rangeSecondaryDelay");
+    TransferOldSetting("fadeSpeed",           "rangeFadeSpeed");
+    TransferOldSetting("colorQual",           "toggleColorByQuality");
+    TransferOldSetting("showAnimation",       "toggleShowAnimation");
+    TransferOldSetting("themeSelect",         "selectTheme");
+    TransferOldSetting("themeColorR",         "fThemeColorR");
+    TransferOldSetting("themeColorG",         "fThemeColorG");
+    TransferOldSetting("themeColorB",         "fThemeColorB");
+    TransferOldSetting("themeColorA",         "fThemeColorA");
+    TransferOldSetting("themeColorBorderR",   "fThemeBorderColorR");
+    TransferOldSetting("themeColorBorderG",   "fThemeBorderColorG");
+    TransferOldSetting("themeColorBorderB",   "fThemeBorderColorB");
+    TransferOldSetting("themeColorBorderA",   "fThemeBorderColorA");
+    TransferOldSetting("lootGold",            "toggleGoldFilter");
+    TransferOldSetting("lootQuest",           "toggleQuestFilter");
+    TransferOldSetting("lootCurrency",        "toggleCurrencyFilter");
+    TransferOldSetting("lootJunk",            "toggleJunkFilter");
+    TransferOldSetting("lootPick",            "togglePickpocketFilter");
+    TransferOldSetting("lootCloth",           "toggleClothFilter");
+    TransferOldSetting("lootMining",          "toggleMiningFilter");
+    TransferOldSetting("lootGems",            "toggleGemFilter");
+    TransferOldSetting("lootHerbs",           "toggleHerbFilter");
+    TransferOldSetting("lootSkinning",        "toggleLeatherFilter");
+    TransferOldSetting("lootFishing",         "toggleFishingFilter");
+    TransferOldSetting("lootEnchanting",      "toggleEnchantingFilter");
+    TransferOldSetting("lootCooking",         "toggleCookingFilter");
+    TransferOldSetting("lootRecipes",         "toggleRecipeFilter");
+    TransferOldSetting("lootPots",            "togglePotionFilter");
+    TransferOldSetting("potionType",          "selectPotionType");
+    TransferOldSetting("lootFlasks",          "toggleFlaskFilter");
+    TransferOldSetting("lootElixirs",         "toggleElixirFilter");
+    TransferOldSetting("lootElemental",       "toggleElementalFilter");
+    TransferOldSetting("lootPoor",            "togglePoorQualityFilter");
+    TransferOldSetting("sellGreys",           "toggleSellPoorItems");
+    TransferOldSetting("lootCommon",          "toggleCommonQualityFilter");
+    TransferOldSetting("lootUncommon",        "toggleUncommonQualityFilter");
+    TransferOldSetting("lootRare",            "toggleRareQualityFilter");
+    TransferOldSetting("lootEpic",            "toggleEpicQualityFilter");
+    TransferOldSetting("lootLegendary",       "toggleLegendaryQualityFilter");
+    TransferOldSetting("minILvl",             "inputMinItemLevel");
+    TransferOldSetting("eList",               "tableExcludeList");
+    TransferOldSetting("iList",               "tableIncludeList");
+    TransferOldSetting("type1",               "selectThresholdType1");
+    TransferOldSetting("type2",               "selectThresholdType2");
+    TransferOldSetting("type3",               "selectThresholdType3");
+    TransferOldSetting("useQuant",            "toggleUseQuantValue");
+
+    HotLoot:Announce("Settings transfer complete!");
+end
 
 -- OnInitialize
 function HotLoot:OnInitialize()
@@ -291,6 +373,9 @@ function HotLoot:OnInitialize()
     hlOptions.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
     --self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("HotLoot", "HotLoot")
     
+    -- Transfer Settings
+    HotLoot:TransferAllSettings();
+
     if not self.db.profile.watchList then
         self.db.profile.watchList = {}
     end

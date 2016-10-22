@@ -1,5 +1,5 @@
 package-as: HotLoot
 
 manual-changelog:
-    filename: CHANGELOG.txt
+    filename: CHANGELOG.md
     markup-type: markdown

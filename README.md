@@ -1,7 +1,5 @@
-# Update! *(October 13, 2016)*
 ## HotLoot is BACK!
-### Welcome to v3.0.0!
-There are still a couple bugs I'm smoothing out but for the most part, it should work.
+### Welcome to v3.0.x!
 
 ## Description
 **HotLoot** is an autoloot filter designed to streamline the looting process. This AddOn will allow you to automatically loot various items related to professions and quests. 
@@ -10,7 +8,7 @@ There are still a couple bugs I'm smoothing out but for the most part, it should
 [Please post any issues here on GitHub](https://github.com/nmsmith22389/HotLoot/issues)
 
 ## Tutorial *NEW*
-//This is an amazing and in depth tutorial made by BetaWhale. Check it out! (if I got your name wrong tell me)//
+This is an amazing and in depth tutorial made by BetaWhale. Check it out! (if I got your name wrong tell me)
 
 [http://youtu.be/_Pt3LOqT4Jo](http://youtu.be/_Pt3LOqT4Jo)
 
@@ -25,11 +23,28 @@ Credit will be made where due
 
 ## Coming Soon
 
-_If you have ideas for new features you would like to see implemented please comment and we will do our best to implement them!_
+_If you have ideas for new features you would like to see implemented please open a ticket in [GitHub issues](https://github.com/nmsmith22389/HotLoot/issues) and we will do our best to implement them!_
 
-## Changes
-### v3.0.0
+## Recent Changes
+## v3.0.3
+### New
+* Added Settings Transfer Function
+* Added Artifact and Heirloom Options
+* Added Better Confirm Dialog to Skinning Mode
+* Added Caught From Var for Debugging
+* Added New Debug Functions
+* Added Enable/Disable All Filters Buttons
+* Added Testing Section to About
 
-* Updated for v7.0.x
-* Removed old Timeless Isle Section
-* Fixed some bugs
+### Fixed
+* Localization Update
+* Fixed Include/Exclude Button Textures
+* Localization Strings Renamed
+* Made Anchor Bar Pretty
+
+### Removed
+* Removed Timeless Isle from Filter
+* Removed Extras Section and MoH Filter
+* Removed Extraneous Files
+* Removed Left Over Functions
+* Removed Right Click Tooltip on Minimap

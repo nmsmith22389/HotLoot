@@ -290,7 +290,7 @@ local function TransferOldSetting(oldKey, newKey)
     end
 end
 function HotLoot:TransferAllSettings()
-    HotLoot:Announce("Settings have changed and need to be transferred.");
+    HotLoot:Announce("Settings have changed and need to be transferred.\n This should only happen once.");
     HotLoot:Announce("Transfering old settings now...");
 
     TransferOldSetting("lootEnabled",         "toggleSystemEnable");
@@ -375,7 +375,10 @@ function HotLoot:OnInitialize()
     --self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("HotLoot", "HotLoot")
     
     -- Transfer Settings
-    HotLoot:TransferAllSettings();
+    if self.db.profile.bOldSettingsTransferred ~= true then
+        HotLoot:TransferAllSettings();
+        self.db.profile.bOldSettingsTransferred = true;
+    end
 
     if not self.db.profile.watchList then
         self.db.profile.watchList = {}

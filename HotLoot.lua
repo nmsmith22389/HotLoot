@@ -338,7 +338,7 @@ function HotLoot:TransferAllSettings()
     TransferOldSetting("lootSkinning",        "toggleLeatherFilter");
     TransferOldSetting("lootFishing",         "toggleFishingFilter");
     TransferOldSetting("lootEnchanting",      "toggleEnchantingFilter");
-    TransferOldSetting("lootPigments",      "togglePigmentsFilter");
+    TransferOldSetting("lootPigments",        "togglePigmentsFilter");
     TransferOldSetting("lootCooking",         "toggleCookingFilter");
     TransferOldSetting("lootRecipes",         "toggleRecipeFilter");
     TransferOldSetting("lootPots",            "togglePotionFilter");

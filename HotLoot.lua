@@ -19,7 +19,7 @@ hIcon = LibStub("LibDBIcon-1.0")
 --         VAR LIST
 --==========================
 --==GENERAL==--
-local lootedByHL, icons, itemsToDelete, closeEL, skinModeTrigger  = {}, {}, "", 0, 0
+local lootedByHL, icons, itemsToDelete, closeEL, skinModeTrigger  = {}, {}, {}, 0, 0
 local strFilterCaught;
 
 --==THEMES==--
@@ -566,14 +566,14 @@ function HotLoot:RemoveFromExcludeList()
     HotLoot:GetExcludeList()[HotLoot:GetExcludeListSelect()] = nil
 end
 
-    
+
 --==========================
 --      To Skin Mode
 --==========================
 local function ToSkin(slot)
     local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(slot)
     if  (HotLoot:GetSkinningMode() or SkinKeyDown()) and (lootQuantity > 0) then
-        itemsToDelete = itemsToDelete .. " " .. lootName
+        itemsToDelete[lootName] = true
         --itemsToDelete[curSlot] = itemLink
         LootSlot(slot)
         HotLoot:Debug("|c" .. HotLoot:GetColor("alert") .. lootName .. " is set to be deleted!|r")
@@ -592,7 +592,7 @@ local function DeleteLeftovers()
                 local dLink = GetContainerItemLink(b, s)
                 if dLink then
                     local dName = select(1, GetItemInfo(dLink))
-                    if string.find(itemsToDelete, dName) ~= nil then 
+                    if itemsToDelete[dName] then
                         PickupContainerItem(b, s)
                         if CursorHasItem() then
                              HotLoot:Announce(dLink .. L["SkinAnnounce2"])
@@ -602,7 +602,7 @@ local function DeleteLeftovers()
                 end
             end
         end
-        itemsToDelete = " "
+        itemsToDelete = {}
     end
 end
 --==========================

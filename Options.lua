@@ -360,16 +360,6 @@ local tableThemes = {
                             get = "GetGrowthDirection",
                             order = 3
                         },
-                        selectTextSide = {
-                            name = L["selectTextSideName"],
-                            desc = L["selectTextSideDesc"],
-                            type = "select",
-                            values = tableDirectionHorizontal,
-                            set = "SetTextSide",
-                            get = "GetTextSide",
-                            order = 4
-                        },
-                        
                         selectTheme = {
                             name = L["selectThemeName"],
                             -- desc = L["selectThemeDesc"],
@@ -466,6 +456,22 @@ local tableThemes = {
                             get = "GetShowAnimation",
                             order = 13
                         }
+                    }
+                },
+                goupLootMonitorText = {
+                    name = L["genText"], 
+                    type = "group", 
+                    order = 6, 
+                    args = {
+                        selectTextSide = {
+                            name = L["selectTextSideName"],
+                            desc = L["selectTextSideDesc"],
+                            type = "select",
+                            values = tableDirectionHorizontal,
+                            set = "SetTextSide",
+                            get = "GetTextSide",
+                            order = 1
+                        },
                     }
                 }
             }

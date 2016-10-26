@@ -1335,6 +1335,9 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
     local sellPrice = lmBackground:CreateFontString(nil, "OVERLAY")
     local itemType = lmBackground:CreateFontString(nil, "OVERLAY")
     local item = iLink
+
+    local itemQuality = select(3, GetItemInfo(iLink));
+
     lmIcon = lmBackground
     lmIcon.size = size
     lmIcon.texture = texture
@@ -1373,6 +1376,19 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             end
             
             lmIcon.name:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize(), "OUTLINE")
+            --[[
+            -- NOTE: I dont think this is needed because the item link should color itself by qual.
+            if HotLoot:GetFontColorByQual then
+                lmIcon.name:SetTextColor(
+                    ITEM_QUALITY_COLORS[itemQuality].r, 
+                    ITEM_QUALITY_COLORS[itemQuality].g, 
+                    ITEM_QUALITY_COLORS[itemQuality].b, 
+                    1
+                );
+            else
+                lmIcon.name:SetTextColor(HotLoot:GetFontColor());
+            end
+            ]]
             
             if iCount == 0 then
                 lmIcon.name:SetText(iName)
@@ -1392,6 +1408,16 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         end
         
         lmIcon.count:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize(), "OUTLINE")
+        if HotLoot:GetFontColorByQual then
+            lmIcon.count:SetTextColor(
+                ITEM_QUALITY_COLORS[itemQuality].r, 
+                ITEM_QUALITY_COLORS[itemQuality].g, 
+                ITEM_QUALITY_COLORS[itemQuality].b, 
+                1
+            );
+        else
+            lmIcon.count:SetTextColor(HotLoot:GetFontColor());
+        end
         
         if iCount > 0 then
             if HotLoot:GetShowTotalQuant() then
@@ -1512,6 +1538,16 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         -- NOTE: Made (large) quant to have font size -2 compared to name.
         --          Adjust as needed.
         lmIcon.count:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize()-2, "OUTLINE")
+        if HotLoot:GetFontColorByQual then
+            lmIcon.count:SetTextColor(
+                ITEM_QUALITY_COLORS[itemQuality].r, 
+                ITEM_QUALITY_COLORS[itemQuality].g, 
+                ITEM_QUALITY_COLORS[itemQuality].b, 
+                1
+            );
+        else
+            lmIcon.count:SetTextColor(HotLoot:GetFontColor());
+        end
         
         if iCount > 0 then
             if HotLoot:GetShowTotalQuant() then
@@ -1535,6 +1571,16 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         end
         
         lmIcon.sell:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize()-2, "OUTLINE")
+        if HotLoot:GetFontColorByQual then
+            lmIcon.sell:SetTextColor(
+                ITEM_QUALITY_COLORS[itemQuality].r, 
+                ITEM_QUALITY_COLORS[itemQuality].g, 
+                ITEM_QUALITY_COLORS[itemQuality].b, 
+                1
+            );
+        else
+            lmIcon.sell:SetTextColor(HotLoot:GetFontColor());
+        end
         
         if sellPriceText then
             lmIcon.sell:SetText(GetCoinTextureString(sellPriceText))
@@ -1555,6 +1601,16 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         end
         
         lmIcon.type:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize()-2, "OUTLINE")
+        if HotLoot:GetFontColorByQual then
+            lmIcon.type:SetTextColor(
+                ITEM_QUALITY_COLORS[itemQuality].r, 
+                ITEM_QUALITY_COLORS[itemQuality].g, 
+                ITEM_QUALITY_COLORS[itemQuality].b, 
+                1
+            );
+        else
+            lmIcon.type:SetTextColor(HotLoot:GetFontColor());
+        end
         if itemTypeText then
             lmIcon.type:SetText(itemTypeText..": "..itemTypeText2)
         end

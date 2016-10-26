@@ -463,15 +463,6 @@ local tableThemes = {
                     type = "group", 
                     order = 6, 
                     args = {
-                        selectTextSide = {
-                            name = L["selectTextSideName"],
-                            desc = L["selectTextSideDesc"],
-                            type = "select",
-                            values = tableDirectionHorizontal,
-                            set = "SetTextSide",
-                            get = "GetTextSide",
-                            order = 1
-                        },
                         selectTextFont = {
                             name = L["genFont"],
                             desc = L["selectTextFontDesc"],
@@ -480,7 +471,17 @@ local tableThemes = {
                             values = AceGUIWidgetLSMlists.font,
                             set = "SetTextFont",
                             get = "GetTextFont",
+                            width = "full",
                             hidden = "GetAdvancedOptionsHidden",
+                            order = 1
+                        },
+                        selectTextSide = {
+                            name = L["selectTextSideName"],
+                            desc = L["selectTextSideDesc"],
+                            type = "select",
+                            values = tableDirectionHorizontal,
+                            set = "SetTextSide",
+                            get = "GetTextSide",
                             order = 2
                         },
                         rangeFontSize = {
@@ -495,6 +496,24 @@ local tableThemes = {
                             get = "GetFontSize",
                             hidden = "GetAdvancedOptionsHidden",
                             order = 3
+                        },
+                        colorFontColor = {
+                            name = L["colorFontColorName"],
+                            --desc = L[colorFontColorDesc"],
+                            type = "color",
+                            set = "SetFontColor",
+                            get = "GetFontColor",
+                            hidden = "GetAdvancedOptionsHidden",
+                            hasAlpha = true,
+                            order = 4
+                        },
+                        toggleFontColorByQual = {
+                            name = L["toggleFontColorByQualName"],
+                            desc = L["toggleFontColorByQualDesc"],
+                            type = "toggle",
+                            set = "SetFontColorByQual",
+                            get = "GetFontColorByQual",
+                            order = 5
                         },
                     }
                 }
@@ -1363,6 +1382,7 @@ hlDefaults = {
         fThemeBorderColorA = 1,
         -- inlineQuant = true,
         toggleShowTotalQuant = true,
+        selectTheme = "toast",
         selectGrowthDirection = -1, 
         inputMinWidth = "145",
         rangeInitialDelay = 5,
@@ -1370,10 +1390,14 @@ hlDefaults = {
         rangeFadeSpeed = 5,
         toggleColorByQuality = true,
         toggleShowAnimation = true,
-        selectTextSide = 0,
         selectTextFont = STANDARD_TEXT_FONT,
+        selectTextSide = 0,
         rangeFontSize = 9,
-        selectTheme = "toast",
+        fFontColorR = 0,
+        fFontColorG = 0,
+        fFontColorB = 0,
+        fFontColorA = 1,
+        toggleFontColorByQual = false,
         lootGridMode = false,
         lootGridNumColumns = 4,
         toggleGoldFilter = true,
@@ -1647,15 +1671,6 @@ function HotLoot:GetShowAnimation(info)
     return self.db.profile.toggleShowAnimation;
 end
 
--- HotLoot:GetTextSide()
-function HotLoot:SetTextSide(info, value)
-    self.db.profile.selectTextSide = value;
-    HotLoot:DebugOption("selectTextSide", value);
-end
-function HotLoot:GetTextSide(info)
-    return self.db.profile.selectTextSide;
-end
-
 -- HotLoot:GetTextFont()
 function HotLoot:SetTextFont(info, value)
     self.db.profile.selectTextFont = value;
@@ -1665,6 +1680,15 @@ function HotLoot:GetTextFont(info)
     return self.db.profile.selectTextFont;
 end
 
+-- HotLoot:GetTextSide()
+function HotLoot:SetTextSide(info, value)
+    self.db.profile.selectTextSide = value;
+    HotLoot:DebugOption("selectTextSide", value);
+end
+function HotLoot:GetTextSide(info)
+    return self.db.profile.selectTextSide;
+end
+
 -- HotLoot:GetFontSize()
 function HotLoot:SetFontSize(info, value)
     self.db.profile.rangeFontSize = value;
@@ -1672,6 +1696,27 @@ function HotLoot:SetFontSize(info, value)
 end
 function HotLoot:GetFontSize(info)
     return self.db.profile.rangeFontSize;
+end
+
+-- HotLoot:GetFontColor()
+function HotLoot:SetFontColor(info, r, g, b, a)
+    self.db.profile.fFontColorR = r;
+    self.db.profile.fFontColorG = g;
+    self.db.profile.fFontColorB = b;
+    self.db.profile.fFontColorA = a;
+    HotLoot:DebugOption("colorFontColor", r..", "..g..", "..b..", "..a);
+end
+function HotLoot:GetFontColor(info)
+    return self.db.profile.fFontColorR, self.db.profile.fFontColorG, self.db.profile.fFontColorB, self.db.profile.fFontColorA;
+end
+
+-- HotLoot:GetFontColorByQual()
+function HotLoot:SetFontColorByQual(info, value)
+    self.db.profile.toggleFontColorByQual = value;
+    HotLoot:DebugOption("toggleFontColorByQual", value);
+end
+function HotLoot:GetFontColorByQual(info)
+    return self.db.profile.toggleFontColorByQual;
 end
 
 -- lootGridMode

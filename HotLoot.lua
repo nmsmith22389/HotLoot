@@ -19,7 +19,7 @@ hIcon = LibStub("LibDBIcon-1.0")
 --         VAR LIST
 --==========================
 --==GENERAL==--
-local lootedByHL, icons, itemsToDelete, closeEL, skinModeTrigger  = {}, {}, {}, 0, 0
+local lootedByHL, icons, closeEL = {}, {}, 0;
 local strFilterCaught;
 
 --==THEMES==--
@@ -511,9 +511,11 @@ end
 --          GET ID
 --==========================
 local function GetItemID(itemLink)
-    local _, _, Color, Ltype, Id, Enchant, Gem1, Gem2, Gem3, Gem4, Suffix, Unique, LinkLvl, Name = string.find(itemLink,
-        "|?c?f?f?(%x*)|?H?([^:]*):?(%d+):?(%d*):?(%d*):?(%d*):?(%d*):?(%d*):?(%-?%d*):?(%-?%d*):?(%d*):?(%d*):?(%-?%d*)|?h?%[?([^%[%]]*)%]?|?h?|?r?")
-    return tonumber(Id)
+    -- local _, _, Color, Ltype, Id, Enchant, Gem1, Gem2, Gem3, Gem4, Suffix, Unique, LinkLvl, Name = string.find(itemLink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+):?(%d*):?(%d*):?(%d*):?(%d*):?(%d*):?(%-?%d*):?(%-?%d*):?(%d*):?(%d*):?(%-?%d*)|?h?%[?([^%[%]]*)%]?|?h?|?r?")
+
+    -- This should return only the item ID
+    local itemID = select(5, string.find(itemLink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+):?(%d*):?(%d*):?(%d*):?(%d*):?(%d*):?(%-?%d*):?(%-?%d*):?(%d*):?(%d*):?(%-?%d*)|?h?%[?([^%[%]]*)%]?|?h?|?r?"));
+    return tonumber(Id);
 end
 --==========================
 --      IS KEY DOWN
@@ -570,39 +572,39 @@ end
 --==========================
 --      To Skin Mode
 --==========================
+-- TODO: Find out what happens if gold isnt set to pick up and you use skinning mode on it.
+local tItemsToDelete = {};
 local function ToSkin(slot)
-    local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(slot)
-    if  (HotLoot:GetSkinningMode() or SkinKeyDown()) and (lootQuantity > 0) then
-        itemsToDelete[lootName] = true
-        --itemsToDelete[curSlot] = itemLink
-        LootSlot(slot)
-        HotLoot:Debug("|c" .. HotLoot:GetColor("alert") .. lootName .. " is set to be deleted!|r")
-        skinModeTrigger = 1
+    local _, lootName, lootQuantity, _, _ = GetLootSlotInfo(slot);
+    local itemLink = GetLootSlotLink(slot);
+    if (HotLoot:GetSkinningMode() or SkinKeyDown()) and (lootQuantity > 0) then
+        tItemsToDelete[lootName] = true;
+        LootSlot(slot);
+        HotLoot:Debug("|c" .. HotLoot:GetColor("alert") .. lootName .. " is set to be deleted!|r");
     end
 end
 --#############################
 --      Skinning Mode
 --#############################
 local function DeleteLeftovers()
-    if (HotLoot:GetSkinningMode() == true) or (skinModeTrigger == 1) then
-        skinModeTrigger = 0
-         HotLoot:Announce(L["SkinAnnounce1"])
-        for b = 0, 4 do 
-            for s = 1, GetContainerNumSlots(b) do 
-                local dLink = GetContainerItemLink(b, s)
-                if dLink then
-                    local dName = select(1, GetItemInfo(dLink))
-                    if itemsToDelete[dName] then
-                        PickupContainerItem(b, s)
-                        if CursorHasItem() then
-                             HotLoot:Announce(dLink .. L["SkinAnnounce2"])
-                            DeleteCursorItem()
-                        end
+    if #tItemsToDelete > 0 then
+        -- TODO: Rename
+        HotLoot:Announce(L["SkinAnnounce1"]);
+        for bag = 0, NUM_BAG_SLOTS do 
+            for slot = 1, GetContainerNumSlots(bag) do 
+                local itemLink = GetContainerItemLink(bag, slot);
+                local itemName = select(1, GetItemInfo(itemLink));
+                if itemName and tItemsToDelete[itemName] then
+                    PickupContainerItem(bag, slot);
+                    if CursorHasItem() then
+                        DeleteCursorItem();
+                        -- TODO: Rename
+                        HotLoot:Announce(itemLink .. L["SkinAnnounce2"]);
                     end
                 end
             end
         end
-        itemsToDelete = {}
+        tItemsToDelete = {}
     end
 end
 --==========================
@@ -1854,9 +1856,7 @@ function HotLoot:LOOT_SLOT_CLEARED(...)
 end
 
 function HotLoot:BAG_UPDATE(...)
-    if skinModeTrigger == 1 then
-        DeleteLeftovers()
-    end
+    DeleteLeftovers();
 end
 
 function HotLoot:MERCHANT_SHOW(...)

@@ -234,8 +234,7 @@ local tableThemes = {
                             type = "toggle",
                             set = "SetShowItemNames",
                             get = "GetShowItemNames",
-                            disabled = "GetShowItemNamesDisabled",
-                            hidden = true, --"GetAdvancedOptions",
+                            hidden = "GetAdvancedOptionsHidden",
                             width = "double",
                             order = 3
                         },

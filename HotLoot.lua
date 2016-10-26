@@ -246,10 +246,7 @@ local function LoadThemeInit(theme)
     disIconSizeCurrent = newThemes[theme]["disIconSize"]
 
 end
--- disNamesC
-function HotLoot:GetShowItemNamesDisabled()
-    return disNamesC
-end
+
 -- disIconSizeCurrent
 function HotLoot:GetIconSizeDisabled()
     return disIconSizeCurrent
@@ -1366,20 +1363,24 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         end
     --Name
     
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.name:SetPoint("LEFT", lmIcon.texture, "RIGHT", 2, 0)
-            lmIcon.name:SetJustifyH("LEFT")
+        if HotLoot:GetShowItemNames() then
+            if HotLoot:GetTextSide() == 0 then
+                lmIcon.name:SetPoint("LEFT", lmIcon.texture, "RIGHT", 2, 0)
+                lmIcon.name:SetJustifyH("LEFT")
+            else
+                lmIcon.name:SetPoint("RIGHT", lmIcon.texture, "LEFT", -2, 0)
+                lmIcon.name:SetJustifyH("RIGHT")
+            end
+            
+            lmIcon.name:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
+            
+            if iCount == 0 then
+                lmIcon.name:SetText(iName)
+            else
+                lmIcon.name:SetText(iLink)
+            end
         else
-            lmIcon.name:SetPoint("RIGHT", lmIcon.texture, "LEFT", -2, 0)
-            lmIcon.name:SetJustifyH("RIGHT")
-        end
-        
-        lmIcon.name:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
-        
-        if iCount == 0 then
-            lmIcon.name:SetText(iName)
-        else
-            lmIcon.name:SetText(iLink)
+            lmIcon.name:Hide();
         end
 
     --Count

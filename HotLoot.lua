@@ -19,7 +19,7 @@ hIcon = LibStub("LibDBIcon-1.0")
 --         VAR LIST
 --==========================
 --==GENERAL==--
-local lootedByHL, icons, closeEL = {}, {}, 0;
+local icons, closeEL = {}, 0;
 local strFilterCaught;
 
 --==THEMES==--

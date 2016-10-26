@@ -205,8 +205,8 @@ local tableThemes = {
                     func = "buttonResetLootMonitor", 
                     order = 3
                 },
-                goupLootMonitorSettings = {
-                    name = L["genSettings"], 
+                goupLootMonitorGeneral = {
+                    name = L["genGeneral"], 
                     type = "group", 
                     order = 4, 
                     args = {

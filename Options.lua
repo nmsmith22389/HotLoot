@@ -472,6 +472,30 @@ local tableThemes = {
                             get = "GetTextSide",
                             order = 1
                         },
+                        selectTextFont = {
+                            name = L["genFont"],
+                            desc = L["selectTextFontDesc"],
+                            type = "select",
+                            dialogControl = 'LSM30_Font',
+                            values = AceGUIWidgetLSMlists.font,
+                            set = "SetTextFont",
+                            get = "GetTextFont",
+                            hidden = "GetAdvancedOptionsHidden",
+                            order = 2
+                        },
+                        rangeFontSize = {
+                            name = L["rangeFontSizeName"],
+                            desc = L["rangeFontSizeDesc"],
+                            type = "range",
+                            min = 6,
+                            max = 16,
+                            step = 2, 
+                            bigStep = 2,
+                            set = "SetFontSize",
+                            get = "GetFontSize",
+                            hidden = "GetAdvancedOptionsHidden",
+                            order = 3
+                        },
                     }
                 }
             }
@@ -1329,17 +1353,6 @@ hlDefaults = {
         toggleShowItemType = true,
         rangeIconSize = 16, 
         rangeTransparency = 1,
-        -- inlineQuant = true,
-        toggleShowTotalQuant = true,
-        selectGrowthDirection = -1, 
-        selectTextSide = 0,
-        inputMinWidth = "145",
-        rangeInitialDelay = 5,
-        rangeSecondaryDelay = 1,
-        rangeFadeSpeed = 5,
-        toggleColorByQuality = true,
-        toggleShowAnimation = true,
-        selectTheme = "toast",
         fThemeColorR = 0,
         fThemeColorG = 0,
         fThemeColorB = 0,
@@ -1348,6 +1361,19 @@ hlDefaults = {
         fThemeBorderColorG = 1,
         fThemeBorderColorB = 1,
         fThemeBorderColorA = 1,
+        -- inlineQuant = true,
+        toggleShowTotalQuant = true,
+        selectGrowthDirection = -1, 
+        inputMinWidth = "145",
+        rangeInitialDelay = 5,
+        rangeSecondaryDelay = 1,
+        rangeFadeSpeed = 5,
+        toggleColorByQuality = true,
+        toggleShowAnimation = true,
+        selectTextSide = 0,
+        selectTextFont = STANDARD_TEXT_FONT,
+        rangeFontSize = 9,
+        selectTheme = "toast",
         lootGridMode = false,
         lootGridNumColumns = 4,
         toggleGoldFilter = true,
@@ -1525,15 +1551,6 @@ function HotLoot:GetGrowthDirection(info)
     return self.db.profile.selectGrowthDirection;
 end
 
--- HotLoot:GetTextSide()
-function HotLoot:SetTextSide(info, value)
-    self.db.profile.selectTextSide = value;
-    HotLoot:DebugOption("selectTextSide", value);
-end
-function HotLoot:GetTextSide(info)
-    return self.db.profile.selectTextSide;
-end
-
 -- SetInlineQuant
 function HotLoot:SetInlineQuant(info, value)
     self.db.profile.inlineQuant = value;
@@ -1628,6 +1645,33 @@ function HotLoot:SetShowAnimation(info, value)
 end
 function HotLoot:GetShowAnimation(info)
     return self.db.profile.toggleShowAnimation;
+end
+
+-- HotLoot:GetTextSide()
+function HotLoot:SetTextSide(info, value)
+    self.db.profile.selectTextSide = value;
+    HotLoot:DebugOption("selectTextSide", value);
+end
+function HotLoot:GetTextSide(info)
+    return self.db.profile.selectTextSide;
+end
+
+-- HotLoot:GetTextFont()
+function HotLoot:SetTextFont(info, value)
+    self.db.profile.selectTextFont = value;
+    HotLoot:DebugOption("selectTextFont", value);
+end
+function HotLoot:GetTextFont(info)
+    return self.db.profile.selectTextFont;
+end
+
+-- HotLoot:GetFontSize()
+function HotLoot:SetFontSize(info, value)
+    self.db.profile.rangeFontSize = value;
+    HotLoot:DebugOption("rangeFontSize", value);
+end
+function HotLoot:GetFontSize(info)
+    return self.db.profile.rangeFontSize;
 end
 
 -- lootGridMode

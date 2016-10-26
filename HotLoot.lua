@@ -1372,7 +1372,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
                 lmIcon.name:SetJustifyH("RIGHT")
             end
             
-            lmIcon.name:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
+            lmIcon.name:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize(), "OUTLINE")
             
             if iCount == 0 then
                 lmIcon.name:SetText(iName)
@@ -1391,7 +1391,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             lmIcon.count:SetPoint("RIGHT", lmIcon.name, "LEFT", -2, 0)
         end
         
-        lmIcon.count:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
+        lmIcon.count:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize(), "OUTLINE")
         
         if iCount > 0 then
             if HotLoot:GetShowTotalQuant() then
@@ -1493,7 +1493,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             lmIcon.name:SetJustifyH("RIGHT")
         end
         
-        lmIcon.name:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
+        lmIcon.name:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize(), "OUTLINE")
         
         if iCount == 0 then
             lmIcon.name:SetText(iName)
@@ -1509,7 +1509,9 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             lmIcon.count:SetPoint("BOTTOMLEFT", lmBackground, "BOTTOMLEFT", 6, 8)
         end
         
-        lmIcon.count:SetFont(STANDARD_TEXT_FONT, 7, "OUTLINE")
+        -- NOTE: Made (large) quant to have font size -2 compared to name.
+        --          Adjust as needed.
+        lmIcon.count:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize()-2, "OUTLINE")
         
         if iCount > 0 then
             if HotLoot:GetShowTotalQuant() then
@@ -1532,7 +1534,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             lmIcon.sell:SetPoint("BOTTOMRIGHT", lmIcon.texture, "BOTTOMLEFT", -2, 0)
         end
         
-        lmIcon.sell:SetFont(STANDARD_TEXT_FONT, 7, "OUTLINE")
+        lmIcon.sell:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize()-2, "OUTLINE")
         
         if sellPriceText then
             lmIcon.sell:SetText(GetCoinTextureString(sellPriceText))
@@ -1552,7 +1554,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             lmIcon.type:SetPoint("RIGHT", lmIcon.texture, "LEFT", -2, 0)
         end
         
-        lmIcon.type:SetFont(STANDARD_TEXT_FONT, 7, "OUTLINE")
+        lmIcon.type:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize()-2, "OUTLINE")
         if itemTypeText then
             lmIcon.type:SetText(itemTypeText..": "..itemTypeText2)
         end

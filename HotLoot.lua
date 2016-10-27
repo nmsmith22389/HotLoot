@@ -1408,7 +1408,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         end
         
         lmIcon.count:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize(), "OUTLINE")
-        if HotLoot:GetFontColorByQual then
+        if HotLoot:GetFontColorByQual() then
             lmIcon.count:SetTextColor(
                 ITEM_QUALITY_COLORS[itemQuality].r, 
                 ITEM_QUALITY_COLORS[itemQuality].g, 
@@ -1538,7 +1538,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         -- NOTE: Made (large) quant to have font size -2 compared to name.
         --          Adjust as needed.
         lmIcon.count:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize()-2, "OUTLINE")
-        if HotLoot:GetFontColorByQual then
+        if HotLoot:GetFontColorByQual() then
             lmIcon.count:SetTextColor(
                 ITEM_QUALITY_COLORS[itemQuality].r, 
                 ITEM_QUALITY_COLORS[itemQuality].g, 
@@ -1571,7 +1571,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         end
         
         lmIcon.sell:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize()-2, "OUTLINE")
-        if HotLoot:GetFontColorByQual then
+        if HotLoot:GetFontColorByQual() then
             lmIcon.sell:SetTextColor(
                 ITEM_QUALITY_COLORS[itemQuality].r, 
                 ITEM_QUALITY_COLORS[itemQuality].g, 
@@ -1601,7 +1601,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         end
         
         lmIcon.type:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize()-2, "OUTLINE")
-        if HotLoot:GetFontColorByQual then
+        if HotLoot:GetFontColorByQual() then
             lmIcon.type:SetTextColor(
                 ITEM_QUALITY_COLORS[itemQuality].r, 
                 ITEM_QUALITY_COLORS[itemQuality].g, 

@@ -12,4 +12,5 @@ Locales\Locales.xml
 
 HotLoot.lua
 Options.lua
+Templates.xml
 

@@ -1375,7 +1375,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
                 lmIcon.name:SetJustifyH("RIGHT")
             end
             
-            lmIcon.name:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize(), "OUTLINE")
+            lmIcon.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE")
             --[[
             -- NOTE: I dont think this is needed because the item link should color itself by qual.
             if HotLoot:GetFontColorByQual then
@@ -1407,7 +1407,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             lmIcon.count:SetPoint("RIGHT", lmIcon.name, "LEFT", -2, 0)
         end
         
-        lmIcon.count:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize(), "OUTLINE")
+        lmIcon.count:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE")
         if HotLoot:GetFontColorByQual() then
             lmIcon.count:SetTextColor(
                 ITEM_QUALITY_COLORS[itemQuality].r, 
@@ -1519,7 +1519,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             lmIcon.name:SetJustifyH("RIGHT")
         end
         
-        lmIcon.name:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize(), "OUTLINE")
+        lmIcon.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE")
         
         if iCount == 0 then
             lmIcon.name:SetText(iName)
@@ -1537,7 +1537,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         
         -- NOTE: Made (large) quant to have font size -2 compared to name.
         --          Adjust as needed.
-        lmIcon.count:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize()-2, "OUTLINE")
+        lmIcon.count:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize()-2, "OUTLINE")
         if HotLoot:GetFontColorByQual() then
             lmIcon.count:SetTextColor(
                 ITEM_QUALITY_COLORS[itemQuality].r, 
@@ -1570,7 +1570,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             lmIcon.sell:SetPoint("BOTTOMRIGHT", lmIcon.texture, "BOTTOMLEFT", -2, 0)
         end
         
-        lmIcon.sell:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize()-2, "OUTLINE")
+        lmIcon.sell:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize()-2, "OUTLINE")
         if HotLoot:GetFontColorByQual() then
             lmIcon.sell:SetTextColor(
                 ITEM_QUALITY_COLORS[itemQuality].r, 
@@ -1600,7 +1600,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             lmIcon.type:SetPoint("RIGHT", lmIcon.texture, "LEFT", -2, 0)
         end
         
-        lmIcon.type:SetFont(HotLoot:GetTextFont(), HotLoot:GetFontSize()-2, "OUTLINE")
+        lmIcon.type:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize()-2, "OUTLINE")
         if HotLoot:GetFontColorByQual() then
             lmIcon.type:SetTextColor(
                 ITEM_QUALITY_COLORS[itemQuality].r, 

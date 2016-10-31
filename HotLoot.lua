@@ -1324,337 +1324,65 @@ function HotLoot:addLootIcon(iPath, iName, iLink, iCount)
 end
     
 function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
-    --Vars
-    --local lmIcon = CreateFrame("Frame", iName, lmBackground)
-    local lmBackground = CreateFrame("frame", "lmBG")
-    local e = CreateFrame("button", "ExButtonFrame", lmBackground)
-    local size = HotLoot:GetIconSize()
-    local texture = lmBackground:CreateTexture(iName.."Icon","OVERLAY")
-    local count = lmBackground:CreateFontString(nil, "OVERLAY")
-    local name = lmBackground:CreateFontString(nil, "OVERLAY")
-    local sellPrice = lmBackground:CreateFontString(nil, "OVERLAY")
-    local itemType = lmBackground:CreateFontString(nil, "OVERLAY")
-    local item = iLink
-
-    local itemQuality = select(3, GetItemInfo(iLink));
-
-    lmIcon = lmBackground
-    lmIcon.size = size
-    lmIcon.texture = texture
-    lmIcon.count = count
-    lmIcon.sell = sellPrice
-    lmIcon.type = itemType
-    lmIcon.name = name
-    lmBackground.item = item
-    lmBackground.ShowTooltip = ShowTooltip
-    if themeSize == "small" then
-    --Set Up Frames
-    --Icon
+    local toast = CreateFrame("frame", "HotLoot_LootToastLarge", nil, "HotLoot_LootToastLargeTemplate");
+    -- local e = CreateFrame("button", "ExButtonFrame", toast)
+    toast.item = iLink;
+    toast.ShowTooltip = ShowTooltip;
+        
+    -- Set Opacity
+    toast:SetAlpha(HotLoot:GetTransparency());
     
+    -- Set Icon
+    toast.icon:SetTexture(iPath);
         
-        lmIcon:SetAlpha(HotLoot:GetTransparency())
-        
-        lmIcon.texture:SetSize(lmIcon.size, lmIcon.size)
-        lmIcon.texture:SetTexture(iPath)
-        
-        lmIcon.texture:SetTexCoord(0.07,0.93,0.07,0.93)
-        
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.texture:SetPoint("LEFT", lmIcon, "LEFT", 2, 0)
-        else
-            lmIcon.texture:SetPoint("RIGHT", lmIcon, "RIGHT", -2, 0)
-        end
-    --Name
-    
-        if HotLoot:GetShowItemNames() then
-            if HotLoot:GetTextSide() == 0 then
-                lmIcon.name:SetPoint("LEFT", lmIcon.texture, "RIGHT", 2, 0)
-                lmIcon.name:SetJustifyH("LEFT")
-            else
-                lmIcon.name:SetPoint("RIGHT", lmIcon.texture, "LEFT", -2, 0)
-                lmIcon.name:SetJustifyH("RIGHT")
-            end
-            
-            lmIcon.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE")
-            --[[
-            -- NOTE: I dont think this is needed because the item link should color itself by qual.
-            if HotLoot:GetFontColorByQual then
-                lmIcon.name:SetTextColor(
-                    ITEM_QUALITY_COLORS[itemQuality].r, 
-                    ITEM_QUALITY_COLORS[itemQuality].g, 
-                    ITEM_QUALITY_COLORS[itemQuality].b, 
-                    1
-                );
-            else
-                lmIcon.name:SetTextColor(HotLoot:GetFontColor());
-            end
-            ]]
-            
-            if iCount == 0 then
-                lmIcon.name:SetText(iName)
-            else
-                lmIcon.name:SetText(iLink)
-            end
-        else
-            lmIcon.name:Hide();
-        end
+    -- Set Name
+    toast.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE") ;
+    if iCount == 0 then
+        toast.name:SetText(iName);
+    else
+        toast.name:SetText(iLink);
+    end
 
-    --Count
-    if HotLoot:GetShowItemQuant() then
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.count:SetPoint("LEFT", lmIcon.name, "RIGHT", 2, 0)
-        else
-            lmIcon.count:SetPoint("RIGHT", lmIcon.name, "LEFT", -2, 0)
-        end
-        
-        lmIcon.count:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE")
-        if HotLoot:GetFontColorByQual() then
-            lmIcon.count:SetTextColor(
-                ITEM_QUALITY_COLORS[itemQuality].r, 
-                ITEM_QUALITY_COLORS[itemQuality].g, 
-                ITEM_QUALITY_COLORS[itemQuality].b, 
-                1
-            );
-        else
-            lmIcon.count:SetTextColor(HotLoot:GetFontColor());
-        end
-        
-        if iCount > 0 then
+    -- Set Count
+    if toast.count and iCount > 0 then
+        toast.count:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize()-2, "OUTLINE");
+        if HotLoot:GetShowItemQuant() then
             if HotLoot:GetShowTotalQuant() then
-                local inBags = InBags(iName, iCount)
-                lmIcon.count:SetText("x"..iCount.." ["..inBags.."]")
+                local inBags = InBags(iName, iCount);
+                toast.count:SetText("x"..iCount.." ["..inBags.."]");
             else
-                lmIcon.count:SetText("x"..iCount)
+                toast.count:SetText("x"..iCount);
             end
+            toast.count:Show();
+        else
+            toast.count:Hide();
         end
-    else
-        lmIcon.count:Hide()
     end
-    --BG
-        local bgWidth = lmIcon.name:GetStringWidth() + lmIcon.count:GetStringWidth() + size +12
-            bgWidth = max(bgWidth, tonumber(HotLoot:GetMinWidth()))
-        lmBackground:SetSize(bgWidth, lmIcon.size+4)
-    
-        lmBackground:SetBackdrop({bgFile = bgFileCurrent, 
-            edgeFile = edgeFileCurrent, 
-            tile = tileCurrent, tileSize = tileSizeCurrent, edgeSize = edgeSizeCurrent, 
-            insets = insetsCurrent})
-        
-        local r, g, b, a = HotLoot:GetThemeBG()
-        local br, bg, bb, ba = HotLoot:GetThemeBorderColor()
-        if HotLoot:GetColorByQuality() and iCount > 0 then
-            local quality = select(3, GetItemInfo(iLink))
-            if quality then
-                br, bg, bb = GetItemQualityColor(quality)
-            end
-            lmBackground:SetBackdropColor(r, g, b, a)
-            lmBackground:SetBackdropBorderColor(br, bg, bb, 1)
-        else
-            lmBackground:SetBackdropColor(r, g, b, a)
-            lmBackground:SetBackdropBorderColor(br, bg, bb, ba)
-        end
-        
-        lmBackground:SetScript("OnEnter", OnEnter)
-        lmBackground:SetScript("OnLeave", OnLeave)
-    
-        if HotLoot:GetShowAnimation() then
-            local AnimationGroup = lmBackground:CreateAnimationGroup()
-            local animation1 = AnimationGroup:CreateAnimation("Translation")
-        
-            animation1:SetDuration(1.5)
-            animation1:SetSmoothing("IN")
-            if HotLoot:GetGrowthDirection() == 1 then
-                animation1:SetOffset(0, 200*HotLoot:GetFadeSpeed())
-            else
-                animation1:SetOffset(0, -200*HotLoot:GetFadeSpeed())
-            end
-            lmBackground.a = AnimationGroup
-        end
-    e:SetHeight(lmBackground:GetHeight() - 2)
-    elseif themeSize == "medium" then
-    
-    elseif themeSize == "large" then
-        local glow = lmBackground:CreateTexture(iName.."Glow","BACKGROUND")
-        lmBackground.glow = glow
-        lmBackground.glow:SetTexture("Interface\\AchievementFrame\\UI-Achievement-Alert-Glow")
-        lmBackground.glow:SetTexCoord(0, 0.78125, 0, 0.66796875)
-        lmBackground.glow:SetPoint("CENTER", lmBackground, "CENTER", 0 ,0)
-        lmBackground.glow:SetAlpha(0)
-        
-        lmBackground.glow:SetBlendMode("ADD")
-        lmBackground.glow:Show()
-        
-        local shine = lmBackground:CreateTexture(iName.."Shine","OVERLAY")
-        lmBackground.shine = shine
-        lmBackground.shine:SetTexture("Interface\\AchievementFrame\\UI-Achievement-Alert-Glow")
-        lmBackground.shine:SetTexCoord(0.78125, 0.912109375, 0, 0.28125)
-        lmBackground.shine:SetPoint("BOTTOMLEFT", 0, 0)
-        lmBackground.shine:SetAlpha(0)
-        lmBackground.shine:SetSize(47,52)
-        lmBackground.shine:SetBlendMode("ADD")
-        lmBackground.shine:Show()
-        
-        --Set Up Frames
-    --Icon
-        
-        
-        lmIcon:SetAlpha(HotLoot:GetTransparency())
-        
-        lmIcon.texture:SetSize(32, 32)
-        lmIcon.texture:SetTexture(iPath)
-        
-        
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.texture:SetPoint("LEFT", lmIcon, "LEFT", 8, 0)
-        else
-            lmIcon.texture:SetPoint("RIGHT", lmIcon, "RIGHT", -8, 0)
-        end
-    --Name
-    
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.name:SetPoint("TOPLEFT", lmIcon.texture, "TOPRIGHT", 2, 0)
-            lmIcon.name:SetJustifyH("LEFT")
-        else
-            lmIcon.name:SetPoint("TOPRIGHT", lmIcon.texture, "TOPLEFT", -2, 0)
-            lmIcon.name:SetJustifyH("RIGHT")
-        end
-        
-        lmIcon.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE")
-        
-        if iCount == 0 then
-            lmIcon.name:SetText(iName)
-        else
-            lmIcon.name:SetText(iLink)
-        end
 
-    --Count
-    if HotLoot:GetShowItemQuant() then
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.count:SetPoint("BOTTOMRIGHT", lmBackground, "BOTTOMRIGHT", -6, 8)
-        else
-            lmIcon.count:SetPoint("BOTTOMLEFT", lmBackground, "BOTTOMLEFT", 6, 8)
-        end
-        
-        -- NOTE: Made (large) quant to have font size -2 compared to name.
-        --          Adjust as needed.
-        lmIcon.count:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize()-2, "OUTLINE")
-        if HotLoot:GetFontColorByQual() then
-            lmIcon.count:SetTextColor(
-                ITEM_QUALITY_COLORS[itemQuality].r, 
-                ITEM_QUALITY_COLORS[itemQuality].g, 
-                ITEM_QUALITY_COLORS[itemQuality].b, 
-                1
-            );
-        else
-            lmIcon.count:SetTextColor(HotLoot:GetFontColor());
-        end
-        
-        if iCount > 0 then
-            if HotLoot:GetShowTotalQuant() then
-                local inBags = InBags(iName, iCount)
-                lmIcon.count:SetText("x"..iCount.." ["..inBags.."]")
-            else
-                lmIcon.count:SetText("x"..iCount)
+    -- Set Value
+    if toast.value and iCount > 0 then
+        toast.value:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize()-2, "OUTLINE");
+        if HotLoot:GetShowSellPrice() then
+            local textItemValue = select(11, GetItemInfo(iLink));
+            if textItemValue then
+                toast.value:SetText(GetCoinTextureString(textItemValue))
+                toast.value:Show();
             end
+        else
+            toast.value:Hide();
         end
-    else
-        lmIcon.count:Hide()
     end
-    --SellPrice
-    if HotLoot:GetShowSellPrice() and iCount > 0 then
-        --lmIcon.sell
-        local sellPriceText = select(11,GetItemInfo(iLink))
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.sell:SetPoint("BOTTOMLEFT", lmIcon.texture, "BOTTOMRIGHT", 2, 0)
-        else
-            lmIcon.sell:SetPoint("BOTTOMRIGHT", lmIcon.texture, "BOTTOMLEFT", -2, 0)
-        end
         
-        lmIcon.sell:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize()-2, "OUTLINE")
-        if HotLoot:GetFontColorByQual() then
-            lmIcon.sell:SetTextColor(
-                ITEM_QUALITY_COLORS[itemQuality].r, 
-                ITEM_QUALITY_COLORS[itemQuality].g, 
-                ITEM_QUALITY_COLORS[itemQuality].b, 
-                1
-            );
-        else
-            lmIcon.sell:SetTextColor(HotLoot:GetFontColor());
-        end
+
+    -- Tooltip
+    toast:SetScript("OnEnter", OnEnter)
+    toast:SetScript("OnLeave", OnLeave)
         
-        if sellPriceText then
-            lmIcon.sell:SetText(GetCoinTextureString(sellPriceText))
-        end
-    else
-        lmIcon.sell:Hide()
-    end
-    
-    --ItemType
-    if HotLoot:GetShowItemType() and iCount > 0  then
-        --lmIcon.type
-        local itemTypeText = select(6,GetItemInfo(iLink))
-        local itemTypeText2 = select(7,GetItemInfo(iLink))
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.type:SetPoint("LEFT", lmIcon.texture, "RIGHT", 2, 0)
-        else
-            lmIcon.type:SetPoint("RIGHT", lmIcon.texture, "LEFT", -2, 0)
-        end
-        
-        lmIcon.type:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize()-2, "OUTLINE")
-        if HotLoot:GetFontColorByQual() then
-            lmIcon.type:SetTextColor(
-                ITEM_QUALITY_COLORS[itemQuality].r, 
-                ITEM_QUALITY_COLORS[itemQuality].g, 
-                ITEM_QUALITY_COLORS[itemQuality].b, 
-                1
-            );
-        else
-            lmIcon.type:SetTextColor(HotLoot:GetFontColor());
-        end
-        if itemTypeText then
-            lmIcon.type:SetText(itemTypeText..": "..itemTypeText2)
-        end
-    else
-        lmIcon.type:Hide()
-    end
-    --BG
-        local bgWidth = lmIcon.name:GetStringWidth() + lmIcon.count:GetStringWidth() + 50
-            bgWidth = max(bgWidth, tonumber(HotLoot:GetMinWidth()))
-        lmBackground:SetSize(bgWidth, 50)
-    
-        lmBackground:SetBackdrop({bgFile = bgFileCurrent, 
-            edgeFile = edgeFileCurrent, 
-            tile = tileCurrent, tileSize = tileSizeCurrent, edgeSize = edgeSizeCurrent, 
-            insets = insetsCurrent})
-        local r, g, b, a
-        if HotLoot:GetTheme() == "toast" then 
-            r, g, b, a = 0,0,0,0.8
-        else
-            r, g, b, a = 1,1,1,1 --HotLoot:GetThemeBG()
-        end
-        local br, bg, bb, ba = 1,1,1,1 --HotLoot:GetThemeBorderColor()
-        if HotLoot:GetColorByQuality() and iCount > 0 then
-            local quality = select(3, GetItemInfo(iLink))
-            if quality then
-                br, bg, bb = GetItemQualityColor(quality)
-            end
-            lmBackground:SetBackdropColor(r, g, b, a)
-            lmBackground:SetBackdropBorderColor(br, bg, bb, 1)
-        else
-            lmBackground:SetBackdropColor(r, g, b, a)
-            lmBackground:SetBackdropBorderColor(br, bg, bb, ba)
-        end
-        
-        lmBackground:SetScript("OnEnter", OnEnter)
-        lmBackground:SetScript("OnLeave", OnLeave)
-        
-        lmBackground.glow:SetSize(bgWidth + 50,100)
-        e:SetHeight(lmBackground:GetHeight() - 10)
-        if HotLoot:GetShowAnimation() then
-            local AnimationGroup = lmBackground:CreateAnimationGroup()
+        --[[if HotLoot:GetShowAnimation() then
+            local AnimationGroup = toast:CreateAnimationGroup()
             local animation1 = AnimationGroup:CreateAnimation("Translation")
-            local GlowAnimationGroup = lmBackground.glow:CreateAnimationGroup()
-            local ShineAnimationGroup = lmBackground.shine:CreateAnimationGroup()
+            local GlowAnimationGroup = toast.glow:CreateAnimationGroup()
+            local ShineAnimationGroup = toast.shine:CreateAnimationGroup()
             local glowAnimIn = GlowAnimationGroup:CreateAnimation("Alpha")
             local glowAnimOut = GlowAnimationGroup:CreateAnimation("Alpha")
             local shineAnimIn = ShineAnimationGroup:CreateAnimation("Alpha")
@@ -1700,18 +1428,18 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             else
                 animation1:SetOffset(0, -100*HotLoot:GetFadeSpeed())
             end
-            lmBackground.a = AnimationGroup
-            lmBackground.glow.a = GlowAnimationGroup
-            lmBackground.shine.a = ShineAnimationGroup
-            lmBackground.shine.a:Play()
-            lmBackground.glow.a:Play()
+            toast.a = AnimationGroup
+            toast.glow.a = GlowAnimationGroup
+            toast.shine.a = ShineAnimationGroup
+            toast.shine.a:Play()
+            toast.glow.a:Play()
         end
-    end
-    if iCount > 0  and HotLoot:GetShowExcludeButton() then
+    ]]
+    --[[if iCount > 0  and HotLoot:GetShowExcludeButton() then
         if HotLoot:GetTextSide() == 0 then
-            e:SetPoint("RIGHT", lmBackground, "LEFT", -1, 0)
+            e:SetPoint("RIGHT", toast, "LEFT", -1, 0)
         else
-            e:SetPoint("LEFT", lmBackground, "RIGHT", 1, 0)
+            e:SetPoint("LEFT", toast, "RIGHT", 1, 0)
         end
         e:SetWidth(5)
         
@@ -1720,12 +1448,12 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         e.texture:SetAllPoints(e)
         e:EnableMouse(true)
         e:RegisterForClicks("LeftButtonUp")
-        e:SetScript("OnEnter", function(self) EBOnEnter(lmBackground) end)
+        e:SetScript("OnEnter", function(self) EBOnEnter(toast) end)
         e:SetScript("OnLeave", function(self) EBOnLeave() end)
         e:SetScript("OnClick", function(self) EButtonClicked(iLink) end)
-        lmBackground.e = e
-    end
-    return lmBackground
+        toast.e = e
+    end]]
+    return toast
 end
 
 --#############################

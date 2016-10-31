@@ -1,18 +1,61 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-   <Frame name="HotLoot_LootToastLargeTemplate" hidden="false">
+   <Frame name="HotLoot_LootToastLargeTemplate" virtual="true">
         <Size>
             <AbsDimension x="145" y="50"/>
         </Size>
-        <Anchors>
+<!--         <Anchors>
             <Anchor point="CENTER">
                 <Offset>
                     <AbsDimension x="0" y="0"/>
                 </Offset>
             </Anchor>
-        </Anchors>
-        <!-- <Layers> -->
-            
-        <!-- </Layers> -->
+        </Anchors> -->
+        <Layers>
+            <Layer level="ARTWORK">
+                <Texture name="$parentIcon" parentKey="icon">
+                    <Size>
+                        <AbsDimension x="32" y="32"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT">
+                            <Offset>
+                                <AbsDimension x="8" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <!-- <TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93"/> -->
+                </Texture>
+            </Layer>
+            <Layer level="OVERLAY">
+                <FontString name="$parentName" parentKey="name">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativepoint="TOPRIGHT" relativeKey="$parent.icon">
+                            <Offset>
+                                <AbsDimension x="2" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentCount" parentKey="count">
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT" relativepoint="BOTTOMRIGHT">
+                            <Offset>
+                                <AbsDimension x="-6" y="8"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentValue" parentKey="value">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativepoint="BOTTOMRIGHT" relativeKey="$parent.icon">
+                            <Offset>
+                                <AbsDimension x="2" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
         <Backdrop bgFile="Interface\ACHIEVEMENTFRAME\UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND" edgeFile="Interface\FriendsFrame\UI-Toast-Border" tile="true">
             <EdgeSize>
                 <AbsValue val="8"/>
@@ -21,7 +64,7 @@
                 <AbsValue val="256"/>
             </TileSize>
             <BackgroundInsets>
-                <AbsInset left="5" right="5" top="5" bottom="5"/>
+                <AbsInset left="3" right="3" top="3" bottom="3"/>
             </BackgroundInsets>
         </Backdrop>
    </Frame>

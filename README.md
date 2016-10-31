@@ -26,25 +26,9 @@ Credit will be made where due
 _If you have ideas for new features you would like to see implemented please open a ticket in [GitHub issues](https://github.com/nmsmith22389/HotLoot/issues) and we will do our best to implement them!_
 
 ## Recent Changes
-## v3.0.3
-### New
-* Added Settings Transfer Function
-* Added Artifact and Heirloom Options
-* Added Better Confirm Dialog to Skinning Mode
-* Added Caught From Var for Debugging
-* Added New Debug Functions
-* Added Enable/Disable All Filters Buttons
-* Added Testing Section to About
-
+## v3.0.4
 ### Fixed
-* Localization Update
-* Fixed Include/Exclude Button Textures
-* Localization Strings Renamed
-* Made Anchor Bar Pretty
-
-### Removed
-* Removed Timeless Isle from Filter
-* Removed Extras Section and MoH Filter
-* Removed Extraneous Files
-* Removed Left Over Functions
-* Removed Right Click Tooltip on Minimap
+* Interface Bump
+* Cleaned Up Skinning Mode Code
+* Changed Skinning Mode to Use a Table Instead
+* Fixed Threshold Val Getting NIL

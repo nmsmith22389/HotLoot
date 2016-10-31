@@ -2310,12 +2310,16 @@ end
 
 --inputThresholdValue1
 function HotLoot:SetThresholdValue1(info, value)
-    self.db.profile.inputThresholdValue1 = value;
-    HotLoot:DebugOption("inputThresholdValue1 to copper", tonumber(HotLoot:ToCopper(value)));
+    self.db.profile.inputThresholdValue1 = value or "0c";
+    HotLoot:DebugOption("inputThresholdValue1 to copper", tonumber(HotLoot:ToCopper(self.db.profile.inputThresholdValue1)));
 end
 
 function HotLoot:GetThresholdValue1(info)
-    return self.db.profile.inputThresholdValue1;
+    if self.db.profile.inputThresholdValue1 == nil then
+        return "0c";
+    else
+        return self.db.profile.inputThresholdValue1;
+    end
 end
 
 --selectThresholdType2
@@ -2329,11 +2333,15 @@ end
 
 --inputThresholdValue2
 function HotLoot:SetThresholdValue2(info, value)
-    self.db.profile.inputThresholdValue2 = value;
+    self.db.profile.inputThresholdValue2 = value or "0c";
     HotLoot:DebugOption("inputThresholdValue2", value);
 end
 function HotLoot:GetThresholdValue2(info)
-    return self.db.profile.inputThresholdValue2;
+    if self.db.profile.inputThresholdValue2 == nil then
+        return "0c";
+    else
+        return self.db.profile.inputThresholdValue2;
+    end
 end
 
 --selectThresholdType3
@@ -2347,11 +2355,15 @@ end
 
 --inputThresholdValue3
 function HotLoot:SetThresholdValue3(info, value)
-    self.db.profile.inputThresholdValue3 = value;
+    self.db.profile.inputThresholdValue3 = value or "0c";
     HotLoot:DebugOption("inputThresholdValue3", value);
 end
 function HotLoot:GetThresholdValue3(info)
-    return self.db.profile.inputThresholdValue3;
+    if self.db.profile.inputThresholdValue3 == nil then
+        return "0c";
+    else
+        return self.db.profile.inputThresholdValue3;
+    end
 end
 
 -- toggleUseQuantValue

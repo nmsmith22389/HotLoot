@@ -26,6 +26,7 @@ Credit will be made where due
 _If you have ideas for new features you would like to see implemented please open a ticket in [GitHub issues](https://github.com/nmsmith22389/HotLoot/issues) and we will do our best to implement them!_
 
 ## Recent Changes
-## v3.0.5
+## v3.0.6
 ### Fixed
-* Fixed Item Debug Bug
+* Fixed Skinning Mode
+* Fixed Profession Filters

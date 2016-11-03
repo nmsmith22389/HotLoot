@@ -587,19 +587,22 @@ end
 --      Skinning Mode
 --#############################
 local function DeleteLeftovers()
-    if #tItemsToDelete > 0 then
+    if tableSize(tItemsToDelete) > 0 then
         -- TODO: Rename
         HotLoot:Announce(L["SkinAnnounce1"]);
         for bag = 0, NUM_BAG_SLOTS do 
             for slot = 1, GetContainerNumSlots(bag) do 
                 local itemLink = GetContainerItemLink(bag, slot);
-                local itemName = select(1, GetItemInfo(itemLink));
-                if itemName and tItemsToDelete[itemName] then
-                    PickupContainerItem(bag, slot);
-                    if CursorHasItem() then
-                        DeleteCursorItem();
-                        -- TODO: Rename
-                        HotLoot:Announce(itemLink .. L["SkinAnnounce2"]);
+                local itemName
+                if itemLink then
+                    itemName = select(1, GetItemInfo(itemLink));
+                    if itemName and tItemsToDelete[itemName] then
+                        PickupContainerItem(bag, slot);
+                        if CursorHasItem() then
+                            DeleteCursorItem();
+                            -- TODO: Rename
+                            HotLoot:Announce(itemLink .. L["SkinAnnounce2"]);
+                        end
                     end
                 end
             end
@@ -1012,7 +1015,7 @@ local function ToFilters(slot)
             elseif
                 -- Cloth
                 -- TODO: Change ALL Trade Goods to Tradeskill
-                (itemSubType == L["Cloth"]) and (itemType == L["Tradeskill"]) and HotLoot:GetClothFilter() and CheckThreshold("Cloth", itemSellPrice, lootQuantity) then 
+                (itemSubType == L["Cloth"]) and (itemType == L["Tradeskill"] or itemType == "Item Enhancement!") and HotLoot:GetClothFilter() and CheckThreshold("Cloth", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Cloth";
                     return true
             elseif
@@ -1022,7 +1025,7 @@ local function ToFilters(slot)
                     return true
             elseif
                 -- Gems
-                (itemType == L["Gem"]) and HotLoot:GetGemFilter() and CheckThreshold("Gem", itemSellPrice, lootQuantity) then 
+                ((itemType == L["Gem"]) or (itemType == "Item Enhancement!" and itemSubType == "Jewelcrafting")) and HotLoot:GetGemFilter() and CheckThreshold("Gem", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Gem";
                     return true
             elseif
@@ -1032,7 +1035,7 @@ local function ToFilters(slot)
                     return true
             elseif
                 -- Leather
-                (itemSubType == L["Leather"]) and (itemType == L["Tradeskill"]) and HotLoot:GetLeatherFilter() and CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
+                (itemSubType == L["Leather"]) and (itemType == L["Tradeskill"] or itemType == "Item Enhancement!") and HotLoot:GetLeatherFilter() and CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Leather";
                     return true
             elseif

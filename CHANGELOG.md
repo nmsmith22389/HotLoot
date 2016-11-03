@@ -1,4 +1,10 @@
 # CHANGELOG
+## v3.0.6
+### Fixed
+* Fixed Skinning Mode
+* Fixed Profession Filters
+
+
 ## v3.0.5
 ### Fixed
 * Fixed Item Debug Bug

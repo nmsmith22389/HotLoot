@@ -1,0 +1,10 @@
+# HotLoot .gitignore file
+
+# Addon Garbage
+old-changelog.txt
+
+# Ignore macOS stuff
+.DS_Store
+
+# Ignore Notes
+/notes

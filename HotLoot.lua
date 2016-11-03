@@ -118,6 +118,10 @@ local function tableSize(tbl)
     return x
 end
 
+string.ucfirst = function(str)
+    return (str:gsub("^%l", string.upper))
+end
+
 
 
 

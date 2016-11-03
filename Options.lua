@@ -1193,7 +1193,7 @@ local tableThemes = {
                     order = 1,
                     args = {
                         desc = {
-                            name = HotLoot:MakeColor("ctrl", L["groupCloseLootWindow"]).."\n"..L["SysHelp1"]..HotLoot:MakeColor("ctrl", L["groupSkinningMode"]).."\n"..L["SysHelp2"],            
+                            name = HotLoot:ColorText("hotkey", L["groupCloseLootWindow"]).."\n"..L["SysHelp1"]..HotLoot:ColorText("hotkey", L["groupSkinningMode"]).."\n"..L["SysHelp2"],            
                             type = "description",
                             order = 1,
                         },
@@ -1205,8 +1205,8 @@ local tableThemes = {
                     order = 2,
                     args = {
                         desc = {
-                            name = HotLoot:MakeColor("ctrl", L["Themes"]).."\n"..L["LMHelp1"],          
-                            --..HotLoot:MakeColor("ctrl", L["GridModeGroup"])..L["LMHelp2"]
+                            name = HotLoot:ColorText("hotkey", L["Themes"]).."\n"..L["LMHelp1"],          
+                            --..HotLoot:ColorText("hotkey", L["GridModeGroup"])..L["LMHelp2"]
                             type = "description",
                             order = 1,
                         },
@@ -1218,7 +1218,7 @@ local tableThemes = {
                     order = 3,
                     args = {
                         desc = {
-                            name = L["IQHelp1"]..HotLoot:MakeColor("ctrl", L["togglePoorQualityFilterName"]).."\n"..L["IQHelp2"],            
+                            name = L["IQHelp1"]..HotLoot:ColorText("hotkey", L["togglePoorQualityFilterName"]).."\n"..L["IQHelp2"],            
                             type = "description",
                             order = 1,
                         },
@@ -1231,7 +1231,7 @@ local tableThemes = {
                     hidden = false,
                     args = {
                         desc = {
-                            name = HotLoot:MakeColor("ctrl", L["IEListHelpGroup"]).."\n"..L["IEListHelp1"],         
+                            name = HotLoot:ColorText("hotkey", L["IEListHelpGroup"]).."\n"..L["IEListHelp1"],         
                             type = "description",
                             order = 1,
                         },
@@ -1243,7 +1243,7 @@ local tableThemes = {
                     order = 5,
                     args = {
                         desc = {
-                            name = HotLoot:MakeColor("ctrl", L["selectThresholdTypeName"]).."\n"..L["ThreshHelp1"]..HotLoot:MakeColor("ctrl", L["inputThresholdValueName"]).."\n"..L["ThreshHelp2"]..HotLoot:MakeColor("ctrl", L["toggleUseQuantValueName"]).."\n"..L["ThreshHelp3"],          
+                            name = HotLoot:ColorText("hotkey", L["selectThresholdTypeName"]).."\n"..L["ThreshHelp1"]..HotLoot:ColorText("hotkey", L["inputThresholdValueName"]).."\n"..L["ThreshHelp2"]..HotLoot:ColorText("hotkey", L["toggleUseQuantValueName"]).."\n"..L["ThreshHelp3"],          
                             type = "description",
                             order = 1,
                         },
@@ -1331,7 +1331,7 @@ local tableThemes = {
             order = 17,
             args = {
                 spacer2 = {
-                    name = HotLoot:MakeColor("ctrl", "HotLoot v"..GetAddOnMetadata("HotLoot", "Version").." ©2016\n\nAuthor:").." Neil Smith\n"..HotLoot:MakeColor("ctrl","Co-author:").." Jessica Mitchell\n"..HotLoot:MakeColor("ctrl","Testing:").."\ndsblack115\n"..HotLoot:MakeColor("ctrl","Translations:").."\nphilipp5796 - German\nMad_Ti - French\n",         
+                    name = HotLoot:ColorText("hotkey", "HotLoot v"..GetAddOnMetadata("HotLoot", "Version").." ©2016\n\nAuthor:").." Neil Smith\n"..HotLoot:ColorText("hotkey","Co-author:").." Jessica Mitchell\n"..HotLoot:ColorText("hotkey","Testing:").."\ndsblack115\n"..HotLoot:ColorText("hotkey","Translations:").."\nphilipp5796 - German\nMad_Ti - French\n",         
                     type = "description",
                     order = 1,
                 },

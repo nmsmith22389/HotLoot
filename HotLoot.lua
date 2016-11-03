@@ -259,15 +259,26 @@ function HotLoot:GetThemeColorDisabled()
     end
 end
 -- color control
-function HotLoot:MakeColor(key, input)
-    if key == "ctrl" then
-        return "|cFFFFCC00"..input.."|r"
+function HotLoot:ColorText(colorName, input)
+    local prefix = "|c";
+    local suffix = "|r";
+    local color;
+
+    if      colorName == "success"  then color = "ff5cb85c"
+    elseif  colorName == "info"     then color = "ff5bc0de"
+    elseif  colorName == "warning"  then color = "fff0ad4e"
+    elseif  colorName == "alert"    then color = "ffd9534f"
+    elseif  colorName == "hotkey"   then color = "ffffcc00"
+    else                                 color = "ff000000"
     end
+
+    return prefix..color..text..suffix;
 end
 
 --=========================
 --       Get Color
 --=========================
+-- NOTE: Don't need???
 function HotLoot:GetColor(color)
     if      color == "success"  then return "ff5cb85c"
     elseif  color == "info"     then return "ff5bc0de"

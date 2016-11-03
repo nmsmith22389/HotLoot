@@ -81,48 +81,47 @@
                         <AbsDimension x="32" y="32"/>
                     </Size>
                     <Anchors>
-                        <Anchor point="LEFT">
+                        <Anchor point="RIGHT">
                             <Offset>
-                                <AbsDimension x="8" y="0"/>
+                                <AbsDimension x="-8" y="0"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
-                    <!-- <TexCoords left="0.07" right="0.93" top="0.07" bottom="0.93"/> -->
                 </Texture>
             </Layer>
             <Layer level="OVERLAY">
-                <FontString name="$parentName" parentKey="name">
-                    <Anchors>
-                        <Anchor point="TOPLEFT" relativepoint="TOPRIGHT" relativeKey="$parent.icon">
-                            <Offset>
-                                <AbsDimension x="2" y="0"/>
-                            </Offset>
-                        </Anchor>
-                    </Anchors>
-                </FontString>
                 <FontString name="$parentCount" parentKey="count">
                     <Anchors>
-                        <Anchor point="BOTTOMRIGHT" relativepoint="BOTTOMRIGHT">
+                        <Anchor point="BOTTOMLEFT" relativepoint="BOTTOMLEFT">
                             <Offset>
-                                <AbsDimension x="-6" y="8"/>
+                                <AbsDimension x="6" y="8"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
                 </FontString>
-                <FontString name="$parentValue" parentKey="value">
+                <FontString name="$parentName" parentKey="name" justifyh="RIGHT">
                     <Anchors>
-                        <Anchor point="BOTTOMLEFT" relativepoint="BOTTOMRIGHT" relativeKey="$parent.icon">
+                        <Anchor point="TOPRIGHT" relativepoint="TOPLEFT" relativeKey="$parent.icon">
                             <Offset>
-                                <AbsDimension x="2" y="0"/>
+                                <AbsDimension x="-2" y="0"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
                 </FontString>
-                <FontString name="$parentType" parentKey="type">
+                <FontString name="$parentType" parentKey="type" justifyh="RIGHT">
                     <Anchors>
-                        <Anchor point="LEFT" relativepoint="RIGHT" relativeKey="$parent.icon">
+                        <Anchor point="RIGHT" relativepoint="LEFT" relativeKey="$parent.icon">
                             <Offset>
-                                <AbsDimension x="2" y="0"/>
+                                <AbsDimension x="-2" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentValue" parentKey="value" justifyh="RIGHT">
+                    <Anchors>
+                        <Anchor point="BOTTOMRIGHT" relativepoint="BOTTOMLEFT" relativeKey="$parent.icon">
+                            <Offset>
+                                <AbsDimension x="-2" y="0"/>
                             </Offset>
                         </Anchor>
                     </Anchors>

@@ -3,13 +3,6 @@
         <Size>
             <AbsDimension x="145" y="50"/>
         </Size>
-<!--         <Anchors>
-            <Anchor point="CENTER">
-                <Offset>
-                    <AbsDimension x="0" y="0"/>
-                </Offset>
-            </Anchor>
-        </Anchors> -->
         <Layers>
             <Layer level="ARTWORK">
                 <Texture name="$parentIcon" parentKey="icon">

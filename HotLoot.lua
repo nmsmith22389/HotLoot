@@ -953,11 +953,11 @@ local function ToFilters(slot)
     -- end
     if lootLink then
     local _, itemLink, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice = GetItemInfo(lootLink)
-    local itemID = GetItemID(itemLink)
+    -- local itemID = GetItemID(itemLink)
     if (HasRoom(1) or CanStack(lootName, itemStackCount, lootQuantity))--[[ and locked == 0 ]]then
             
             local strFilterDebug =  "---------------------\n"..
-                                    itemLink .. "(" .. itemID .. ") Loot Slot: " .. slot .. "\n" ..
+                                    itemLink .. " - Loot Slot: " .. slot .. "\n" ..
                                     "Type: [" .. itemType .. "]  Sub-Type: [" .. itemSubType .. "]\n";
             HotLoot:Debug(strFilterDebug);
             if

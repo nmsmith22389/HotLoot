@@ -26,9 +26,6 @@ Credit will be made where due
 _If you have ideas for new features you would like to see implemented please open a ticket in [GitHub issues](https://github.com/nmsmith22389/HotLoot/issues) and we will do our best to implement them!_
 
 ## Recent Changes
-## v3.0.4
+## v3.0.5
 ### Fixed
-* Interface Bump
-* Cleaned Up Skinning Mode Code
-* Changed Skinning Mode to Use a Table Instead
-* Fixed Threshold Val Getting NIL
+* Fixed Item Debug Bug

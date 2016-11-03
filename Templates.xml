@@ -47,6 +47,15 @@
                         </Anchor>
                     </Anchors>
                 </FontString>
+                <FontString name="$parentType" parentKey="type">
+                    <Anchors>
+                        <Anchor point="LEFT" relativepoint="RIGHT" relativeKey="$parent.icon">
+                            <Offset>
+                                <AbsDimension x="2" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
             </Layer>
         </Layers>
         <Backdrop bgFile="Interface\ACHIEVEMENTFRAME\UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND" edgeFile="Interface\FriendsFrame\UI-Toast-Border" tile="true">

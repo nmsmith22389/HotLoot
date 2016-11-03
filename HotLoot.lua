@@ -1374,20 +1374,34 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
     if toast.value and iCount > 0 then
         toast.value:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize()-2, "OUTLINE");
         if HotLoot:GetShowSellPrice() then
-            local textItemValue = select(11, GetItemInfo(iLink));
-            if textItemValue then
-                toast.value:SetText(GetCoinTextureString(textItemValue))
+            local strItemValue = select(11, GetItemInfo(iLink));
+            if strItemValue then
+                toast.value:SetText(GetCoinTextureString(strItemValue));
                 toast.value:Show();
             end
         else
             toast.value:Hide();
         end
     end
-        
+    
+    -- Set Type
+    if toast.type and iCount > 0 then
+        toast.type:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize()-2, "OUTLINE");
+        if HotLoot:GetShowItemType() then
+            local strItemType = select(6, GetItemInfo(iLink));
+            local strItemSubType = select(7, GetItemInfo(iLink));
+            if strItemType and strItemSubType then
+                toast.type:SetText(strItemType .. ": " .. strItemSubType);
+                toast.type:Show();
+            end
+        else
+            toast.type:Hide();
+        end
+    end
 
     -- Tooltip
-    toast:SetScript("OnEnter", OnEnter)
-    toast:SetScript("OnLeave", OnLeave)
+    toast:SetScript("OnEnter", OnEnter);
+    toast:SetScript("OnLeave", OnLeave);
         
         --[[if HotLoot:GetShowAnimation() then
             local AnimationGroup = toast:CreateAnimationGroup()

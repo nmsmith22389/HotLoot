@@ -55,9 +55,10 @@ local tableThemes = {
     --["classic"] = "Classic",
     --["minimal"] = "Minimal",
     --["holo"] = "Holo",
-    ["color"] = "Colored (Any)",
-    ["paper"] = "Paper (Large)",
-    ["toast"] = "Toast (Large)",
+    -- ["color"] = "Colored (Any)",
+    -- ["paper"] = "Paper (Large)",
+    -- ["toast"] = "Toast (Large)",
+    ["HotLoot_ToastPaperLargeTemplate"] = "Paper "..HotLoot:ColorText("info", "(Large)"),
 }
 -- options
 --
@@ -1382,7 +1383,7 @@ hlDefaults = {
         fThemeBorderColorA = 1,
         -- inlineQuant = true,
         toggleShowTotalQuant = true,
-        selectTheme = "toast",
+        selectTheme = "HotLoot_ToastPaperLargeTemplate",
         selectGrowthDirection = -1, 
         inputMinWidth = "145",
         rangeInitialDelay = 5,
@@ -1588,7 +1589,7 @@ end
 function HotLoot:SetTheme(info, value)
     self.db.profile.selectTheme = value;
     HotLoot:DebugOption("selectTheme", value);
-    HotLoot:LoadTheme(value);
+    -- HotLoot:LoadTheme(value);
 end
 function HotLoot:GetTheme(info)
     return self.db.profile.selectTheme;

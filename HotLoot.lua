@@ -214,7 +214,7 @@ local newThemes = {
         ["insets"] = { left = 5, right = 5, top = 5, bottom = 5 }
     },
 }
-
+--[[
 function HotLoot:LoadTheme(theme)
     -- load vars
     nameCurrent = newThemes[theme]["name"]
@@ -246,7 +246,7 @@ local function LoadThemeInit(theme)
     disIconSizeCurrent = newThemes[theme]["disIconSize"]
 
 end
-
+]]
 -- disIconSizeCurrent
 function HotLoot:GetIconSizeDisabled()
     return disIconSizeCurrent
@@ -410,13 +410,13 @@ end
 function HotLoot:OnEnable()
     TipHooker:Hook(HotLoot.ProcessTooltip, "item")
     
-    if not HotLoot:GetTheme() then
+    --[[if not HotLoot:GetTheme() then
         HotLoot:SetThemeSelect(self,"classic")
-    end
+    end]]
     
     tStart = 0
     HotLoot:ToggleAnchor(HotLoot:GetShowLootMonitorAnchor())
-    LoadThemeInit(HotLoot:GetTheme())
+    -- LoadThemeInit(HotLoot:GetTheme())
     HotLoot:RegisterEvent("LOOT_OPENED")
     HotLoot:RegisterEvent("LOOT_CLOSED")
     HotLoot:RegisterEvent("LOOT_SLOT_CLEARED")
@@ -1324,7 +1324,7 @@ function HotLoot:addLootIcon(iPath, iName, iLink, iCount)
 end
     
 function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
-    local toast = CreateFrame("frame", "HotLoot_LootToastLarge", nil, "HotLoot_LootToastLargeTemplate");
+    local toast = CreateFrame("frame", "HotLoot_ToastFrame", nil, HotLoot:GetTheme());
     -- local e = CreateFrame("button", "ExButtonFrame", toast)
     toast.item = iLink;
     toast.ShowTooltip = ShowTooltip;

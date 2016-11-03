@@ -52,13 +52,10 @@ local tableFilterTypes = {
 }
 
 local tableThemes = {
-    --["classic"] = "Classic",
-    --["minimal"] = "Minimal",
-    --["holo"] = "Holo",
-    -- ["color"] = "Colored (Any)",
-    -- ["paper"] = "Paper (Large)",
-    -- ["toast"] = "Toast (Large)",
-    ["HotLoot_ToastPaperLargeTemplate"] = "Paper "..HotLoot:ColorText("info", "(Large)"),
+    ["customSmall"] = "Custom "..HotLoot:ColorText("info", "(Small)"),
+    ["customLarge"] = "Custom "..HotLoot:ColorText("info", "(Large)"),
+    ["toast"]       = "Toast "..HotLoot:ColorText("info", "(Large)"),
+    ["paper"]       = "Paper "..HotLoot:ColorText("info", "(Large)"),
 }
 -- options
 --
@@ -1383,7 +1380,7 @@ hlDefaults = {
         fThemeBorderColorA = 1,
         -- inlineQuant = true,
         toggleShowTotalQuant = true,
-        selectTheme = "HotLoot_ToastPaperLargeTemplate",
+        selectTheme = "paper",
         selectGrowthDirection = -1, 
         inputMinWidth = "145",
         rangeInitialDelay = 5,

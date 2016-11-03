@@ -157,55 +157,36 @@ end
 --==================================
 --      Themes Table and FUNCS
 --==================================
-local newThemes = {
-    ["classic"] ={
-        ["name"] = "Classic",
+local tableThemeSettings = {
+    ["customSmall"] ={
+        ["name"] = "Custom",
         ["disIconSize"] = false,
         ["themeSize"] = "small",
-        ["height"] = 18,
-        ["bgFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\statusbars\\trans", 
-        ["edgeFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\borders\\trans", 
-        ["tile"] = true, ["tileSize"] = 16, ["edgeSize"] = 16, 
+        ["height"] = 20,
+        ["bgFile"] = [[Interface\AddOns\HotLoot\media\textures\statusbars\colorbg]],
+        ["edgeFile"] = [[Interface\AddOns\HotLoot\media\textures\borders\colorborder]],
+        ["tile"] = true, ["tileSize"] = 16, ["edgeSize"] = 16,
         ["insets"] = { left = 2, right = 2, top = 2, bottom = 2 }
     },
-    ["minimal"] ={
-        ["name"] = "Minimal",
-        ["disIconSize"] = true,
-        ["height"] = 18,
-        ["bgFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\statusbars\\elv", 
-        ["edgeFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\borders\\px-black", 
-        ["tile"] = true, ["tileSize"] = 16, ["edgeSize"] = 16, 
+    ["customLarge"] ={
+        ["name"] = "Custom",
+        ["disIconSize"] = false,
+        ["themeSize"] = "large",
+        ["height"] = 50,
+        ["bgFile"] = [[Interface\AddOns\HotLoot\media\textures\statusbars\colorbg]],
+        ["edgeFile"] = [[Interface\AddOns\HotLoot\media\textures\borders\colorborder]],
+        ["tile"] = true, ["tileSize"] = 16, ["edgeSize"] = 16,
         ["insets"] = { left = 2, right = 2, top = 2, bottom = 2 }
     },
-    ["holo"] ={
-        ["name"] = "Holo",
-        ["disIconSize"] = true,
-        ["height"] = 18,
-        ["bgFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\statusbars\\holo", 
-        ["edgeFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\borders\\trans", 
-        ["tile"] = true, ["tileSize"] = 32, ["edgeSize"] = 16, 
-        ["insets"] = { left = 0, right = 0, top = 0, bottom = 0 }
-    },
-    --UI-Achievement-WoodBorder
     ["paper"] ={
         ["name"] = "Paper",
         ["disIconSize"] = true,
         ["themeSize"] = "large",
         ["height"] = 50,
-        ["bgFile"] = "Interface\\ACHIEVEMENTFRAME\\UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND", 
-        ["edgeFile"] = [[Interface\FriendsFrame\UI-Toast-Border]], 
-        ["tile"] = true, ["tileSize"] = 256, ["edgeSize"] = 12, 
-        ["insets"] = { left = 5, right = 5, top = 5, bottom = 5 }
-    },
-    ["color"] ={
-        ["name"] = "Colored",
-        ["disIconSize"] = false,
-        ["themeSize"] = "small",
-        ["height"] = 20,
-        ["bgFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\statusbars\\colorbg", 
-        ["edgeFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\borders\\colorborder", 
-        ["tile"] = true, ["tileSize"] = 16, ["edgeSize"] = 16, 
-        ["insets"] = { left = 2, right = 2, top = 2, bottom = 2 }
+        ["bgFile"] = [[Interface\ACHIEVEMENTFRAME\UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND]],
+        ["edgeFile"] = [[Interface\FriendsFrame\UI-Toast-Border]],
+        ["tile"] = true, ["tileSize"] = 256, ["edgeSize"] = 8,
+        ["insets"] = { left = 3, right = 3, top = 3, bottom = 3 }
     },
     ["toast"] ={
         ["name"] = "Toast",
@@ -218,51 +199,24 @@ local newThemes = {
         ["insets"] = { left = 5, right = 5, top = 5, bottom = 5 }
     },
 }
---[[
-function HotLoot:LoadTheme(theme)
-    -- load vars
-    nameCurrent = newThemes[theme]["name"]
-     HotLoot:Announce(L["AnnounceLoadingTheme"]..nameCurrent)
-    themeSize = newThemes[theme]["themeSize"]
-    heightCurrent = newThemes[theme]["height"]
-    bgFileCurrent = newThemes[theme]["bgFile"]
-    edgeFileCurrent = newThemes[theme]["edgeFile"]
-    tileCurrent = newThemes[theme]["tile"]
-    tileSizeCurrent = newThemes[theme]["tileSize"]
-    edgeSizeCurrent = newThemes[theme]["edgeSize"]
-    insetsCurrent = newThemes[theme]["insets"]
-    disIconSizeCurrent = newThemes[theme]["disIconSize"]
+
+function HotLoot:GetThemeSetting( setting )
+    return tableThemeSettings[HotLoot:GetTheme()][setting];
 end
 
-local function LoadThemeInit(theme)
-    --newThemes
-    -- load vars
-    nameCurrent = newThemes[theme]["name"]
-     HotLoot:Announce(L["AnnounceLoadingTheme"]..nameCurrent)
-    themeSize = newThemes[theme]["themeSize"]
-    heightCurrent = newThemes[theme]["height"]
-    bgFileCurrent = newThemes[theme]["bgFile"]
-    edgeFileCurrent = newThemes[theme]["edgeFile"]
-    tileCurrent = newThemes[theme]["tile"]
-    tileSizeCurrent = newThemes[theme]["tileSize"]
-    edgeSizeCurrent = newThemes[theme]["edgeSize"]
-    insetsCurrent = newThemes[theme]["insets"]
-    disIconSizeCurrent = newThemes[theme]["disIconSize"]
-
-end
-]]
 -- disIconSizeCurrent
 function HotLoot:GetIconSizeDisabled()
     return disIconSizeCurrent
 end
+
 function HotLoot:GetThemeColorDisabled()
-    if HotLoot:GetTheme() == "color" then
+    if HotLoot:GetTheme():find("custom") ~= nil then
         return false
     else
         return true
     end
 end
--- color control
+
 function HotLoot:ColorText(colorName, input)
     local prefix = "|c";
     local suffix = "|r";
@@ -1258,7 +1212,7 @@ function HotLoot:UpdateMonitor()
         end
     else
         while i <= #icons do
-            if themeSize == "large" then
+            if HotLoot:GetThemeSetting("themeSize") == "large" then
                 yOffset = (i * ((32 + 18) * HotLoot:GetGrowthDirection()))
             else
                 yOffset = (i * ((HotLoot:GetIconSize() + 3) * HotLoot:GetGrowthDirection()))
@@ -1339,16 +1293,31 @@ function HotLoot:addLootIcon(iPath, iName, iLink, iCount)
 end
     
 function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
-    local toast = CreateFrame("frame", "HotLoot_ToastFrame", nil, HotLoot:GetTheme());
+    local strThemeSize = HotLoot:GetThemeSetting("themeSize"):ucfirst();
+    local strFlipped = (HotLoot:GetTextSide() == 0) and "" or "Flipped";
+    local toast = CreateFrame("frame", "HotLoot_ToastFrame", nil, "HotLoot_Toast"..strThemeSize..strFlipped.."Template");
     -- local e = CreateFrame("button", "ExButtonFrame", toast)
     toast.item = iLink;
     toast.ShowTooltip = ShowTooltip;
+
+    -- Set Backdrop
+    toast:SetBackdrop({
+        bgFile   = HotLoot:GetThemeSetting("bgFile"),
+        edgeFile = HotLoot:GetThemeSetting("edgeFile"),
+        tile     = HotLoot:GetThemeSetting("tile"),
+        tileSize = HotLoot:GetThemeSetting("tileSize"),
+        edgeSize = HotLoot:GetThemeSetting("edgeSize"),
+        insets   = HotLoot:GetThemeSetting("insets")
+    });
         
     -- Set Opacity
     toast:SetAlpha(HotLoot:GetTransparency());
     
     -- Set Icon
     toast.icon:SetTexture(iPath);
+    if not HotLoot:GetIconSizeDisabled() then
+        --then
+    end
         
     -- Set Name
     toast.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE") ;
@@ -1403,9 +1372,30 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         end
     end
 
+    -- Width
+    local intWidth = toast.name:GetStringWidth() + toast.count:GetStringWidth() + toast.icon:GetWidth() + 16;
+    local intHeight = HotLoot:GetThemeSetting("height");
+    intWidth = max(intWidth, tonumber(HotLoot:GetMinWidth()));
+    toast:SetSize(intWidth, intHeight);
+
     -- Tooltip
     toast:SetScript("OnEnter", OnEnter);
     toast:SetScript("OnLeave", OnLeave);
+
+    -- Fade Animation
+    if HotLoot:GetShowAnimation() then
+        local aniGroupFade = toast:CreateAnimationGroup();
+        local aniFade = aniGroupFade:CreateAnimation("Translation");
+        toast.ani = aniGroupFade;
+
+        aniFade:SetDuration(1.5);
+        aniFade:SetSmoothing("IN");
+        if HotLoot:GetGrowthDirection() == 1 then
+            aniFade:SetOffset(0, 100*HotLoot:GetFadeSpeed());
+        else
+            aniFade:SetOffset(0, -100*HotLoot:GetFadeSpeed());
+        end
+    end
         
         --[[if HotLoot:GetShowAnimation() then
             local AnimationGroup = toast:CreateAnimationGroup()
@@ -1575,8 +1565,8 @@ function hlFadeItems()
             
         end
         if (alpha > 0) then 
-            if HotLoot:GetShowAnimation() and iframe.a then
-                iframe.a:Play()
+            if HotLoot:GetShowAnimation() and iframe.ani then
+                iframe.ani:Play()
             end
             iframe:SetAlpha(alpha - fSpeed) -- fSpeed = 0.05
         elseif (alpha <= 0) then 

@@ -1,5 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-   <Frame name="HotLoot_ToastPaperLargeTemplate" virtual="true">
+   <Frame name="HotLoot_ToastLargeTemplate" virtual="true">
         <Size>
             <AbsDimension x="145" y="50"/>
         </Size>
@@ -58,7 +58,7 @@
                 </FontString>
             </Layer>
         </Layers>
-        <Backdrop bgFile="Interface\ACHIEVEMENTFRAME\UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND" edgeFile="Interface\FriendsFrame\UI-Toast-Border" tile="true">
+        <!-- <Backdrop bgFile="Interface\ACHIEVEMENTFRAME\UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND" edgeFile="Interface\FriendsFrame\UI-Toast-Border" tile="true">
             <EdgeSize>
                 <AbsValue val="8"/>
             </EdgeSize>
@@ -68,9 +68,9 @@
             <BackgroundInsets>
                 <AbsInset left="3" right="3" top="3" bottom="3"/>
             </BackgroundInsets>
-        </Backdrop>
+        </Backdrop> -->
    </Frame>
-   <Frame name="HotLoot_ToastPaperLargeFlippedTemplate" virtual="true">
+   <Frame name="HotLoot_ToastLargeFlippedTemplate" virtual="true">
         <Size>
             <AbsDimension x="145" y="50"/>
         </Size>

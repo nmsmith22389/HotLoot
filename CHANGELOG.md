@@ -1,10 +1,16 @@
 # CHANGELOG
+## v3.0.5
+### Fixed
+* Fixed Item Debug Bug
+
+
 ## v3.0.4
 ### Fixed
 * Interface Bump
 * Cleaned Up Skinning Mode Code
 * Changed Skinning Mode to Use a Table Instead
 * Fixed Threshold Val Getting NIL
+
 
 ## v3.0.3
 ### New

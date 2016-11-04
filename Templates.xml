@@ -174,7 +174,7 @@
                     <Anchors>
                         <Anchor point="RIGHT">
                             <Offset>
-                                <AbsDimension x="-2" y="0"/>
+                                <AbsDimension x="-4" y="0"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
@@ -216,7 +216,7 @@
                     <Anchors>
                         <Anchor point="LEFT">
                             <Offset>
-                                <AbsDimension x="2" y="0"/>
+                                <AbsDimension x="4" y="0"/>
                             </Offset>
                         </Anchor>
                     </Anchors>

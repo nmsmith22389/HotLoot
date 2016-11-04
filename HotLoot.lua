@@ -217,7 +217,7 @@ function HotLoot:GetThemeColorDisabled()
     end
 end
 
-function HotLoot:ColorText(colorName, input)
+function HotLoot:ColorText(colorName, text)
     local prefix = "|c";
     local suffix = "|r";
     local color;

@@ -1332,7 +1332,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
 
     -- Set Count
     if toast.count and iCount > 0 then
-        toast.count:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize()-2, "OUTLINE");
+        toast.count:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
         if HotLoot:GetShowItemQuant() then
             if HotLoot:GetShowTotalQuant() then
                 local inBags = InBags(iName, iCount);
@@ -1348,7 +1348,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
 
     -- Set Value
     if toast.value and iCount > 0 then
-        toast.value:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize()-2, "OUTLINE");
+        toast.value:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
         if HotLoot:GetShowSellPrice() then
             local strItemValue = select(11, GetItemInfo(iLink));
             if strItemValue then
@@ -1362,7 +1362,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
     
     -- Set Type
     if toast.type and iCount > 0 then
-        toast.type:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize()-2, "OUTLINE");
+        toast.type:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
         if HotLoot:GetShowItemType() then
             local strItemType = select(6, GetItemInfo(iLink));
             local strItemSubType = select(7, GetItemInfo(iLink));

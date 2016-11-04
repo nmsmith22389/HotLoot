@@ -1377,8 +1377,13 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
 
     -- Width
     local intWidth = toast.name:GetStringWidth() + toast.count:GetStringWidth() + toast.icon:GetWidth() + 16;
+    if toast.type and HotLoot:GetShowItemType() then
+        local intTypeWidth = toast.type:GetStringWidth() + toast.count:GetStringWidth() + toast.icon:GetWidth() + 16;
+        intWidth = max(intWidth, intTypeWidth, tonumber(HotLoot:GetMinWidth()));
+    else
+        intWidth = max(intWidth, tonumber(HotLoot:GetMinWidth()));
+    end
     local intHeight = HotLoot:GetThemeSetting("height");
-    intWidth = max(intWidth, tonumber(HotLoot:GetMinWidth()));
     toast:SetSize(intWidth, intHeight);
 
     -- Tooltip

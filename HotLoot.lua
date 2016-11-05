@@ -1398,6 +1398,7 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
 
         aniFade:SetDuration(1.5);
         aniFade:SetSmoothing("IN");
+        -- NOTE: Small said 200 so idk try experimenting
         if HotLoot:GetGrowthDirection() == 1 then
             aniFade:SetOffset(0, 100*HotLoot:GetFadeSpeed());
         else

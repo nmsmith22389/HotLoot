@@ -54,7 +54,7 @@ local tableFilterTypes = {
 local tableThemes = {
     ["customSmall"] = "Custom "..HotLoot:ColorText("info", "(Small)"),
     ["customLarge"] = "Custom "..HotLoot:ColorText("info", "(Large)"),
-    ["toast"]       = "Toast "..HotLoot:ColorText("info", "(Large)"),
+    ["tooltip"]     = "Tooltip "..HotLoot:ColorText("info", "(Large)"),
     ["paper"]       = "Paper "..HotLoot:ColorText("info", "(Large)"),
 }
 -- options

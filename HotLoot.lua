@@ -188,15 +188,15 @@ local tableThemeSettings = {
         ["tile"] = true, ["tileSize"] = 256, ["edgeSize"] = 8,
         ["insets"] = { left = 3, right = 3, top = 3, bottom = 3 }
     },
-    ["toast"] ={
-        ["name"] = "Toast",
+    ["tooltip"] ={
+        ["name"] = "Tooltip",
         ["themeSize"] = "large",
-        ["disIconSize"] = true,
+        ["iconSizable"] = false,
         ["height"] = 50,
-        ["bgFile"] = [[Interface\CHATFRAME\CHATFRAMEBACKGROUND]], 
-        ["edgeFile"] = [[Interface\FriendsFrame\UI-Toast-Border]], 
-        ["tile"] = true, ["tileSize"] = 12, ["edgeSize"] = 12, 
-        ["insets"] = { left = 5, right = 5, top = 5, bottom = 5 }
+        ["bgFile"] = [[Interface\Tooltips\CHATBUBBLE-BACKGROUND]], 
+        ["edgeFile"] = [[Interface\Tooltips\UI-Tooltip-Border]], 
+        ["tile"] = true, ["tileSize"] = 32, ["edgeSize"] = 12, 
+        ["insets"] = { left = 3, right = 3, top = 3, bottom = 3 }
     },
 }
 

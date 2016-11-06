@@ -465,12 +465,11 @@ end
 --      Test Monitor
 --==========================
 function HotLoot:buttonTestLootMonitor()
-    local itemName, itemLink, _, itemLevel, _, itemType, itemSubType, _, _, itemTexture, itemSellPrice = GetItemInfo(6948)
+    local itemName, itemLink, _, _, _, _, _, _, _, itemTexture, _ = GetItemInfo(120978)
     local itoadd = HotLoot:addLootIcon(itemTexture, itemName, itemLink, 5)
     table.insert(icons, 1, itoadd)
     ResetTimer()
     itoadd = nil
-    itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = nil          
     HotLoot:UpdateMonitor()
 end
 --==========================

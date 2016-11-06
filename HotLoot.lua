@@ -160,7 +160,7 @@ end
 local tableThemeSettings = {
     ["customSmall"] ={
         ["name"] = "Custom",
-        ["disIconSize"] = false,
+        ["iconSizable"] = true,
         ["themeSize"] = "small",
         ["height"] = 20,
         ["bgFile"] = [[Interface\AddOns\HotLoot\media\textures\statusbars\colorbg]],
@@ -170,7 +170,7 @@ local tableThemeSettings = {
     },
     ["customLarge"] ={
         ["name"] = "Custom",
-        ["disIconSize"] = false,
+        ["iconSizable"] = true,
         ["themeSize"] = "large",
         ["height"] = 50,
         ["bgFile"] = [[Interface\AddOns\HotLoot\media\textures\statusbars\colorbg]],
@@ -180,7 +180,7 @@ local tableThemeSettings = {
     },
     ["paper"] ={
         ["name"] = "Paper",
-        ["disIconSize"] = true,
+        ["iconSizable"] = false,
         ["themeSize"] = "large",
         ["height"] = 50,
         ["bgFile"] = [[Interface\ACHIEVEMENTFRAME\UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND]],
@@ -379,9 +379,9 @@ end
 function HotLoot:OnEnable()
     TipHooker:Hook(HotLoot.ProcessTooltip, "item")
     
-    --[[if not HotLoot:GetTheme() then
-        HotLoot:SetThemeSelect(self,"classic")
-    end]]
+    if HotLoot:GetTheme() == nil or tableThemeSettings[HotLoot:GetTheme()] == nil then
+        HotLoot:SetTheme(self, "paper");
+    end
     
     tStart = 0
     HotLoot:ToggleAnchor(HotLoot:GetShowLootMonitorAnchor())
@@ -1235,29 +1235,6 @@ end
 --          Tooltips
 --#############################
 
-
-
-local function ClearTooltips()
-    GameTooltip:Hide()
-    --HotLoot:UpdateMonitor()
-end
-
-local function ShowTooltip(self)
-    if self.item then
-        GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
-        GameTooltip:SetHyperlink(self.item)
-        GameTooltip:Show()
-    end
-end
-
-local function OnEnter(self)
-    self:ShowTooltip()
-end
-
-local function OnLeave(self)
-    ClearTooltips()
-    ResetCursor()
-end
 local function EButtonClicked(name)
     HotLoot:AddEList(name)
     for i = 1, #icons do
@@ -1289,22 +1266,28 @@ end
 --#############################
 --      Loot Monitor Icon
 --#############################
-function HotLoot:addLootIcon(iPath, iName, iLink, iCount)
-    local icon = self.createLootIcon(iPath, iName, iLink, iCount)
+function HotLoot:addLootIcon(strIconPath, strItemName, strItemLink, intItemCount)
+    local icon = self.createLootIcon(strIconPath, strItemName, strItemLink, intItemCount)
     icon:Show()
     return icon
 end
     
-function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
-    local strThemeSize = HotLoot:GetThemeSetting("themeSize"):ucfirst();
-    local strFlipped = (HotLoot:GetTextSide() == 0) and "" or "Flipped";
-    local toast = CreateFrame("frame", "HotLoot_ToastFrame", nil, "HotLoot_Toast"..strThemeSize..strFlipped.."Template");
-    -- local e = CreateFrame("button", "ExButtonFrame", toast)
-    toast.item = iLink;
-    toast.ShowTooltip = ShowTooltip;
+function HotLoot.createLootIcon(strIconPath, strItemName, strItemLink, intItemCount)
+    local strThemeSize     = HotLoot:GetThemeSetting("themeSize"):ucfirst();
+    local strFlipped       = (HotLoot:GetTextSide() == 0) and "" or "Flipped";
+    local frameToast       = CreateFrame("frame", "HotLoot_ToastFrame", nil, "HotLoot_Toast"..strThemeSize..strFlipped.."Template");
+    -- local e             = CreateFrame("button", "ExButtonFrame", frameToast)
+    frameToast.item        = strItemLink;
+    frameToast.ShowTooltip = function(self)
+        if self.item then
+            GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+            GameTooltip:SetHyperlink(self.item)
+            GameTooltip:Show()
+        end
+    end
 
     -- Set Backdrop
-    toast:SetBackdrop({
+    frameToast:SetBackdrop({
         bgFile   = HotLoot:GetThemeSetting("bgFile"),
         edgeFile = HotLoot:GetThemeSetting("edgeFile"),
         tile     = HotLoot:GetThemeSetting("tile"),
@@ -1312,89 +1295,112 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         edgeSize = HotLoot:GetThemeSetting("edgeSize"),
         insets   = HotLoot:GetThemeSetting("insets")
     });
-        
+    
+    -- Color
+    if not HotLoot:GetThemeColorDisabled() then
+        local colorBG, colorBorder = {}, {};
+        colorBG.red, colorBG.green, colorBG.blue, colorBG.alpha = HotLoot:GetThemeBG();
+        colorBorder.red, colorBorder.green, colorBorder.blue, colorBorder.alpha = HotLoot:GetThemeBorderColor();
+        if HotLoot:GetColorByQuality() and intItemCount > 0 then
+            local intQuality = select(3, GetItemInfo(strItemLink));
+            if intQuality then
+                colorBorder.red, colorBorder.green, colorBorder.blue = GetItemQualityColor(intQuality);
+            end
+            frameToast:SetBackdropColor(colorBG.red, colorBG.green, colorBG.blue, colorBG.alpha);
+            frameToast:SetBackdropBorderColor(colorBorder.red, colorBorder.green, colorBorder.blue, 1);
+        else
+            frameToast:SetBackdropColor(colorBG.red, colorBG.green, colorBG.blue, colorBG.alpha);
+            frameToast:SetBackdropBorderColor(colorBorder.red, colorBorder.green, colorBorder.blue, colorBorder.alpha);
+        end
+    end
+
     -- Set Opacity
-    toast:SetAlpha(HotLoot:GetTransparency());
+    frameToast:SetAlpha(HotLoot:GetTransparency());
     
     -- Set Icon
-    toast.icon:SetTexture(iPath);
-    if not HotLoot:GetIconSizeDisabled() then
-        --then
+    frameToast.icon:SetTexture(strIconPath);
+    if HotLoot:GetThemeSetting("themeSize") == "small" then
+        frameToast.icon:SetSize(HotLoot:GetIconSize(), HotLoot:GetIconSize());
     end
         
     -- Set Name
-    toast.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE") ;
-    if iCount == 0 then
-        toast.name:SetText(iName);
+    frameToast.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE") ;
+    if intItemCount == 0 then
+        frameToast.name:SetText(strItemName);
     else
-        toast.name:SetText(iLink);
+        frameToast.name:SetText(strItemLink);
     end
 
     -- Set Count
-    if toast.count and iCount > 0 then
-        toast.count:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
+    if frameToast.count and intItemCount > 0 then
+        frameToast.count:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
         if HotLoot:GetShowItemQuant() then
             if HotLoot:GetShowTotalQuant() then
-                local inBags = InBags(iName, iCount);
-                toast.count:SetText("x"..iCount.." ["..inBags.."]");
+                local inBags = InBags(strItemName, intItemCount);
+                frameToast.count:SetText("x"..intItemCount.." ["..inBags.."]");
             else
-                toast.count:SetText("x"..iCount);
+                frameToast.count:SetText("x"..intItemCount);
             end
-            toast.count:Show();
+            frameToast.count:Show();
         else
-            toast.count:Hide();
+            frameToast.count:Hide();
         end
     end
 
     -- Set Value
-    if toast.value and iCount > 0 then
-        toast.value:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
+    if frameToast.value and intItemCount > 0 then
+        frameToast.value:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
         if HotLoot:GetShowSellPrice() then
-            local strItemValue = select(11, GetItemInfo(iLink));
+            local strItemValue = select(11, GetItemInfo(strItemLink));
             if strItemValue then
-                toast.value:SetText(GetCoinTextureString(strItemValue));
-                toast.value:Show();
+                frameToast.value:SetText(GetCoinTextureString(strItemValue));
+                frameToast.value:Show();
             end
         else
-            toast.value:Hide();
+            frameToast.value:Hide();
         end
     end
     
     -- Set Type
-    if toast.type and iCount > 0 then
-        toast.type:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
+    if frameToast.type and intItemCount > 0 then
+        frameToast.type:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
         if HotLoot:GetShowItemType() then
-            local strItemType = select(6, GetItemInfo(iLink));
-            local strItemSubType = select(7, GetItemInfo(iLink));
+            local strItemType = select(6, GetItemInfo(strItemLink));
+            local strItemSubType = select(7, GetItemInfo(strItemLink));
             if strItemType and strItemSubType then
-                toast.type:SetText(strItemType .. ": " .. strItemSubType);
-                toast.type:Show();
+                frameToast.type:SetText(strItemType .. ": " .. strItemSubType);
+                frameToast.type:Show();
             end
         else
-            toast.type:Hide();
+            frameToast.type:Hide();
         end
     end
 
-    -- Width
-    local intWidth = toast.name:GetStringWidth() + toast.count:GetStringWidth() + toast.icon:GetWidth() + 16;
-    if toast.type and HotLoot:GetShowItemType() then
-        local intTypeWidth = toast.type:GetStringWidth() + toast.count:GetStringWidth() + toast.icon:GetWidth() + 16;
+    -- Set Size
+    local intWidth = frameToast.name:GetStringWidth() + frameToast.count:GetStringWidth() + frameToast.icon:GetWidth() + 16;
+    if frameToast.type and HotLoot:GetShowItemType() then
+        local intTypeWidth = frameToast.type:GetStringWidth() + frameToast.count:GetStringWidth() + frameToast.icon:GetWidth() + 16;
         intWidth = max(intWidth, intTypeWidth, tonumber(HotLoot:GetMinWidth()));
     else
         intWidth = max(intWidth, tonumber(HotLoot:GetMinWidth()));
     end
-    local intHeight = HotLoot:GetThemeSetting("height");
-    toast:SetSize(intWidth, intHeight);
+    local intHeight = (HotLoot:GetThemeSetting("themeSize") == "small") and (HotLoot:GetIconSize() + 4) or HotLoot:GetThemeSetting("height");
+    frameToast:SetSize(intWidth, intHeight);
 
     -- Tooltip
-    toast:SetScript("OnEnter", OnEnter);
-    toast:SetScript("OnLeave", OnLeave);
+    frameToast:SetScript("OnEnter", function(self)
+        self:ShowTooltip();
+    end);
+    frameToast:SetScript("OnLeave", function(self)
+        GameTooltip:Hide();
+        ResetCursor();
+    end);
 
     -- Fade Animation
     if HotLoot:GetShowAnimation() then
-        local aniGroupFade = toast:CreateAnimationGroup();
+        local aniGroupFade = frameToast:CreateAnimationGroup();
         local aniFade = aniGroupFade:CreateAnimation("Translation");
-        toast.ani = aniGroupFade;
+        frameToast.ani = aniGroupFade;
 
         aniFade:SetDuration(1.5);
         aniFade:SetSmoothing("IN");
@@ -1407,10 +1413,10 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
     end
         
         --[[if HotLoot:GetShowAnimation() then
-            local AnimationGroup = toast:CreateAnimationGroup()
+            local AnimationGroup = frameToast:CreateAnimationGroup()
             local animation1 = AnimationGroup:CreateAnimation("Translation")
-            local GlowAnimationGroup = toast.glow:CreateAnimationGroup()
-            local ShineAnimationGroup = toast.shine:CreateAnimationGroup()
+            local GlowAnimationGroup = frameToast.glow:CreateAnimationGroup()
+            local ShineAnimationGroup = frameToast.shine:CreateAnimationGroup()
             local glowAnimIn = GlowAnimationGroup:CreateAnimation("Alpha")
             local glowAnimOut = GlowAnimationGroup:CreateAnimation("Alpha")
             local shineAnimIn = ShineAnimationGroup:CreateAnimation("Alpha")
@@ -1456,18 +1462,18 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
             else
                 animation1:SetOffset(0, -100*HotLoot:GetFadeSpeed())
             end
-            toast.a = AnimationGroup
-            toast.glow.a = GlowAnimationGroup
-            toast.shine.a = ShineAnimationGroup
-            toast.shine.a:Play()
-            toast.glow.a:Play()
+            frameToast.a = AnimationGroup
+            frameToast.glow.a = GlowAnimationGroup
+            frameToast.shine.a = ShineAnimationGroup
+            frameToast.shine.a:Play()
+            frameToast.glow.a:Play()
         end
     ]]
-    --[[if iCount > 0  and HotLoot:GetShowExcludeButton() then
+    --[[if intItemCount > 0  and HotLoot:GetShowExcludeButton() then
         if HotLoot:GetTextSide() == 0 then
-            e:SetPoint("RIGHT", toast, "LEFT", -1, 0)
+            e:SetPoint("RIGHT", frameToast, "LEFT", -1, 0)
         else
-            e:SetPoint("LEFT", toast, "RIGHT", 1, 0)
+            e:SetPoint("LEFT", frameToast, "RIGHT", 1, 0)
         end
         e:SetWidth(5)
         
@@ -1476,12 +1482,12 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         e.texture:SetAllPoints(e)
         e:EnableMouse(true)
         e:RegisterForClicks("LeftButtonUp")
-        e:SetScript("OnEnter", function(self) EBOnEnter(toast) end)
+        e:SetScript("OnEnter", function(self) EBOnEnter(frameToast) end)
         e:SetScript("OnLeave", function(self) EBOnLeave() end)
-        e:SetScript("OnClick", function(self) EButtonClicked(iLink) end)
-        toast.e = e
+        e:SetScript("OnClick", function(self) EButtonClicked(strItemLink) end)
+        frameToast.e = e
     end]]
-    return toast
+    return frameToast
 end
 
 --#############################

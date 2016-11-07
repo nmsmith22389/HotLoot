@@ -1293,7 +1293,7 @@ local function OnLeave(self)
     ResetCursor()
 end
 local function EButtonClicked(name)
-    HotLoot:AddEList(name)
+    HotLoot:AddToExcludeList(name)
     for i = 1, #icons do
         if icons[i].item == name then
             icons[i].e:Hide()

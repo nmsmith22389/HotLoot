@@ -466,11 +466,7 @@ end
 --==========================
 function HotLoot:buttonTestLootMonitor()
     local itemName, itemLink, _, _, _, _, _, _, _, itemTexture, _ = GetItemInfo(120978)
-    local itoadd = HotLoot:addLootIcon(itemTexture, itemName, itemLink, 5)
-    table.insert(icons, 1, itoadd)
-    ResetTimer()
-    itoadd = nil
-    HotLoot:UpdateMonitor()
+    local itoadd = HotLoot:CreateLootIcon(itemTexture, itemName, itemLink, 5)
 end
 --==========================
 --          GET ID
@@ -1265,13 +1261,8 @@ end
 --#############################
 --      Loot Monitor Icon
 --#############################
-function HotLoot:addLootIcon(strIconPath, strItemName, strItemLink, intItemCount)
-    local icon = self.createLootIcon(strIconPath, strItemName, strItemLink, intItemCount)
-    icon:Show()
-    return icon
-end
     
-function HotLoot.createLootIcon(strIconPath, strItemName, strItemLink, intItemCount)
+function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCount)
     local strThemeSize     = HotLoot:GetThemeSetting("themeSize"):ucfirst();
     local strFlipped       = (HotLoot:GetTextSide() == 0) and "" or "Flipped";
     local frameToast       = CreateFrame("frame", "HotLoot_ToastFrame", nil, "HotLoot_Toast"..strThemeSize..strFlipped.."Template");
@@ -1486,7 +1477,14 @@ function HotLoot.createLootIcon(strIconPath, strItemName, strItemLink, intItemCo
         e:SetScript("OnClick", function(self) EButtonClicked(strItemLink) end)
         frameToast.e = e
     end]]
-    return frameToast
+
+    -- Finalize
+    frameToast:Show();
+    table.insert(icons, 1, frameToast);
+    ResetTimer();
+    HotLoot:UpdateMonitor();
+
+    -- return frameToast
 end
 
 --#############################
@@ -1621,12 +1619,7 @@ function HotLoot:LOOT_OPENED()
                     if IsGold(i) then
                         lootName = GetCoinTextureString(HotLoot:ToCopper(lootName))
                     end
-                    local itoadd = HotLoot:addLootIcon(lootIcon, lootName, itemLink, lootQuantity)
-                    table.insert(icons, 1, itoadd)
-                    ResetTimer()
-                    itoadd = nil
-            
-                    HotLoot:UpdateMonitor()
+                    HotLoot:CreateLootIcon(lootIcon, lootName, itemLink, lootQuantity)
                 end
                 if IsAddOnLoaded("HotLoot_LootHistory") then
                     HotLoot:AddToLootHistory(i, lootName, lootQuantity)

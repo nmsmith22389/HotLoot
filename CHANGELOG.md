@@ -1,4 +1,12 @@
 # CHANGELOG
+## v3.0.7
+### Fixed
+Fixed Add to Exclude List
+
+### Removed
+Removed Old Changelog
+
+
 ## v3.0.6
 ### Fixed
 * Fixed Skinning Mode

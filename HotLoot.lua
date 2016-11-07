@@ -556,6 +556,7 @@ end
 --==========================
 --      Add to E List
 --==========================
+-- TODO: Optomize this!
 function HotLoot:AddToExcludeList(value)
     if GetItemInfo(tostring(value)) then
         local iName = select(1,GetItemInfo(value))

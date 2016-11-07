@@ -2268,7 +2268,7 @@ end
 function HotLoot:SetExcludeListAdd(info, value)
     --self.db.profile.inputExcludeListAdd = value
     HotLoot:DebugOption("inputExcludeListAdd", value)
-    HotLoot:AddEList(value)
+    HotLoot:AddToExcludeList(value)
 end
 function HotLoot:GetExcludeListAdd(info)
     --return self.db.profile.includeList;

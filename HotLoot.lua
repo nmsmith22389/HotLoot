@@ -1266,6 +1266,7 @@ function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCo
     local strThemeSize     = HotLoot:GetThemeSetting("themeSize"):ucfirst();
     local strFlipped       = (HotLoot:GetTextSide() == 0) and "" or "Flipped";
     local frameToast       = CreateFrame("frame", "HotLoot_ToastFrame", nil, "HotLoot_Toast"..strThemeSize..strFlipped.."Template");
+    local intQuality = select(3, GetItemInfo(strItemLink));
     -- local e             = CreateFrame("button", "ExButtonFrame", frameToast)
     frameToast.item        = strItemLink;
     frameToast.ShowTooltip = function(self)
@@ -1292,7 +1293,6 @@ function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCo
         colorBG.red, colorBG.green, colorBG.blue, colorBG.alpha = HotLoot:GetThemeBG();
         colorBorder.red, colorBorder.green, colorBorder.blue, colorBorder.alpha = HotLoot:GetThemeBorderColor();
         if HotLoot:GetColorByQuality() and intItemCount > 0 then
-            local intQuality = select(3, GetItemInfo(strItemLink));
             if intQuality then
                 colorBorder.red, colorBorder.green, colorBorder.blue = GetItemQualityColor(intQuality);
             end
@@ -1302,6 +1302,15 @@ function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCo
             frameToast:SetBackdropColor(colorBG.red, colorBG.green, colorBG.blue, colorBG.alpha);
             frameToast:SetBackdropBorderColor(colorBorder.red, colorBorder.green, colorBorder.blue, colorBorder.alpha);
         end
+    end
+
+    -- Font Color
+    local colorFont = {};
+    if HotLoot:GetFontColorByQual() and intQuality then
+        colorFont.red, colorFont.green, colorFont.blue = GetItemQualityColor(intQuality);
+        colorFont.alpha = 1.0;
+    else
+        colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha = HotLoot:GetFontColor();
     end
 
     -- Set Opacity
@@ -1314,7 +1323,8 @@ function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCo
     end
         
     -- Set Name
-    frameToast.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE") ;
+    frameToast.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
+    -- frameToast.name:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha);
     if intItemCount == 0 then
         frameToast.name:SetText(strItemName);
     else
@@ -1324,6 +1334,7 @@ function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCo
     -- Set Count
     if frameToast.count and intItemCount > 0 then
         frameToast.count:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
+        frameToast.count:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha);
         if HotLoot:GetShowItemQuant() then
             if HotLoot:GetShowTotalQuant() then
                 local inBags = InBags(strItemName, intItemCount);
@@ -1340,6 +1351,7 @@ function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCo
     -- Set Value
     if frameToast.value and intItemCount > 0 then
         frameToast.value:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
+        frameToast.value:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha);
         if HotLoot:GetShowSellPrice() then
             local strItemValue = select(11, GetItemInfo(strItemLink));
             if strItemValue then
@@ -1354,6 +1366,7 @@ function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCo
     -- Set Type
     if frameToast.type and intItemCount > 0 then
         frameToast.type:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
+        frameToast.type:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha);
         if HotLoot:GetShowItemType() then
             local strItemType = select(6, GetItemInfo(strItemLink));
             local strItemSubType = select(7, GetItemInfo(strItemLink));

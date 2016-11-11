@@ -470,8 +470,8 @@ local tableThemes = {
                             values = AceGUIWidgetLSMlists.font,
                             set = "SetTextFont",
                             get = "GetTextFont",
-                            width = "full",
-                            hidden = "GetAdvancedOptionsHidden",
+                            width = "double",
+                            -- hidden = "GetAdvancedOptionsHidden",
                             order = 1
                         },
                         selectTextSide = {

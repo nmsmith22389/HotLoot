@@ -1392,10 +1392,12 @@ hlDefaults = {
         selectTextFont = "Friz Quadrata TT",
         selectTextSide = 0,
         rangeFontSize = 9,
-        fFontColorR = 0,
-        fFontColorG = 0,
-        fFontColorB = 0,
-        fFontColorA = 1,
+        colorFontColor = {
+            ["r"] = 1.0;
+            ["g"] = 1.0;
+            ["b"] = 1.0;
+            ["a"] = 1.0;
+        };
         toggleFontColorByQual = false,
         lootGridMode = false,
         lootGridNumColumns = 4,
@@ -1699,14 +1701,16 @@ end
 
 -- HotLoot:GetFontColor()
 function HotLoot:SetFontColor(info, r, g, b, a)
-    self.db.profile.fFontColorR = r;
-    self.db.profile.fFontColorG = g;
-    self.db.profile.fFontColorB = b;
-    self.db.profile.fFontColorA = a;
-    HotLoot:DebugOption("colorFontColor", r..", "..g..", "..b..", "..a);
+    self.db.profile.colorFontColor = {
+        ["r"] = r;
+        ["g"] = g;
+        ["b"] = b;
+        ["a"] = a;
+    };
+    HotLoot:DebugOption("colorFontColor{}", r..", "..g..", "..b..", "..a);
 end
 function HotLoot:GetFontColor(info)
-    return self.db.profile.fFontColorR, self.db.profile.fFontColorG, self.db.profile.fFontColorB, self.db.profile.fFontColorA;
+    return self.db.profile.colorFontColor.r, self.db.profile.colorFontColor.g, self.db.profile.colorFontColor.b, self.db.profile.colorFontColor.a;
 end
 
 -- HotLoot:GetFontColorByQual()

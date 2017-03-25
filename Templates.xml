@@ -22,7 +22,7 @@
             <Layer level="OVERLAY">
                 <FontString name="$parentName" parentKey="name">
                     <Anchors>
-                        <Anchor point="TOPLEFT" relativepoint="TOPRIGHT" relativeKey="$parent.icon">
+                        <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.icon">
                             <Offset>
                                 <AbsDimension x="2" y="0"/>
                             </Offset>
@@ -31,7 +31,7 @@
                 </FontString>
                 <FontString name="$parentCount" parentKey="count">
                     <Anchors>
-                        <Anchor point="BOTTOMRIGHT" relativepoint="BOTTOMRIGHT">
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
                             <Offset>
                                 <AbsDimension x="-6" y="8"/>
                             </Offset>
@@ -40,7 +40,7 @@
                 </FontString>
                 <FontString name="$parentValue" parentKey="value">
                     <Anchors>
-                        <Anchor point="BOTTOMLEFT" relativepoint="BOTTOMRIGHT" relativeKey="$parent.icon">
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT" relativeKey="$parent.icon">
                             <Offset>
                                 <AbsDimension x="2" y="0"/>
                             </Offset>
@@ -49,7 +49,7 @@
                 </FontString>
                 <FontString name="$parentType" parentKey="type">
                     <Anchors>
-                        <Anchor point="LEFT" relativepoint="RIGHT" relativeKey="$parent.icon">
+                        <Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.icon">
                             <Offset>
                                 <AbsDimension x="2" y="0"/>
                             </Offset>
@@ -58,17 +58,44 @@
                 </FontString>
             </Layer>
         </Layers>
-        <!-- <Backdrop bgFile="Interface\ACHIEVEMENTFRAME\UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND" edgeFile="Interface\FriendsFrame\UI-Toast-Border" tile="true">
-            <EdgeSize>
-                <AbsValue val="8"/>
-            </EdgeSize>
-            <TileSize>
-                <AbsValue val="256"/>
-            </TileSize>
-            <BackgroundInsets>
-                <AbsInset left="3" right="3" top="3" bottom="3"/>
-            </BackgroundInsets>
-        </Backdrop> -->
+        <Frames>
+            <!-- inherits="OptionsButtonTemplate" -->
+            <Button name="$parentButtonExclude" parentKey="exclude" enableMouse="true" hidden="true">
+                <Size x="16" y="50"/>
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="-10" y="0"/>
+                        </Offset>
+                    </Anchor>
+                    <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT">
+                        <Offset>
+                            <AbsDimension x="-10" y="0"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <NormalTexture name="$parentTexture" setAllPoints="true">
+                            <Color r="0.75" g="0" b="0" a="1" />
+                        </NormalTexture>
+                        <HighlightTexture name="$parentHighlightTexture" setAllPoints="true">
+                            <Color r="1" g="0" b="0" a="1" />
+                        </HighlightTexture>
+                    </Layer>
+                    <Layer level="OVERLAY">
+                        <FontString name="$parentText" inherits="GameFontWhiteTiny" justifyH="CENTER" text="E\nX\nC\nL\nU\nD\nE">
+                            <Anchors>
+                                <Anchor point="CENTER"/>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <!-- <Scripts>
+                    <OnClick> autoInviteMainConfigFrame:Hide(); </OnClick>
+                </Scripts> -->
+            </Button>
+        </Frames>
    </Frame>
    <Frame name="HotLoot_ToastLargeFlippedTemplate" virtual="true">
         <Size>
@@ -92,7 +119,7 @@
             <Layer level="OVERLAY">
                 <FontString name="$parentCount" parentKey="count">
                     <Anchors>
-                        <Anchor point="BOTTOMLEFT" relativepoint="BOTTOMLEFT">
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
                             <Offset>
                                 <AbsDimension x="6" y="8"/>
                             </Offset>
@@ -101,7 +128,7 @@
                 </FontString>
                 <FontString name="$parentName" parentKey="name" justifyh="RIGHT">
                     <Anchors>
-                        <Anchor point="TOPRIGHT" relativepoint="TOPLEFT" relativeKey="$parent.icon">
+                        <Anchor point="TOPRIGHT" relativePoint="TOPLEFT" relativeKey="$parent.icon">
                             <Offset>
                                 <AbsDimension x="-2" y="0"/>
                             </Offset>
@@ -110,7 +137,7 @@
                 </FontString>
                 <FontString name="$parentType" parentKey="type" justifyh="RIGHT">
                     <Anchors>
-                        <Anchor point="RIGHT" relativepoint="LEFT" relativeKey="$parent.icon">
+                        <Anchor point="RIGHT" relativePoint="LEFT" relativeKey="$parent.icon">
                             <Offset>
                                 <AbsDimension x="-2" y="0"/>
                             </Offset>
@@ -119,7 +146,7 @@
                 </FontString>
                 <FontString name="$parentValue" parentKey="value" justifyh="RIGHT">
                     <Anchors>
-                        <Anchor point="BOTTOMRIGHT" relativepoint="BOTTOMLEFT" relativeKey="$parent.icon">
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMLEFT" relativeKey="$parent.icon">
                             <Offset>
                                 <AbsDimension x="-2" y="0"/>
                             </Offset>
@@ -128,17 +155,6 @@
                 </FontString>
             </Layer>
         </Layers>
-        <!-- <Backdrop bgFile="Interface\ACHIEVEMENTFRAME\UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND" edgeFile="Interface\FriendsFrame\UI-Toast-Border" tile="true">
-            <EdgeSize>
-                <AbsValue val="8"/>
-            </EdgeSize>
-            <TileSize>
-                <AbsValue val="256"/>
-            </TileSize>
-            <BackgroundInsets>
-                <AbsInset left="3" right="3" top="3" bottom="3"/>
-            </BackgroundInsets>
-        </Backdrop> -->
    </Frame>
    <Frame name="HotLoot_ToastSmallTemplate" virtual="true">
         <Size>
@@ -163,7 +179,7 @@
             <Layer level="OVERLAY">
                 <FontString name="$parentName" parentKey="name">
                     <Anchors>
-                        <Anchor point="LEFT" relativepoint="RIGHT" relativeKey="$parent.icon">
+                        <Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.icon">
                             <Offset>
                                 <AbsDimension x="2" y="0"/>
                             </Offset>
@@ -205,7 +221,7 @@
             <Layer level="OVERLAY">
                 <FontString name="$parentName" parentKey="name">
                     <Anchors>
-                        <Anchor point="RIGHT" relativepoint="LEFT" relativeKey="$parent.icon">
+                        <Anchor point="RIGHT" relativePoint="LEFT" relativeKey="$parent.icon">
                             <Offset>
                                 <AbsDimension x="-2" y="0"/>
                             </Offset>

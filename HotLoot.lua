@@ -1417,6 +1417,11 @@ function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCo
         
     -- NOTE: Removed Shine and Glow for now because it's not absolutely necessary but will add in later.
 
+    -- Exclude Button
+    if HotLoot:GetShowExcludeButton() and intItemCount > 0 then
+        --then
+    end
+
     --[[if intItemCount > 0  and HotLoot:GetShowExcludeButton() then
         if HotLoot:GetTextSide() == 0 then
             e:SetPoint("RIGHT", frameToast, "LEFT", -1, 0)

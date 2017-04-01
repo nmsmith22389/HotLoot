@@ -1040,7 +1040,13 @@ local function ToFilters(slot)
                     return true
             elseif
                 -- Leather
-                (itemSubType == L["Leather"]) and (itemType == L["Tradeskill"] or itemType == "Item Enhancement!") and HotLoot:GetLeatherFilter() and CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
+                HotLoot:GetLeatherFilter() and 
+                (
+                    (itemType == L["Tradeskill"] and (
+                        itemSubType == L["Leather"] or itemType == "Item Enhancement!")) or 
+                    (HotLoot.CheckUntyped('leather', itemLink))
+                ) and 
+                CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Leather";
                     return true
             elseif

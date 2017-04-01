@@ -482,15 +482,7 @@ function HotLoot:buttonTestLootMonitor()
     local itemName, itemLink, _, _, _, _, _, _, _, itemTexture, _ = GetItemInfo(120978)
     local itoadd = HotLoot:CreateLootIcon(itemTexture, itemName, itemLink, 5)
 end
---==========================
---          GET ID
---==========================
-local function GetItemID(itemLink)
-    -- local _, _, Color, Ltype, Id, Enchant, Gem1, Gem2, Gem3, Gem4, Suffix, Unique, LinkLvl, Name = string.find(itemLink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+):?(%d*):?(%d*):?(%d*):?(%d*):?(%d*):?(%-?%d*):?(%-?%d*):?(%d*):?(%d*):?(%-?%d*)|?h?%[?([^%[%]]*)%]?|?h?|?r?")
 
-    -- This should return only the item ID
-    local itemID = select(5, string.find(itemLink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+):?(%d*):?(%d*):?(%d*):?(%d*):?(%d*):?(%-?%d*):?(%-?%d*):?(%d*):?(%d*):?(%-?%d*)|?h?%[?([^%[%]]*)%]?|?h?|?r?"));
-    return tonumber(Id);
 --
 -- ─── REALUI SUPPORT ─────────────────────────────────────────────────────────────
 --
@@ -1649,12 +1641,13 @@ function HotLoot:LOOT_OPENED()
     mFocus = GetMouseFocus():GetName()
     skinModeTrigger = 0
         for i=1, GetNumLootItems() do
+            -- Show Include Buttons
             local _, lootName = GetLootSlotInfo(i)
-            --table.insert(lootSlots, HotLoot:CreatLootSlot(i))
             if HotLoot:GetShowIncludeButton() and not HotLoot:GetIncludeList()[lootName] then
                 incButtons[i] = HotLoot:CreateILootButton(i)
-                --HotLoot:dBug(incButtons[i])
             end
+
+            -- Send to Filters
             if ToFilters(i) then
                 -- TODO: Localize
                 HotLoot:Debug("Item Looted in " .. strFilterCaught .. " filter.")
@@ -1671,30 +1664,29 @@ function HotLoot:LOOT_OPENED()
                     else
                         self:CreateLootIcon(lootName, itemLink, lootQuantity, lootIcon, self.LOOT_SLOT_TYPE.ITEM)
                     end
-                    HotLoot:CreateLootIcon(lootIcon, lootName, itemLink, lootQuantity)
                 end
-                if IsAddOnLoaded("HotLoot_LootHistory") then
-                    HotLoot:AddToLootHistory(i, lootName, lootQuantity)
-                end
-                if IsAddOnLoaded("HotLoot_LootNotification") then
-                    HotLoot:CheckForLootNotification(lootName, itemLink)
-                end
+
+                -- if IsAddOnLoaded("HotLoot_LootHistory") then
+                --     HotLoot:AddToLootHistory(i, lootName, lootQuantity)
+                -- end
+                -- if IsAddOnLoaded("HotLoot_LootNotification") then
+                --     HotLoot:CheckForLootNotification(lootName, itemLink)
+                -- end
                 
                 LootSlot(i)
             else
                 HotLoot:Debug("Item NOT Looted")
                 ToSkin(i)
-                
             end
-        
         end
+
         if mFocus == nil then
             mFocus = "nil"
         end
-        --HotLoot:dBug("mFocus", mFocus)
-        if HotLoot:GetCloseLootWindow() and not CloseKeyDown() and string.find(mFocus, "WorldFrame") then     
-            closeEL = 1
-            CloseLoot()
+
+        if HotLoot:GetCloseLootWindow() and not CloseKeyDown() and (string.find(mFocus, "WorldFrame") or isRealUILootOn()) then
+            closeEL = 1;
+            CloseLoot();
         end
     end
 end

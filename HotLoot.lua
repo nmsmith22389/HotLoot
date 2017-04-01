@@ -33,6 +33,15 @@ local incButtons = {}
 local isFirst = 0
 --**************************
 
+--
+-- ─── GET ITEM ID ────────────────────────────────────────────────────────────────
+--
+
+local function GetItemID(itemString)
+    local itemId = select(2, strsplit(":", itemString))
+    return tonumber(itemId)
+end
+
 
 --==========================
 --      Process Tooltip

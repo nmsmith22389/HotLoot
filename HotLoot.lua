@@ -486,7 +486,18 @@ local function GetItemID(itemLink)
     -- This should return only the item ID
     local itemID = select(5, string.find(itemLink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+):?(%d*):?(%d*):?(%d*):?(%d*):?(%d*):?(%-?%d*):?(%-?%d*):?(%d*):?(%d*):?(%-?%d*)|?h?%[?([^%[%]]*)%]?|?h?|?r?"));
     return tonumber(Id);
+--
+-- ─── REALUI SUPPORT ─────────────────────────────────────────────────────────────
+--
+
+local function isRealUILootOn()
+    if IsAddOnLoaded('nibRealUI') then
+        return RealUI:GetModuleEnabled('Loot');
+    else
+        return false;
+    end
 end
+
 --==========================
 --      IS KEY DOWN
 --==========================
@@ -1486,7 +1497,8 @@ local function IBOnLeave()
 end
 
 function HotLoot:CreateILootButton(slot)
-    local i = CreateFrame("button", "IncButton"..slot, _G["LootFrame"])
+    local attachFrame = isRealUILootOn() and _G['RealUI_Loot'] or _G['LootFrame'];
+    local i = CreateFrame("button", "IncButton"..slot, attachFrame)
     i:SetWidth(8)
     i:SetHeight(30)
     --[[
@@ -1499,8 +1511,13 @@ function HotLoot:CreateILootButton(slot)
         i:SetPoint("RIGHT", _G["ElvLootSlot"..slot], "LEFT", -10, 0)
     else
     ]]
-        i:SetPoint("RIGHT", _G["LootButton"..slot], "LEFT", -10, 0)
     --end
+
+    if isRealUILootOn() then
+        i:SetPoint("RIGHT", _G["ButsuSlot"..slot], "LEFT", -35, 0)
+    else
+        i:SetPoint("RIGHT", _G["LootButton"..slot], "LEFT", -10, 0)
+    end
     
     i.texture = i:CreateTexture("iTexture"..slot )
     i.texture:SetColorTexture(0, 1, 0, 0.7)

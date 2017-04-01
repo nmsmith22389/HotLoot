@@ -1522,6 +1522,14 @@ function HotLoot:CreateILootButton(slot)
     i.texture = i:CreateTexture("iTexture"..slot )
     i.texture:SetColorTexture(0, 1, 0, 0.7)
     i.texture:SetAllPoints(i)
+
+    -- Plus text on button
+    i.text = i:CreateFontString(nil, "OVERLAY")
+    i.text:SetPoint("CENTER", i, "CENTER", 1, 0)
+    i.text:SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
+    --name:SetJustifyH("LEFT")
+    i.text:SetText("+")
+
     i:EnableMouse(true)
     i:RegisterForClicks("LeftButtonUp")
     i:SetScript("OnEnter", function(self) IBOnEnter(slot) end)

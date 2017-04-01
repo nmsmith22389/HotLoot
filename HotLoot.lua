@@ -727,6 +727,30 @@ function HotLoot:SellPoorItems()
         HotLoot:Announce(string.format(L["AllGreysSold"], GetCoinTextureString(totalPrice)))
     end
 end
+
+--
+-- ─── CHECK UNTYPED ──────────────────────────────────────────────────────────────
+--
+
+function HotLoot.CheckUntyped( type, itemLink )
+    -- local itemName, _, _, itemLevel, _, itemType, itemSubType, _, _, _, _ = GetItemInfo(itemLink)
+    local itemId = GetItemID(itemLink)
+    local items = {}
+    if (type == 'leather') then
+        items = {
+            [124439] = true,
+            [124438] = true,
+        }
+    end
+
+    if items[itemId] then
+        HotLoot:Debug(--[[itemLink..' ('..itemId..') is an '..]]'untyped item in the '..type..' filter.')
+        return true
+    else
+        return false
+    end
+end
+
 --==========================
 --          TT SCANNER
 --==========================

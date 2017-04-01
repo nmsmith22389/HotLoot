@@ -1,4 +1,4 @@
-## Interface: 70100
+## Interface: 70200
 ## Title: HotLoot
 ## Notes: Auto looting AddOn.
 ## Version: 3.0.7
@@ -12,4 +12,5 @@ Locales\Locales.xml
 
 HotLoot.lua
 Options.lua
+Templates.xml
 

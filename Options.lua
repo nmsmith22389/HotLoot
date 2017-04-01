@@ -52,12 +52,10 @@ local tableFilterTypes = {
 }
 
 local tableThemes = {
-    --["classic"] = "Classic",
-    --["minimal"] = "Minimal",
-    --["holo"] = "Holo",
-    ["color"] = "Colored (Any)",
-    ["paper"] = "Paper (Large)",
-    ["toast"] = "Toast (Large)",
+    ["customSmall"] = "Custom "..HotLoot:ColorText("info", "(Small)"),
+    ["customLarge"] = "Custom "..HotLoot:ColorText("info", "(Large)"),
+    ["tooltip"]     = "Tooltip "..HotLoot:ColorText("info", "(Large)"),
+    ["paper"]       = "Paper "..HotLoot:ColorText("info", "(Large)"),
 }
 -- options
 --
@@ -205,8 +203,8 @@ local tableThemes = {
                     func = "buttonResetLootMonitor", 
                     order = 3
                 },
-                goupLootMonitorSettings = {
-                    name = L["genSettings"], 
+                goupLootMonitorGeneral = {
+                    name = L["genGeneral"], 
                     type = "group", 
                     order = 4, 
                     args = {
@@ -234,8 +232,8 @@ local tableThemes = {
                             type = "toggle",
                             set = "SetShowItemNames",
                             get = "GetShowItemNames",
-                            disabled = "GetShowItemNamesDisabled",
-                            hidden = true, --"GetAdvancedOptions",
+                            -- hidden = "GetAdvancedOptionsHidden",
+                            hidden = true,
                             width = "double",
                             order = 3
                         },
@@ -332,8 +330,8 @@ local tableThemes = {
                             type = "range",
                             min = 16,
                             max = 32,
-                            step = 8, 
-                            bigStep = 8,
+                            step = 4, 
+                            bigStep = 4,
                             disabled = "GetIconSizeDisabled",
                             set = "SetIconSize",
                             get = "GetIconSize",
@@ -361,16 +359,6 @@ local tableThemes = {
                             get = "GetGrowthDirection",
                             order = 3
                         },
-                        selectTextSide = {
-                            name = L["selectTextSideName"],
-                            desc = L["selectTextSideDesc"],
-                            type = "select",
-                            values = tableDirectionHorizontal,
-                            set = "SetTextSide",
-                            get = "GetTextSide",
-                            order = 4
-                        },
-                        
                         selectTheme = {
                             name = L["selectThemeName"],
                             -- desc = L["selectThemeDesc"],
@@ -467,6 +455,65 @@ local tableThemes = {
                             get = "GetShowAnimation",
                             order = 13
                         }
+                    }
+                },
+                goupLootMonitorText = {
+                    name = L["genText"], 
+                    type = "group", 
+                    order = 6, 
+                    args = {
+                        selectTextFont = {
+                            name = L["genFont"],
+                            desc = L["selectTextFontDesc"],
+                            type = "select",
+                            dialogControl = 'LSM30_Font',
+                            values = AceGUIWidgetLSMlists.font,
+                            set = "SetTextFont",
+                            get = "GetTextFont",
+                            width = "double",
+                            -- hidden = "GetAdvancedOptionsHidden",
+                            order = 1
+                        },
+                        selectTextSide = {
+                            name = L["selectTextSideName"],
+                            desc = L["selectTextSideDesc"],
+                            type = "select",
+                            values = tableDirectionHorizontal,
+                            set = "SetTextSide",
+                            get = "GetTextSide",
+                            order = 2
+                        },
+                        rangeFontSize = {
+                            name = L["rangeFontSizeName"],
+                            desc = L["rangeFontSizeDesc"],
+                            type = "range",
+                            min = 6,
+                            max = 16,
+                            step = 1, 
+                            bigStep = 1,
+                            set = "SetFontSize",
+                            get = "GetFontSize",
+                            hidden = "GetAdvancedOptionsHidden",
+                            order = 3
+                        },
+                        colorFontColor = {
+                            name = L["colorFontColorName"],
+                            desc = L["colorFontColorDesc"],
+                            type = "color",
+                            set = "SetFontColor",
+                            get = "GetFontColor",
+                            hidden = "GetAdvancedOptionsHidden",
+                            hasAlpha = true,
+                            order = 4
+                        },
+                        toggleFontColorByQual = {
+                            name = L["toggleFontColorByQualName"],
+                            desc = L["toggleFontColorByQualDesc"],
+                            type = "toggle",
+                            set = "SetFontColorByQual",
+                            get = "GetFontColorByQual",
+                            order = 5
+                        },
                     }
                 }
             }
@@ -1144,7 +1191,7 @@ local tableThemes = {
                     order = 1,
                     args = {
                         desc = {
-                            name = HotLoot:MakeColor("ctrl", L["groupCloseLootWindow"]).."\n"..L["SysHelp1"]..HotLoot:MakeColor("ctrl", L["groupSkinningMode"]).."\n"..L["SysHelp2"],            
+                            name = HotLoot:ColorText("hotkey", L["groupCloseLootWindow"]).."\n"..L["SysHelp1"]..HotLoot:ColorText("hotkey", L["groupSkinningMode"]).."\n"..L["SysHelp2"],            
                             type = "description",
                             order = 1,
                         },
@@ -1156,8 +1203,8 @@ local tableThemes = {
                     order = 2,
                     args = {
                         desc = {
-                            name = HotLoot:MakeColor("ctrl", L["Themes"]).."\n"..L["LMHelp1"],          
-                            --..HotLoot:MakeColor("ctrl", L["GridModeGroup"])..L["LMHelp2"]
+                            name = HotLoot:ColorText("hotkey", L["Themes"]).."\n"..L["LMHelp1"],          
+                            --..HotLoot:ColorText("hotkey", L["GridModeGroup"])..L["LMHelp2"]
                             type = "description",
                             order = 1,
                         },
@@ -1169,7 +1216,7 @@ local tableThemes = {
                     order = 3,
                     args = {
                         desc = {
-                            name = L["IQHelp1"]..HotLoot:MakeColor("ctrl", L["togglePoorQualityFilterName"]).."\n"..L["IQHelp2"],            
+                            name = L["IQHelp1"]..HotLoot:ColorText("hotkey", L["togglePoorQualityFilterName"]).."\n"..L["IQHelp2"],            
                             type = "description",
                             order = 1,
                         },
@@ -1182,7 +1229,7 @@ local tableThemes = {
                     hidden = false,
                     args = {
                         desc = {
-                            name = HotLoot:MakeColor("ctrl", L["IEListHelpGroup"]).."\n"..L["IEListHelp1"],         
+                            name = HotLoot:ColorText("hotkey", L["IEListHelpGroup"]).."\n"..L["IEListHelp1"],         
                             type = "description",
                             order = 1,
                         },
@@ -1194,7 +1241,7 @@ local tableThemes = {
                     order = 5,
                     args = {
                         desc = {
-                            name = HotLoot:MakeColor("ctrl", L["selectThresholdTypeName"]).."\n"..L["ThreshHelp1"]..HotLoot:MakeColor("ctrl", L["inputThresholdValueName"]).."\n"..L["ThreshHelp2"]..HotLoot:MakeColor("ctrl", L["toggleUseQuantValueName"]).."\n"..L["ThreshHelp3"],          
+                            name = HotLoot:ColorText("hotkey", L["selectThresholdTypeName"]).."\n"..L["ThreshHelp1"]..HotLoot:ColorText("hotkey", L["inputThresholdValueName"]).."\n"..L["ThreshHelp2"]..HotLoot:ColorText("hotkey", L["toggleUseQuantValueName"]).."\n"..L["ThreshHelp3"],          
                             type = "description",
                             order = 1,
                         },
@@ -1282,7 +1329,7 @@ local tableThemes = {
             order = 17,
             args = {
                 spacer2 = {
-                    name = HotLoot:MakeColor("ctrl", "HotLoot v"..GetAddOnMetadata("HotLoot", "Version").." ©2016\n\nAuthor:").." Neil Smith\n"..HotLoot:MakeColor("ctrl","Co-author:").." Jessica Mitchell\n"..HotLoot:MakeColor("ctrl","Testing:").."\ndsblack115\n"..HotLoot:MakeColor("ctrl","Translations:").."\nphilipp5796 - German\nMad_Ti - French\n",         
+                    name = HotLoot:ColorText("hotkey", "HotLoot v"..GetAddOnMetadata("HotLoot", "Version").." ©2016\n\nAuthor:").." Neil Smith\n"..HotLoot:ColorText("hotkey","Co-author:").." Jessica Mitchell\n"..HotLoot:ColorText("hotkey","Testing:").."\ndsblack115\n"..HotLoot:ColorText("hotkey","Translations:").."\nphilipp5796 - German\nMad_Ti - French\n",         
                     type = "description",
                     order = 1,
                 },
@@ -1324,17 +1371,6 @@ hlDefaults = {
         toggleShowItemType = true,
         rangeIconSize = 16, 
         rangeTransparency = 1,
-        -- inlineQuant = true,
-        toggleShowTotalQuant = true,
-        selectGrowthDirection = -1, 
-        selectTextSide = 0,
-        inputMinWidth = "145",
-        rangeInitialDelay = 5,
-        rangeSecondaryDelay = 1,
-        rangeFadeSpeed = 5,
-        toggleColorByQuality = true,
-        toggleShowAnimation = true,
-        selectTheme = "toast",
         fThemeColorR = 0,
         fThemeColorG = 0,
         fThemeColorB = 0,
@@ -1343,6 +1379,26 @@ hlDefaults = {
         fThemeBorderColorG = 1,
         fThemeBorderColorB = 1,
         fThemeBorderColorA = 1,
+        -- inlineQuant = true,
+        toggleShowTotalQuant = true,
+        selectTheme = "paper",
+        selectGrowthDirection = -1, 
+        inputMinWidth = "145",
+        rangeInitialDelay = 5,
+        rangeSecondaryDelay = 1,
+        rangeFadeSpeed = 5,
+        toggleColorByQuality = true,
+        toggleShowAnimation = true,
+        selectTextFont = "Friz Quadrata TT",
+        selectTextSide = 0,
+        rangeFontSize = 9,
+        colorFontColor = {
+            ["r"] = 1.0;
+            ["g"] = 1.0;
+            ["b"] = 1.0;
+            ["a"] = 1.0;
+        };
+        toggleFontColorByQual = false,
         lootGridMode = false,
         lootGridNumColumns = 4,
         toggleGoldFilter = true,
@@ -1520,15 +1576,6 @@ function HotLoot:GetGrowthDirection(info)
     return self.db.profile.selectGrowthDirection;
 end
 
--- HotLoot:GetTextSide()
-function HotLoot:SetTextSide(info, value)
-    self.db.profile.selectTextSide = value;
-    HotLoot:DebugOption("selectTextSide", value);
-end
-function HotLoot:GetTextSide(info)
-    return self.db.profile.selectTextSide;
-end
-
 -- SetInlineQuant
 function HotLoot:SetInlineQuant(info, value)
     self.db.profile.inlineQuant = value;
@@ -1542,7 +1589,7 @@ end
 function HotLoot:SetTheme(info, value)
     self.db.profile.selectTheme = value;
     HotLoot:DebugOption("selectTheme", value);
-    HotLoot:LoadTheme(value);
+    -- HotLoot:LoadTheme(value);
 end
 function HotLoot:GetTheme(info)
     return self.db.profile.selectTheme;
@@ -1623,6 +1670,56 @@ function HotLoot:SetShowAnimation(info, value)
 end
 function HotLoot:GetShowAnimation(info)
     return self.db.profile.toggleShowAnimation;
+end
+
+-- HotLoot:GetTextFont()
+function HotLoot:SetTextFont(info, value)
+    self.db.profile.selectTextFont = value;
+    HotLoot:DebugOption("selectTextFont", value);
+end
+function HotLoot:GetTextFont(info)
+    return self.db.profile.selectTextFont;
+end
+
+-- HotLoot:GetTextSide()
+function HotLoot:SetTextSide(info, value)
+    self.db.profile.selectTextSide = value;
+    HotLoot:DebugOption("selectTextSide", value);
+end
+function HotLoot:GetTextSide(info)
+    return self.db.profile.selectTextSide;
+end
+
+-- HotLoot:GetFontSize()
+function HotLoot:SetFontSize(info, value)
+    self.db.profile.rangeFontSize = value;
+    HotLoot:DebugOption("rangeFontSize", value);
+end
+function HotLoot:GetFontSize(info)
+    return self.db.profile.rangeFontSize;
+end
+
+-- HotLoot:GetFontColor()
+function HotLoot:SetFontColor(info, r, g, b, a)
+    self.db.profile.colorFontColor = {
+        ["r"] = r;
+        ["g"] = g;
+        ["b"] = b;
+        ["a"] = a;
+    };
+    HotLoot:DebugOption("colorFontColor{}", r..", "..g..", "..b..", "..a);
+end
+function HotLoot:GetFontColor(info)
+    return self.db.profile.colorFontColor.r, self.db.profile.colorFontColor.g, self.db.profile.colorFontColor.b, self.db.profile.colorFontColor.a;
+end
+
+-- HotLoot:GetFontColorByQual()
+function HotLoot:SetFontColorByQual(info, value)
+    self.db.profile.toggleFontColorByQual = value;
+    HotLoot:DebugOption("toggleFontColorByQual", value);
+end
+function HotLoot:GetFontColorByQual(info)
+    return self.db.profile.toggleFontColorByQual;
 end
 
 -- lootGridMode

@@ -14,6 +14,11 @@ local TipHooker = LibStub:GetLibrary("LibTipHooker-1.1")
 local ScrollingTable = LibStub("ScrollingTable")
 --local ScrollingTable = LibStub:GetLibrary("ScrollingTable")
 hIcon = LibStub("LibDBIcon-1.0")
+HotLoot.LOOT_SLOT_TYPE = {
+    ['ITEM'] = 1,
+    ['COIN'] = 2,
+    ['CURRENCY'] = 3,
+}
 
 --==========================
 --         VAR LIST
@@ -32,6 +37,15 @@ local incButtons = {}
 --==FADE ITEMS==--
 local isFirst = 0
 --**************************
+
+--
+-- ─── GET ITEM ID ────────────────────────────────────────────────────────────────
+--
+
+local function GetItemID(itemString)
+    local itemId = select(2, strsplit(":", itemString))
+    return tonumber(itemId)
+end
 
 
 --==========================
@@ -118,6 +132,10 @@ local function tableSize(tbl)
     return x
 end
 
+string.ucfirst = function(str)
+    return (str:gsub("^%l", string.upper))
+end
+
 
 
 
@@ -153,124 +171,86 @@ end
 --==================================
 --      Themes Table and FUNCS
 --==================================
-local newThemes = {
-    ["classic"] ={
-        ["name"] = "Classic",
-        ["disIconSize"] = false,
-        ["themeSize"] = "small",
-        ["height"] = 18,
-        ["bgFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\statusbars\\trans", 
-        ["edgeFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\borders\\trans", 
-        ["tile"] = true, ["tileSize"] = 16, ["edgeSize"] = 16, 
-        ["insets"] = { left = 2, right = 2, top = 2, bottom = 2 }
-    },
-    ["minimal"] ={
-        ["name"] = "Minimal",
-        ["disIconSize"] = true,
-        ["height"] = 18,
-        ["bgFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\statusbars\\elv", 
-        ["edgeFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\borders\\px-black", 
-        ["tile"] = true, ["tileSize"] = 16, ["edgeSize"] = 16, 
-        ["insets"] = { left = 2, right = 2, top = 2, bottom = 2 }
-    },
-    ["holo"] ={
-        ["name"] = "Holo",
-        ["disIconSize"] = true,
-        ["height"] = 18,
-        ["bgFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\statusbars\\holo", 
-        ["edgeFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\borders\\trans", 
-        ["tile"] = true, ["tileSize"] = 32, ["edgeSize"] = 16, 
-        ["insets"] = { left = 0, right = 0, top = 0, bottom = 0 }
-    },
-    --UI-Achievement-WoodBorder
-    ["paper"] ={
-        ["name"] = "Paper",
-        ["disIconSize"] = true,
-        ["themeSize"] = "large",
-        ["height"] = 50,
-        ["bgFile"] = "Interface\\ACHIEVEMENTFRAME\\UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND", 
-        ["edgeFile"] = [[Interface\FriendsFrame\UI-Toast-Border]], 
-        ["tile"] = true, ["tileSize"] = 256, ["edgeSize"] = 12, 
-        ["insets"] = { left = 5, right = 5, top = 5, bottom = 5 }
-    },
-    ["color"] ={
-        ["name"] = "Colored",
-        ["disIconSize"] = false,
+local tableThemeSettings = {
+    ["customSmall"] ={
+        ["name"] = "Custom",
+        ["iconSizable"] = true,
         ["themeSize"] = "small",
         ["height"] = 20,
-        ["bgFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\statusbars\\colorbg", 
-        ["edgeFile"] = "Interface\\AddOns\\HotLoot\\media\\textures\\borders\\colorborder", 
-        ["tile"] = true, ["tileSize"] = 16, ["edgeSize"] = 16, 
+        ["bgFile"] = [[Interface\AddOns\HotLoot\media\textures\statusbars\colorbg]],
+        ["edgeFile"] = [[Interface\AddOns\HotLoot\media\textures\borders\colorborder]],
+        ["tile"] = true, ["tileSize"] = 16, ["edgeSize"] = 16,
         ["insets"] = { left = 2, right = 2, top = 2, bottom = 2 }
     },
-    ["toast"] ={
-        ["name"] = "Toast",
+    ["customLarge"] ={
+        ["name"] = "Custom",
+        ["iconSizable"] = true,
         ["themeSize"] = "large",
-        ["disIconSize"] = true,
         ["height"] = 50,
-        ["bgFile"] = [[Interface\CHATFRAME\CHATFRAMEBACKGROUND]], 
-        ["edgeFile"] = [[Interface\FriendsFrame\UI-Toast-Border]], 
-        ["tile"] = true, ["tileSize"] = 12, ["edgeSize"] = 12, 
-        ["insets"] = { left = 5, right = 5, top = 5, bottom = 5 }
+        ["bgFile"] = [[Interface\AddOns\HotLoot\media\textures\statusbars\colorbg]],
+        ["edgeFile"] = [[Interface\AddOns\HotLoot\media\textures\borders\colorborder]],
+        ["tile"] = true, ["tileSize"] = 16, ["edgeSize"] = 16,
+        ["insets"] = { left = 2, right = 2, top = 2, bottom = 2 }
+    },
+    ["paper"] ={
+        ["name"] = "Paper",
+        ["iconSizable"] = false,
+        ["themeSize"] = "large",
+        ["height"] = 50,
+        ["bgFile"] = [[Interface\ACHIEVEMENTFRAME\UI-ACHIEVEMENT-ACHIEVEMENTBACKGROUND]],
+        ["edgeFile"] = [[Interface\FriendsFrame\UI-Toast-Border]],
+        ["tile"] = true, ["tileSize"] = 256, ["edgeSize"] = 8,
+        ["insets"] = { left = 3, right = 3, top = 3, bottom = 3 }
+    },
+    ["tooltip"] ={
+        ["name"] = "Tooltip",
+        ["themeSize"] = "large",
+        ["iconSizable"] = false,
+        ["height"] = 50,
+        ["bgFile"] = [[Interface\Tooltips\CHATBUBBLE-BACKGROUND]], 
+        ["edgeFile"] = [[Interface\Tooltips\UI-Tooltip-Border]], 
+        ["tile"] = true, ["tileSize"] = 32, ["edgeSize"] = 12, 
+        ["insets"] = { left = 3, right = 3, top = 3, bottom = 3 }
     },
 }
 
-function HotLoot:LoadTheme(theme)
-    -- load vars
-    nameCurrent = newThemes[theme]["name"]
-     HotLoot:Announce(L["AnnounceLoadingTheme"]..nameCurrent)
-    themeSize = newThemes[theme]["themeSize"]
-    heightCurrent = newThemes[theme]["height"]
-    bgFileCurrent = newThemes[theme]["bgFile"]
-    edgeFileCurrent = newThemes[theme]["edgeFile"]
-    tileCurrent = newThemes[theme]["tile"]
-    tileSizeCurrent = newThemes[theme]["tileSize"]
-    edgeSizeCurrent = newThemes[theme]["edgeSize"]
-    insetsCurrent = newThemes[theme]["insets"]
-    disIconSizeCurrent = newThemes[theme]["disIconSize"]
+function HotLoot:GetThemeSetting( setting )
+    return tableThemeSettings[HotLoot:GetTheme()][setting];
 end
 
-local function LoadThemeInit(theme)
-    --newThemes
-    -- load vars
-    nameCurrent = newThemes[theme]["name"]
-     HotLoot:Announce(L["AnnounceLoadingTheme"]..nameCurrent)
-    themeSize = newThemes[theme]["themeSize"]
-    heightCurrent = newThemes[theme]["height"]
-    bgFileCurrent = newThemes[theme]["bgFile"]
-    edgeFileCurrent = newThemes[theme]["edgeFile"]
-    tileCurrent = newThemes[theme]["tile"]
-    tileSizeCurrent = newThemes[theme]["tileSize"]
-    edgeSizeCurrent = newThemes[theme]["edgeSize"]
-    insetsCurrent = newThemes[theme]["insets"]
-    disIconSizeCurrent = newThemes[theme]["disIconSize"]
-
-end
--- disNamesC
-function HotLoot:GetShowItemNamesDisabled()
-    return disNamesC
-end
 -- disIconSizeCurrent
 function HotLoot:GetIconSizeDisabled()
     return disIconSizeCurrent
 end
+
 function HotLoot:GetThemeColorDisabled()
-    if HotLoot:GetTheme() == "color" then
+    if HotLoot:GetTheme():find("custom") ~= nil then
         return false
     else
         return true
     end
 end
--- color control
-function HotLoot:MakeColor(key, input)
-    if key == "ctrl" then
-        return "|cFFFFCC00"..input.."|r"
+
+function HotLoot:ColorText(colorName, text)
+    local prefix = "|c";
+    local suffix = "|r";
+    local color;
+
+    if      colorName == "success"  then color = "ff5cb85c"
+    elseif  colorName == "info"     then color = "ff5bc0de"
+    elseif  colorName == "warning"  then color = "fff0ad4e"
+    elseif  colorName == "alert"    then color = "ffd9534f"
+    elseif  colorName == "hotkey"   then color = "ffffcc00"
+    else                                 color = "ff000000"
     end
+
+    return prefix..color..text..suffix;
 end
 
 --=========================
 --       Get Color
 --=========================
+-- NOTE: Don't need???
 function HotLoot:GetColor(color)
     if      color == "success"  then return "ff5cb85c"
     elseif  color == "info"     then return "ff5bc0de"
@@ -413,13 +393,13 @@ end
 function HotLoot:OnEnable()
     TipHooker:Hook(HotLoot.ProcessTooltip, "item")
     
-    if not HotLoot:GetTheme() then
-        HotLoot:SetThemeSelect(self,"classic")
+    if HotLoot:GetTheme() == nil or tableThemeSettings[HotLoot:GetTheme()] == nil then
+        HotLoot:SetTheme(self, "paper");
     end
     
     tStart = 0
     HotLoot:ToggleAnchor(HotLoot:GetShowLootMonitorAnchor())
-    LoadThemeInit(HotLoot:GetTheme())
+    -- LoadThemeInit(HotLoot:GetTheme())
     HotLoot:RegisterEvent("LOOT_OPENED")
     HotLoot:RegisterEvent("LOOT_CLOSED")
     HotLoot:RegisterEvent("LOOT_SLOT_CLEARED")
@@ -499,24 +479,22 @@ end
 --      Test Monitor
 --==========================
 function HotLoot:buttonTestLootMonitor()
-    local itemName, itemLink, _, itemLevel, _, itemType, itemSubType, _, _, itemTexture, itemSellPrice = GetItemInfo(6948)
-    local itoadd = HotLoot:addLootIcon(itemTexture, itemName, itemLink, 5)
-    table.insert(icons, 1, itoadd)
-    ResetTimer()
-    itoadd = nil
-    itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, itemTexture, itemSellPrice = nil          
-    HotLoot:UpdateMonitor()
+    local itemName, itemLink, _, _, _, _, _, _, _, itemTexture, _ = GetItemInfo(120978)
+    local itoadd = HotLoot:CreateLootIcon(itemTexture, itemName, itemLink, 5)
 end
---==========================
---          GET ID
---==========================
-local function GetItemID(itemLink)
-    -- local _, _, Color, Ltype, Id, Enchant, Gem1, Gem2, Gem3, Gem4, Suffix, Unique, LinkLvl, Name = string.find(itemLink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+):?(%d*):?(%d*):?(%d*):?(%d*):?(%d*):?(%-?%d*):?(%-?%d*):?(%d*):?(%d*):?(%-?%d*)|?h?%[?([^%[%]]*)%]?|?h?|?r?")
 
-    -- This should return only the item ID
-    local itemID = select(5, string.find(itemLink, "|?c?f?f?(%x*)|?H?([^:]*):?(%d+):?(%d*):?(%d*):?(%d*):?(%d*):?(%d*):?(%-?%d*):?(%-?%d*):?(%d*):?(%d*):?(%-?%d*)|?h?%[?([^%[%]]*)%]?|?h?|?r?"));
-    return tonumber(Id);
+--
+-- ─── REALUI SUPPORT ─────────────────────────────────────────────────────────────
+--
+
+local function isRealUILootOn()
+    if IsAddOnLoaded('nibRealUI') then
+        return RealUI:GetModuleEnabled('Loot');
+    else
+        return false;
+    end
 end
+
 --==========================
 --      IS KEY DOWN
 --==========================
@@ -747,6 +725,30 @@ function HotLoot:SellPoorItems()
         HotLoot:Announce(string.format(L["AllGreysSold"], GetCoinTextureString(totalPrice)))
     end
 end
+
+--
+-- ─── CHECK UNTYPED ──────────────────────────────────────────────────────────────
+--
+
+function HotLoot.CheckUntyped( type, itemLink )
+    -- local itemName, _, _, itemLevel, _, itemType, itemSubType, _, _, _, _ = GetItemInfo(itemLink)
+    local itemId = GetItemID(itemLink)
+    local items = {}
+    if (type == 'leather') then
+        items = {
+            [124439] = true,
+            [124438] = true,
+        }
+    end
+
+    if items[itemId] then
+        HotLoot:Debug(--[[itemLink..' ('..itemId..') is an '..]]'untyped item in the '..type..' filter.')
+        return true
+    else
+        return false
+    end
+end
+
 --==========================
 --          TT SCANNER
 --==========================
@@ -1036,7 +1038,13 @@ local function ToFilters(slot)
                     return true
             elseif
                 -- Leather
-                (itemSubType == L["Leather"]) and (itemType == L["Tradeskill"] or itemType == "Item Enhancement!") and HotLoot:GetLeatherFilter() and CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
+                HotLoot:GetLeatherFilter() and 
+                (
+                    (itemType == L["Tradeskill"] and (
+                        itemSubType == L["Leather"] or itemType == "Item Enhancement!")) or 
+                    (HotLoot.CheckUntyped('leather', itemLink))
+                ) and 
+                CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
                     strFilterCaught = "Leather";
                     return true
             elseif
@@ -1250,7 +1258,7 @@ function HotLoot:UpdateMonitor()
         end
     else
         while i <= #icons do
-            if themeSize == "large" then
+            if HotLoot:GetThemeSetting("themeSize") == "large" then
                 yOffset = (i * ((32 + 18) * HotLoot:GetGrowthDirection()))
             else
                 yOffset = (i * ((HotLoot:GetIconSize() + 3) * HotLoot:GetGrowthDirection()))
@@ -1270,29 +1278,6 @@ end
 --          Tooltips
 --#############################
 
-
-
-local function ClearTooltips()
-    GameTooltip:Hide()
-    --HotLoot:UpdateMonitor()
-end
-
-local function ShowTooltip(self)
-    if self.item then
-        GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
-        GameTooltip:SetHyperlink(self.item)
-        GameTooltip:Show()
-    end
-end
-
-local function OnEnter(self)
-    self:ShowTooltip()
-end
-
-local function OnLeave(self)
-    ClearTooltips()
-    ResetCursor()
-end
 local function EButtonClicked(name)
     HotLoot:AddToExcludeList(name)
     for i = 1, #icons do
@@ -1324,339 +1309,187 @@ end
 --#############################
 --      Loot Monitor Icon
 --#############################
-function HotLoot:addLootIcon(iPath, iName, iLink, iCount)
-    local icon = self.createLootIcon(iPath, iName, iLink, iCount)
-    icon:Show()
-    return icon
-end
     
-function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
-    --Vars
-    --local lmIcon = CreateFrame("Frame", iName, lmBackground)
-    local lmBackground = CreateFrame("frame", "lmBG")
-    local e = CreateFrame("button", "ExButtonFrame", lmBackground)
-    local size = HotLoot:GetIconSize()
-    local texture = lmBackground:CreateTexture(iName.."Icon","OVERLAY")
-    local count = lmBackground:CreateFontString(nil, "OVERLAY")
-    local name = lmBackground:CreateFontString(nil, "OVERLAY")
-    local sellPrice = lmBackground:CreateFontString(nil, "OVERLAY")
-    local itemType = lmBackground:CreateFontString(nil, "OVERLAY")
-    local item = iLink
-    lmIcon = lmBackground
-    lmIcon.size = size
-    lmIcon.texture = texture
-    lmIcon.count = count
-    lmIcon.sell = sellPrice
-    lmIcon.type = itemType
-    lmIcon.name = name
-    lmBackground.item = item
-    lmBackground.ShowTooltip = ShowTooltip
-    if themeSize == "small" then
-    --Set Up Frames
-    --Icon
-    
-        
-        lmIcon:SetAlpha(HotLoot:GetTransparency())
-        
-        lmIcon.texture:SetSize(lmIcon.size, lmIcon.size)
-        lmIcon.texture:SetTexture(iPath)
-        
-        lmIcon.texture:SetTexCoord(0.07,0.93,0.07,0.93)
-        
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.texture:SetPoint("LEFT", lmIcon, "LEFT", 2, 0)
-        else
-            lmIcon.texture:SetPoint("RIGHT", lmIcon, "RIGHT", -2, 0)
+function HotLoot:CreateLootIcon(strItemName, strItemLink, intItemCount, strIconPath, lootSlotType)
+    local strThemeSize     = HotLoot:GetThemeSetting("themeSize"):ucfirst();
+    local strFlipped       = (HotLoot:GetTextSide() == 0) and "" or "Flipped";
+    local frameToast       = CreateFrame("frame", "HotLoot_ToastFrame", nil, "HotLoot_Toast"..strThemeSize..strFlipped.."Template");
+    local intQuality       = (lootSlotType == self.LOOT_SLOT_TYPE.ITEM) and select(3, GetItemInfo(strItemLink)) or false
+    -- local e             = CreateFrame("button", "ExButtonFrame", frameToast)
+    frameToast.item        = strItemLink;
+    frameToast.ShowTooltip = function(self)
+        if self.item then
+            GameTooltip:SetOwner(self, "ANCHOR_CURSOR")
+            GameTooltip:SetHyperlink(self.item)
+            GameTooltip:Show()
         end
-    --Name
-    
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.name:SetPoint("LEFT", lmIcon.texture, "RIGHT", 2, 0)
-            lmIcon.name:SetJustifyH("LEFT")
-        else
-            lmIcon.name:SetPoint("RIGHT", lmIcon.texture, "LEFT", -2, 0)
-            lmIcon.name:SetJustifyH("RIGHT")
-        end
-        
-        lmIcon.name:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
-        
-        if iCount == 0 then
-            lmIcon.name:SetText(iName)
-        else
-            lmIcon.name:SetText(iLink)
-        end
+    end
 
-    --Count
-    if HotLoot:GetShowItemQuant() then
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.count:SetPoint("LEFT", lmIcon.name, "RIGHT", 2, 0)
+    -- Set Backdrop
+    frameToast:SetBackdrop({
+        bgFile   = HotLoot:GetThemeSetting("bgFile"),
+        edgeFile = HotLoot:GetThemeSetting("edgeFile"),
+        tile     = HotLoot:GetThemeSetting("tile"),
+        tileSize = HotLoot:GetThemeSetting("tileSize"),
+        edgeSize = HotLoot:GetThemeSetting("edgeSize"),
+        insets   = HotLoot:GetThemeSetting("insets")
+    });
+    
+    -- Color
+    if not HotLoot:GetThemeColorDisabled() then
+        local colorBG, colorBorder = {}, {};
+        colorBG.red, colorBG.green, colorBG.blue, colorBG.alpha = HotLoot:GetThemeBG();
+        colorBorder.red, colorBorder.green, colorBorder.blue, colorBorder.alpha = HotLoot:GetThemeBorderColor();
+        if HotLoot:GetColorByQuality() and intItemCount > 0 then
+            if intQuality then
+                colorBorder.red, colorBorder.green, colorBorder.blue = GetItemQualityColor(intQuality);
+            end
+            frameToast:SetBackdropColor(colorBG.red, colorBG.green, colorBG.blue, colorBG.alpha);
+            frameToast:SetBackdropBorderColor(colorBorder.red, colorBorder.green, colorBorder.blue, 1);
         else
-            lmIcon.count:SetPoint("RIGHT", lmIcon.name, "LEFT", -2, 0)
+            frameToast:SetBackdropColor(colorBG.red, colorBG.green, colorBG.blue, colorBG.alpha);
+            frameToast:SetBackdropBorderColor(colorBorder.red, colorBorder.green, colorBorder.blue, colorBorder.alpha);
         end
+    end
+
+    -- Font Color
+    local colorFont = {};
+    if HotLoot:GetFontColorByQual() and intQuality then
+        colorFont.red, colorFont.green, colorFont.blue = GetItemQualityColor(intQuality);
+        colorFont.alpha = 1.0;
+    else
+        colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha = HotLoot:GetFontColor();
+    end
+
+    -- Set Opacity
+    frameToast:SetAlpha(HotLoot:GetTransparency());
+    
+    -- Set Icon
+    frameToast.icon:SetTexture(strIconPath);
+    if HotLoot:GetThemeSetting("themeSize") == "small" then
+        frameToast.icon:SetSize(HotLoot:GetIconSize(), HotLoot:GetIconSize());
+    end
         
-        lmIcon.count:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
-        
-        if iCount > 0 then
+    -- Set Name
+    frameToast.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
+    -- frameToast.name:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha);
+    if intItemCount == 0 then
+        frameToast.name:SetText(strItemName);
+    else
+        frameToast.name:SetText(strItemLink);
+    end
+
+    -- Set Count
+    if frameToast.count and intItemCount > 0 then
+        frameToast.count:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
+        frameToast.count:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha);
+        if HotLoot:GetShowItemQuant() then
             if HotLoot:GetShowTotalQuant() then
-                local inBags = InBags(iName, iCount)
-                lmIcon.count:SetText("x"..iCount.." ["..inBags.."]")
+                if lootSlotType == self.LOOT_SLOT_TYPE.CURRENCY then
+                    local currencyCurrentAmount = select(2, GetCurrencyInfo(strItemLink))
+                    frameToast.count:SetText("x"..intItemCount.." ["..currencyCurrentAmount.."]");
+                else
+                    local inBags = InBags(strItemName, intItemCount);
+                    frameToast.count:SetText("x"..intItemCount.." ["..inBags.."]");
+                end
             else
-                lmIcon.count:SetText("x"..iCount)
+                frameToast.count:SetText("x"..intItemCount);
             end
+            frameToast.count:Show();
+        else
+            frameToast.count:Hide();
         end
-    else
-        lmIcon.count:Hide()
     end
-    --BG
-        local bgWidth = lmIcon.name:GetStringWidth() + lmIcon.count:GetStringWidth() + size +12
-            bgWidth = max(bgWidth, tonumber(HotLoot:GetMinWidth()))
-        lmBackground:SetSize(bgWidth, lmIcon.size+4)
-    
-        lmBackground:SetBackdrop({bgFile = bgFileCurrent, 
-            edgeFile = edgeFileCurrent, 
-            tile = tileCurrent, tileSize = tileSizeCurrent, edgeSize = edgeSizeCurrent, 
-            insets = insetsCurrent})
-        
-        local r, g, b, a = HotLoot:GetThemeBG()
-        local br, bg, bb, ba = HotLoot:GetThemeBorderColor()
-        if HotLoot:GetColorByQuality() and iCount > 0 then
-            local quality = select(3, GetItemInfo(iLink))
-            if quality then
-                br, bg, bb = GetItemQualityColor(quality)
-            end
-            lmBackground:SetBackdropColor(r, g, b, a)
-            lmBackground:SetBackdropBorderColor(br, bg, bb, 1)
-        else
-            lmBackground:SetBackdropColor(r, g, b, a)
-            lmBackground:SetBackdropBorderColor(br, bg, bb, ba)
-        end
-        
-        lmBackground:SetScript("OnEnter", OnEnter)
-        lmBackground:SetScript("OnLeave", OnLeave)
-    
-        if HotLoot:GetShowAnimation() then
-            local AnimationGroup = lmBackground:CreateAnimationGroup()
-            local animation1 = AnimationGroup:CreateAnimation("Translation")
-        
-            animation1:SetDuration(1.5)
-            animation1:SetSmoothing("IN")
-            if HotLoot:GetGrowthDirection() == 1 then
-                animation1:SetOffset(0, 200*HotLoot:GetFadeSpeed())
-            else
-                animation1:SetOffset(0, -200*HotLoot:GetFadeSpeed())
-            end
-            lmBackground.a = AnimationGroup
-        end
-    e:SetHeight(lmBackground:GetHeight() - 2)
-    elseif themeSize == "medium" then
-    
-    elseif themeSize == "large" then
-        local glow = lmBackground:CreateTexture(iName.."Glow","BACKGROUND")
-        lmBackground.glow = glow
-        lmBackground.glow:SetTexture("Interface\\AchievementFrame\\UI-Achievement-Alert-Glow")
-        lmBackground.glow:SetTexCoord(0, 0.78125, 0, 0.66796875)
-        lmBackground.glow:SetPoint("CENTER", lmBackground, "CENTER", 0 ,0)
-        lmBackground.glow:SetAlpha(0)
-        
-        lmBackground.glow:SetBlendMode("ADD")
-        lmBackground.glow:Show()
-        
-        local shine = lmBackground:CreateTexture(iName.."Shine","OVERLAY")
-        lmBackground.shine = shine
-        lmBackground.shine:SetTexture("Interface\\AchievementFrame\\UI-Achievement-Alert-Glow")
-        lmBackground.shine:SetTexCoord(0.78125, 0.912109375, 0, 0.28125)
-        lmBackground.shine:SetPoint("BOTTOMLEFT", 0, 0)
-        lmBackground.shine:SetAlpha(0)
-        lmBackground.shine:SetSize(47,52)
-        lmBackground.shine:SetBlendMode("ADD")
-        lmBackground.shine:Show()
-        
-        --Set Up Frames
-    --Icon
-        
-        
-        lmIcon:SetAlpha(HotLoot:GetTransparency())
-        
-        lmIcon.texture:SetSize(32, 32)
-        lmIcon.texture:SetTexture(iPath)
-        
-        
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.texture:SetPoint("LEFT", lmIcon, "LEFT", 8, 0)
-        else
-            lmIcon.texture:SetPoint("RIGHT", lmIcon, "RIGHT", -8, 0)
-        end
-    --Name
-    
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.name:SetPoint("TOPLEFT", lmIcon.texture, "TOPRIGHT", 2, 0)
-            lmIcon.name:SetJustifyH("LEFT")
-        else
-            lmIcon.name:SetPoint("TOPRIGHT", lmIcon.texture, "TOPLEFT", -2, 0)
-            lmIcon.name:SetJustifyH("RIGHT")
-        end
-        
-        lmIcon.name:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
-        
-        if iCount == 0 then
-            lmIcon.name:SetText(iName)
-        else
-            lmIcon.name:SetText(iLink)
-        end
 
-    --Count
-    if HotLoot:GetShowItemQuant() then
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.count:SetPoint("BOTTOMRIGHT", lmBackground, "BOTTOMRIGHT", -6, 8)
-        else
-            lmIcon.count:SetPoint("BOTTOMLEFT", lmBackground, "BOTTOMLEFT", 6, 8)
-        end
-        
-        lmIcon.count:SetFont(STANDARD_TEXT_FONT, 7, "OUTLINE")
-        
-        if iCount > 0 then
-            if HotLoot:GetShowTotalQuant() then
-                local inBags = InBags(iName, iCount)
-                lmIcon.count:SetText("x"..iCount.." ["..inBags.."]")
-            else
-                lmIcon.count:SetText("x"..iCount)
+    -- Set Value
+    if frameToast.value and intItemCount > 0 and lootSlotType == self.LOOT_SLOT_TYPE.ITEM then
+        frameToast.value:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
+        frameToast.value:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha);
+        if HotLoot:GetShowSellPrice() then
+            local strItemValue = select(11, GetItemInfo(strItemLink));
+            if strItemValue then
+                frameToast.value:SetText(GetCoinTextureString(strItemValue));
+                frameToast.value:Show();
             end
-        end
-    else
-        lmIcon.count:Hide()
-    end
-    --SellPrice
-    if HotLoot:GetShowSellPrice() and iCount > 0 then
-        --lmIcon.sell
-        local sellPriceText = select(11,GetItemInfo(iLink))
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.sell:SetPoint("BOTTOMLEFT", lmIcon.texture, "BOTTOMRIGHT", 2, 0)
         else
-            lmIcon.sell:SetPoint("BOTTOMRIGHT", lmIcon.texture, "BOTTOMLEFT", -2, 0)
+            frameToast.value:Hide();
         end
-        
-        lmIcon.sell:SetFont(STANDARD_TEXT_FONT, 7, "OUTLINE")
-        
-        if sellPriceText then
-            lmIcon.sell:SetText(GetCoinTextureString(sellPriceText))
-        end
-    else
-        lmIcon.sell:Hide()
     end
     
-    --ItemType
-    if HotLoot:GetShowItemType() and iCount > 0  then
-        --lmIcon.type
-        local itemTypeText = select(6,GetItemInfo(iLink))
-        local itemTypeText2 = select(7,GetItemInfo(iLink))
-        if HotLoot:GetTextSide() == 0 then
-            lmIcon.type:SetPoint("LEFT", lmIcon.texture, "RIGHT", 2, 0)
-        else
-            lmIcon.type:SetPoint("RIGHT", lmIcon.texture, "LEFT", -2, 0)
-        end
-        
-        lmIcon.type:SetFont(STANDARD_TEXT_FONT, 7, "OUTLINE")
-        if itemTypeText then
-            lmIcon.type:SetText(itemTypeText..": "..itemTypeText2)
-        end
-    else
-        lmIcon.type:Hide()
-    end
-    --BG
-        local bgWidth = lmIcon.name:GetStringWidth() + lmIcon.count:GetStringWidth() + 50
-            bgWidth = max(bgWidth, tonumber(HotLoot:GetMinWidth()))
-        lmBackground:SetSize(bgWidth, 50)
-    
-        lmBackground:SetBackdrop({bgFile = bgFileCurrent, 
-            edgeFile = edgeFileCurrent, 
-            tile = tileCurrent, tileSize = tileSizeCurrent, edgeSize = edgeSizeCurrent, 
-            insets = insetsCurrent})
-        local r, g, b, a
-        if HotLoot:GetTheme() == "toast" then 
-            r, g, b, a = 0,0,0,0.8
-        else
-            r, g, b, a = 1,1,1,1 --HotLoot:GetThemeBG()
-        end
-        local br, bg, bb, ba = 1,1,1,1 --HotLoot:GetThemeBorderColor()
-        if HotLoot:GetColorByQuality() and iCount > 0 then
-            local quality = select(3, GetItemInfo(iLink))
-            if quality then
-                br, bg, bb = GetItemQualityColor(quality)
+    -- Set Type
+    if frameToast.type and intItemCount > 0 and lootSlotType == self.LOOT_SLOT_TYPE.ITEM then
+        frameToast.type:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
+        frameToast.type:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha);
+        if HotLoot:GetShowItemType() then
+            local strItemType = select(6, GetItemInfo(strItemLink));
+            local strItemSubType = select(7, GetItemInfo(strItemLink));
+            if strItemType and strItemSubType then
+                frameToast.type:SetText(strItemType .. ": " .. strItemSubType);
+                frameToast.type:Show();
             end
-            lmBackground:SetBackdropColor(r, g, b, a)
-            lmBackground:SetBackdropBorderColor(br, bg, bb, 1)
         else
-            lmBackground:SetBackdropColor(r, g, b, a)
-            lmBackground:SetBackdropBorderColor(br, bg, bb, ba)
+            frameToast.type:Hide();
         end
-        
-        lmBackground:SetScript("OnEnter", OnEnter)
-        lmBackground:SetScript("OnLeave", OnLeave)
-        
-        lmBackground.glow:SetSize(bgWidth + 50,100)
-        e:SetHeight(lmBackground:GetHeight() - 10)
-        if HotLoot:GetShowAnimation() then
-            local AnimationGroup = lmBackground:CreateAnimationGroup()
-            local animation1 = AnimationGroup:CreateAnimation("Translation")
-            local GlowAnimationGroup = lmBackground.glow:CreateAnimationGroup()
-            local ShineAnimationGroup = lmBackground.shine:CreateAnimationGroup()
-            local glowAnimIn = GlowAnimationGroup:CreateAnimation("Alpha")
-            local glowAnimOut = GlowAnimationGroup:CreateAnimation("Alpha")
-            local shineAnimIn = ShineAnimationGroup:CreateAnimation("Alpha")
-            local shineAnimT = ShineAnimationGroup:CreateAnimation("Translation")
-            local shineAnimOut = ShineAnimationGroup:CreateAnimation("Alpha")
-            glowAnimIn:SetDuration(0.2)
-            glowAnimOut:SetDuration(0.5)
-            
-            -- Depreciated - Use From/To
-            -- glowAnimIn:SetChange(0.7)
-            -- glowAnimOut:SetChange(-1)
-            glowAnimIn:SetFromAlpha(0)
-            glowAnimIn:SetToAlpha(0.6)
-            glowAnimOut:SetFromAlpha(0.6)
-            glowAnimOut:SetToAlpha(0)
-            
-            glowAnimIn:SetOrder(1)
-            glowAnimOut:SetOrder(2)
-            
-            shineAnimIn:SetOrder(1)
-            shineAnimT:SetOrder(2)
-            shineAnimOut:SetOrder(2)
-            
-            -- shineAnimIn:SetChange(1)
-            -- shineAnimOut:SetChange(-1)
-            shineAnimIn:SetFromAlpha(0)
-            shineAnimIn:SetToAlpha(0.6)
-            shineAnimOut:SetFromAlpha(0.6)
-            shineAnimOut:SetToAlpha(0)
+    elseif frameToast.type and lootSlotType == self.LOOT_SLOT_TYPE.CURRENCY then
+        frameToast.type:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
+        frameToast.type:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha);
+        if HotLoot:GetShowItemType() then
+            -- TODO: Localize This
+            frameToast.type:SetText('Currency');
+            frameToast.type:Show();
+        else
+            frameToast.type:Hide();
+        end
+    end
 
-            shineAnimT:SetOffset(200,0)
-            
-            shineAnimOut:SetStartDelay(0)
-            
-            shineAnimT:SetDuration(0.5)
-            shineAnimIn:SetDuration(0.2)
-            shineAnimOut:SetDuration(0.3)
-            
-            animation1:SetDuration(1.5)
-            animation1:SetSmoothing("IN")
-            if HotLoot:GetGrowthDirection() == 1 then
-                animation1:SetOffset(0, 100*HotLoot:GetFadeSpeed())
-            else
-                animation1:SetOffset(0, -100*HotLoot:GetFadeSpeed())
-            end
-            lmBackground.a = AnimationGroup
-            lmBackground.glow.a = GlowAnimationGroup
-            lmBackground.shine.a = ShineAnimationGroup
-            lmBackground.shine.a:Play()
-            lmBackground.glow.a:Play()
+    -- Set Size
+    local intWidth = frameToast.name:GetStringWidth() + frameToast.count:GetStringWidth() + frameToast.icon:GetWidth() + 16;
+    if frameToast.type and HotLoot:GetShowItemType() then
+        local intTypeWidth = frameToast.type:GetStringWidth() + frameToast.count:GetStringWidth() + frameToast.icon:GetWidth() + 16;
+        intWidth = max(intWidth, intTypeWidth, tonumber(HotLoot:GetMinWidth()));
+    else
+        intWidth = max(intWidth, tonumber(HotLoot:GetMinWidth()));
+    end
+    local intHeight = (HotLoot:GetThemeSetting("themeSize") == "small") and (HotLoot:GetIconSize() + 4) or HotLoot:GetThemeSetting("height");
+    frameToast:SetSize(intWidth, intHeight);
+
+    -- Tooltip
+    frameToast:SetScript("OnEnter", function(self)
+        self:ShowTooltip();
+    end);
+    frameToast:SetScript("OnLeave", function(self)
+        GameTooltip:Hide();
+        ResetCursor();
+    end);
+
+    -- Fade Animation
+    if HotLoot:GetShowAnimation() then
+        local aniGroupFade = frameToast:CreateAnimationGroup();
+        local aniFade = aniGroupFade:CreateAnimation("Translation");
+        frameToast.ani = aniGroupFade;
+
+        aniFade:SetDuration(1.5);
+        aniFade:SetSmoothing("IN");
+        -- NOTE: Small said 200 so idk try experimenting
+        if HotLoot:GetGrowthDirection() == 1 then
+            aniFade:SetOffset(0, 100*HotLoot:GetFadeSpeed());
+        else
+            aniFade:SetOffset(0, -100*HotLoot:GetFadeSpeed());
         end
     end
-    if iCount > 0  and HotLoot:GetShowExcludeButton() then
+        
+    -- NOTE: Removed Shine and Glow for now because it's not absolutely necessary but will add in later.
+
+    -- Exclude Button
+    if HotLoot:GetShowExcludeButton() and intItemCount > 0 then
+        --then
+    end
+
+    --[[if intItemCount > 0  and HotLoot:GetShowExcludeButton() then
         if HotLoot:GetTextSide() == 0 then
-            e:SetPoint("RIGHT", lmBackground, "LEFT", -1, 0)
+            e:SetPoint("RIGHT", frameToast, "LEFT", -1, 0)
         else
-            e:SetPoint("LEFT", lmBackground, "RIGHT", 1, 0)
+            e:SetPoint("LEFT", frameToast, "RIGHT", 1, 0)
         end
         e:SetWidth(5)
         
@@ -1665,12 +1498,19 @@ function HotLoot.createLootIcon(iPath, iName, iLink, iCount)
         e.texture:SetAllPoints(e)
         e:EnableMouse(true)
         e:RegisterForClicks("LeftButtonUp")
-        e:SetScript("OnEnter", function(self) EBOnEnter(lmBackground) end)
+        e:SetScript("OnEnter", function(self) EBOnEnter(frameToast) end)
         e:SetScript("OnLeave", function(self) EBOnLeave() end)
-        e:SetScript("OnClick", function(self) EButtonClicked(iLink) end)
-        lmBackground.e = e
-    end
-    return lmBackground
+        e:SetScript("OnClick", function(self) EButtonClicked(strItemLink) end)
+        frameToast.e = e
+    end]]
+
+    -- Finalize
+    frameToast:Show();
+    table.insert(icons, 1, frameToast);
+    ResetTimer();
+    HotLoot:UpdateMonitor();
+
+    -- return frameToast
 end
 
 --#############################
@@ -1700,7 +1540,8 @@ local function IBOnLeave()
 end
 
 function HotLoot:CreateILootButton(slot)
-    local i = CreateFrame("button", "IncButton"..slot, _G["LootFrame"])
+    local attachFrame = isRealUILootOn() and _G['RealUI_Loot'] or _G['LootFrame'];
+    local i = CreateFrame("button", "IncButton"..slot, attachFrame)
     i:SetWidth(8)
     i:SetHeight(30)
     --[[
@@ -1713,12 +1554,25 @@ function HotLoot:CreateILootButton(slot)
         i:SetPoint("RIGHT", _G["ElvLootSlot"..slot], "LEFT", -10, 0)
     else
     ]]
-        i:SetPoint("RIGHT", _G["LootButton"..slot], "LEFT", -10, 0)
     --end
+
+    if isRealUILootOn() then
+        i:SetPoint("RIGHT", _G["ButsuSlot"..slot], "LEFT", -35, 0)
+    else
+        i:SetPoint("RIGHT", _G["LootButton"..slot], "LEFT", -10, 0)
+    end
     
     i.texture = i:CreateTexture("iTexture"..slot )
     i.texture:SetColorTexture(0, 1, 0, 0.7)
     i.texture:SetAllPoints(i)
+
+    -- Plus text on button
+    i.text = i:CreateFontString(nil, "OVERLAY")
+    i.text:SetPoint("CENTER", i, "CENTER", 1, 0)
+    i.text:SetFont(STANDARD_TEXT_FONT, 12, "OUTLINE")
+    --name:SetJustifyH("LEFT")
+    i.text:SetText("+")
+
     i:EnableMouse(true)
     i:RegisterForClicks("LeftButtonUp")
     i:SetScript("OnEnter", function(self) IBOnEnter(slot) end)
@@ -1763,8 +1617,8 @@ function hlFadeItems()
             
         end
         if (alpha > 0) then 
-            if HotLoot:GetShowAnimation() and iframe.a then
-                iframe.a:Play()
+            if HotLoot:GetShowAnimation() and iframe.ani then
+                iframe.ani:Play()
             end
             iframe:SetAlpha(alpha - fSpeed) -- fSpeed = 0.05
         elseif (alpha <= 0) then 
@@ -1788,52 +1642,52 @@ function HotLoot:LOOT_OPENED()
     mFocus = GetMouseFocus():GetName()
     skinModeTrigger = 0
         for i=1, GetNumLootItems() do
+            -- Show Include Buttons
             local _, lootName = GetLootSlotInfo(i)
-            --table.insert(lootSlots, HotLoot:CreatLootSlot(i))
             if HotLoot:GetShowIncludeButton() and not HotLoot:GetIncludeList()[lootName] then
                 incButtons[i] = HotLoot:CreateILootButton(i)
-                --HotLoot:dBug(incButtons[i])
             end
+
+            -- Send to Filters
             if ToFilters(i) then
-                HotLoot:Debug("Item Looted in " .. strFilterCaught .. " filter.") -- TODO: Localize
-                --local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(i)
-                --Toast:Spawn("Loot",lootName, lootIcon )
-                    local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(i)
-                    local itemLink = GetLootSlotLink(i)
-                --HotLoot:AddToCount(lootName, lootQuantity)
+                -- TODO: Localize
+                HotLoot:Debug("Item Looted in " .. strFilterCaught .. " filter.")
+                local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(i)
+                local itemLink = GetLootSlotLink(i)
+
                 if (HotLoot:GetEnableLootMonitor() == true) then
                     if IsGold(i) then
                         lootName = GetCoinTextureString(HotLoot:ToCopper(lootName))
+                        self:CreateLootIcon(lootName, itemLink, lootQuantity, lootIcon, self.LOOT_SLOT_TYPE.COIN)
+                    elseif IsCurrency(i) then
+                        local currencyName, _, currencyTexture = GetCurrencyInfo(itemLink)
+                        self:CreateLootIcon(currencyName, itemLink, lootQuantity, currencyTexture, self.LOOT_SLOT_TYPE.CURRENCY)
+                    else
+                        self:CreateLootIcon(lootName, itemLink, lootQuantity, lootIcon, self.LOOT_SLOT_TYPE.ITEM)
                     end
-                    local itoadd = HotLoot:addLootIcon(lootIcon, lootName, itemLink, lootQuantity)
-                    table.insert(icons, 1, itoadd)
-                    ResetTimer()
-                    itoadd = nil
-            
-                    HotLoot:UpdateMonitor()
                 end
-                if IsAddOnLoaded("HotLoot_LootHistory") then
-                    HotLoot:AddToLootHistory(i, lootName, lootQuantity)
-                end
-                if IsAddOnLoaded("HotLoot_LootNotification") then
-                    HotLoot:CheckForLootNotification(lootName, itemLink)
-                end
+
+                -- if IsAddOnLoaded("HotLoot_LootHistory") then
+                --     HotLoot:AddToLootHistory(i, lootName, lootQuantity)
+                -- end
+                -- if IsAddOnLoaded("HotLoot_LootNotification") then
+                --     HotLoot:CheckForLootNotification(lootName, itemLink)
+                -- end
                 
                 LootSlot(i)
             else
                 HotLoot:Debug("Item NOT Looted")
                 ToSkin(i)
-                
             end
-        
         end
+
         if mFocus == nil then
             mFocus = "nil"
         end
-        --HotLoot:dBug("mFocus", mFocus)
-        if HotLoot:GetCloseLootWindow() and not CloseKeyDown() and string.find(mFocus, "WorldFrame") then     
-            closeEL = 1
-            CloseLoot()
+
+        if HotLoot:GetCloseLootWindow() and not CloseKeyDown() and (string.find(mFocus, "WorldFrame") or isRealUILootOn()) then
+            closeEL = 1;
+            CloseLoot();
         end
     end
 end

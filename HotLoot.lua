@@ -14,6 +14,11 @@ local TipHooker = LibStub:GetLibrary("LibTipHooker-1.1")
 local ScrollingTable = LibStub("ScrollingTable")
 --local ScrollingTable = LibStub:GetLibrary("ScrollingTable")
 hIcon = LibStub("LibDBIcon-1.0")
+HotLoot.LOOT_SLOT_TYPE = {
+    ['ITEM'] = 1,
+    ['COIN'] = 2,
+    ['CURRENCY'] = 3,
+}
 
 --==========================
 --         VAR LIST
@@ -1312,11 +1317,11 @@ end
 --      Loot Monitor Icon
 --#############################
     
-function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCount)
+function HotLoot:CreateLootIcon(strItemName, strItemLink, intItemCount, strIconPath, lootSlotType)
     local strThemeSize     = HotLoot:GetThemeSetting("themeSize"):ucfirst();
     local strFlipped       = (HotLoot:GetTextSide() == 0) and "" or "Flipped";
     local frameToast       = CreateFrame("frame", "HotLoot_ToastFrame", nil, "HotLoot_Toast"..strThemeSize..strFlipped.."Template");
-    local intQuality = select(3, GetItemInfo(strItemLink));
+    local intQuality       = (lootSlotType == self.LOOT_SLOT_TYPE.ITEM) and select(3, GetItemInfo(strItemLink)) or false
     -- local e             = CreateFrame("button", "ExButtonFrame", frameToast)
     frameToast.item        = strItemLink;
     frameToast.ShowTooltip = function(self)
@@ -1387,8 +1392,13 @@ function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCo
         frameToast.count:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha);
         if HotLoot:GetShowItemQuant() then
             if HotLoot:GetShowTotalQuant() then
-                local inBags = InBags(strItemName, intItemCount);
-                frameToast.count:SetText("x"..intItemCount.." ["..inBags.."]");
+                if lootSlotType == self.LOOT_SLOT_TYPE.CURRENCY then
+                    local currencyCurrentAmount = select(2, GetCurrencyInfo(strItemLink))
+                    frameToast.count:SetText("x"..intItemCount.." ["..currencyCurrentAmount.."]");
+                else
+                    local inBags = InBags(strItemName, intItemCount);
+                    frameToast.count:SetText("x"..intItemCount.." ["..inBags.."]");
+                end
             else
                 frameToast.count:SetText("x"..intItemCount);
             end
@@ -1399,7 +1409,7 @@ function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCo
     end
 
     -- Set Value
-    if frameToast.value and intItemCount > 0 then
+    if frameToast.value and intItemCount > 0 and lootSlotType == self.LOOT_SLOT_TYPE.ITEM then
         frameToast.value:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
         frameToast.value:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha);
         if HotLoot:GetShowSellPrice() then
@@ -1414,7 +1424,7 @@ function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCo
     end
     
     -- Set Type
-    if frameToast.type and intItemCount > 0 then
+    if frameToast.type and intItemCount > 0 and lootSlotType == self.LOOT_SLOT_TYPE.ITEM then
         frameToast.type:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
         frameToast.type:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha);
         if HotLoot:GetShowItemType() then
@@ -1424,6 +1434,16 @@ function HotLoot.CreateLootIcon(strIconPath, strItemName, strItemLink, intItemCo
                 frameToast.type:SetText(strItemType .. ": " .. strItemSubType);
                 frameToast.type:Show();
             end
+        else
+            frameToast.type:Hide();
+        end
+    elseif frameToast.type and lootSlotType == self.LOOT_SLOT_TYPE.CURRENCY then
+        frameToast.type:SetFont(AceGUIWidgetLSMlists.font[HotLoot:GetTextFont()], HotLoot:GetFontSize(), "OUTLINE");
+        frameToast.type:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha);
+        if HotLoot:GetShowItemType() then
+            -- TODO: Localize This
+            frameToast.type:SetText('Currency');
+            frameToast.type:Show();
         else
             frameToast.type:Hide();
         end
@@ -1636,15 +1656,20 @@ function HotLoot:LOOT_OPENED()
                 --HotLoot:dBug(incButtons[i])
             end
             if ToFilters(i) then
-                HotLoot:Debug("Item Looted in " .. strFilterCaught .. " filter.") -- TODO: Localize
-                --local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(i)
-                --Toast:Spawn("Loot",lootName, lootIcon )
-                    local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(i)
-                    local itemLink = GetLootSlotLink(i)
-                --HotLoot:AddToCount(lootName, lootQuantity)
+                -- TODO: Localize
+                HotLoot:Debug("Item Looted in " .. strFilterCaught .. " filter.")
+                local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(i)
+                local itemLink = GetLootSlotLink(i)
+
                 if (HotLoot:GetEnableLootMonitor() == true) then
                     if IsGold(i) then
                         lootName = GetCoinTextureString(HotLoot:ToCopper(lootName))
+                        self:CreateLootIcon(lootName, itemLink, lootQuantity, lootIcon, self.LOOT_SLOT_TYPE.COIN)
+                    elseif IsCurrency(i) then
+                        local currencyName, _, currencyTexture = GetCurrencyInfo(itemLink)
+                        self:CreateLootIcon(currencyName, itemLink, lootQuantity, currencyTexture, self.LOOT_SLOT_TYPE.CURRENCY)
+                    else
+                        self:CreateLootIcon(lootName, itemLink, lootQuantity, lootIcon, self.LOOT_SLOT_TYPE.ITEM)
                     end
                     HotLoot:CreateLootIcon(lootIcon, lootName, itemLink, lootQuantity)
                 end

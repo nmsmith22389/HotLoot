@@ -1407,7 +1407,7 @@ function HotLoot:CreateLootIcon(strItemName, strItemLink, intItemCount, strIconP
         if HotLoot:GetShowItemQuant() then
             if HotLoot:GetShowTotalQuant() then
                 if lootSlotType == self.LOOT_SLOT_TYPE.CURRENCY then
-                    local currencyCurrentAmount = select(2, GetCurrencyInfo(strItemLink))
+                    local currencyCurrentAmount = select(2, GetCurrencyInfo(strItemLink)) + intItemCount
                     frameToast.count:SetText("x"..intItemCount.." ["..currencyCurrentAmount.."]");
                 else
                     local inBags = InBags(strItemName, intItemCount);

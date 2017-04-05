@@ -1,9 +1,25 @@
+-- ────────────────────────────────────────────────────────────────────────────────
+--[[
+                            )            (                     
+                         ( /(          ) )\ )               )  
+                         )\())      ( /((()/(            ( /(  
+                        ((_)\   (   )\())/(_))  (    (   )\()) 
+                         _((_)  )\ (_))/(_))    )\   )\ (_))/  
+                        | || | ((_)| |_ | |    ((_) ((_)| |_   
+                        | __ |/ _ \|  _|| |__ / _ \/ _ \|  _|  
+                        |_||_|\___/ \__||____|\___/\___/ \__|  
+                                       
+By Neil Smith
+https://github.com/nmsmith22389/HotLoot
+
+MIT License
+--]]
+-- ────────────────────────────────────────────────────────────────────────────────
 
 HotLoot = LibStub("AceAddon-3.0"):NewAddon("HotLoot", "AceConsole-3.0", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("HotLoot")
 local TipHooker = LibStub:GetLibrary("LibTipHooker-1.1")
 local ScrollingTable = LibStub("ScrollingTable")
---local ScrollingTable = LibStub:GetLibrary("ScrollingTable")
 hIcon = LibStub("LibDBIcon-1.0")
 HotLoot.LOOT_SLOT_TYPE = {
     ['ITEM'] = 1,
@@ -11,15 +27,15 @@ HotLoot.LOOT_SLOT_TYPE = {
     ['CURRENCY'] = 3,
 }
 
---==========================
---         VAR LIST
---==========================
+--
+-- ─── VAR LIST ───────────────────────────────────────────────────────────────────
+--
 --==GENERAL==--
 local icons, closeEL = {}, 0;
 local strFilterCaught;
 
 --==THEMES==--
---Current
+-- Current
 local nameCurrent,themeSize,heightCurrent,bgFileCurrent,edgeFileCurrent,tileCurrent,tileSizeCurrent,edgeSizeCurrent,insetsCurrent,disIconSizeCurrent
 
 --==INCLUDE BUTTONS==--
@@ -27,7 +43,6 @@ local incButtons = {}
 
 --==FADE ITEMS==--
 local isFirst = 0
---**************************
 
 --
 -- ─── GET ITEM ID ────────────────────────────────────────────────────────────────
@@ -38,10 +53,10 @@ local function GetItemID(itemString)
     return tonumber(itemId)
 end
 
+--
+-- ─── PROCESS TOOLTIP ────────────────────────────────────────────────────────────
+--
 
---==========================
---      Process Tooltip
---==========================
 function HotLoot:ProcessTooltip(tooltip, name, link)
     --HotLoot:dBug("name", name)
     --HotLoot:dBug("link", link)
@@ -55,9 +70,10 @@ function HotLoot:ProcessTooltip(tooltip, name, link)
     GameTooltip:Show()
 end
 
---==========================
---      MINIMAP ICON
---==========================
+--
+-- ─── MINIMAP ICON ───────────────────────────────────────────────────────────────
+--
+
 local hLDB = LibStub("LibDataBroker-1.1"):NewDataObject("HotLoot", {
     type = "launcher",
     icon = "Interface\\AddOns\\HotLoot\\icon",

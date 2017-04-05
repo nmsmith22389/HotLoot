@@ -1,7 +1,7 @@
 ## Interface: 70200
 ## Title: HotLoot
 ## Notes: Auto looting AddOn.
-## Version: 3.0.7
+## Version: 3.1.0
 ## SavedVariables: HotLootDB
 ## Author: Neil & Jessica
 
@@ -13,4 +13,3 @@ Locales\Locales.xml
 HotLoot.lua
 Options.lua
 Templates.xml
-

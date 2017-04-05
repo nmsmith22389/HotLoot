@@ -1,4 +1,22 @@
 # CHANGELOG
+## v3.1.0
+### Added
+* Added `Font Color` option.
+* Added RealUI support.
+* Added a `+` sign on the include button.
+* Added support for *some* proffesion items not in the proffesion type. *(currently only leatherworking but more to come)*
+
+### Fixed
+* Tried to fix `Exclude Button` but it's still broken :(
+* Locale updated.
+* Interface bump.
+* **Greatly** improved the `Test Monitor` function. *(now it uses a random item from your backpack)*
+* Misc error fixes.
+
+### Removed
+* Removed glow and shine animations.
+
+
 ## v3.0.7
 ### Fixed
 Fixed Add to Exclude List

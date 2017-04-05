@@ -1,12 +1,3 @@
--- =================== --
---        TODO         --
--------------------------
--- * Add Enable/Disable select option to decide which one the mod key does.
--- * Make Include & Exclude button look better (texture)
--- * Export and update localizations (for artifact and heirloom qualities and other stuff maybe)
--- * Optimize Code
--- =================== --
-
 
 HotLoot = LibStub("AceAddon-3.0"):NewAddon("HotLoot", "AceConsole-3.0", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("HotLoot")

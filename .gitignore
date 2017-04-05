@@ -7,4 +7,5 @@ old-changelog.txt
 .DS_Store
 
 # Ignore Notes
-/notes
+notes/*
+!/notes/todo.notes

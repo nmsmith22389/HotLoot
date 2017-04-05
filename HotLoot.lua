@@ -486,8 +486,22 @@ end
 --      Test Monitor
 --==========================
 function HotLoot:buttonTestLootMonitor()
-    local itemName, itemLink, _, _, _, _, _, _, _, itemTexture, _ = GetItemInfo(120978)
-    local itoadd = HotLoot:CreateLootIcon(itemTexture, itemName, itemLink, 5)
+    -- Get an Item in bags.
+    local rndBag = math.random( 0, NUM_BAG_SLOTS - 1 )
+    local rndSlot = math.random( 1, GetContainerNumSlots(rndBag) )
+    local itemId = GetContainerItemID(rndBag, rndSlot)
+
+    if not itemId then
+        while not itemId do
+            rndBag = math.random( 0, NUM_BAG_SLOTS - 1 )
+            rndSlot = math.random( 1, GetContainerNumSlots(rndBag) )
+            itemId = GetContainerItemID(rndBag, rndSlot)
+        end
+    end
+
+    local itemName, itemLink, _, _, _, _, _, _, _, itemTexture = GetItemInfo(itemId)
+
+    self:CreateLootIcon(itemName, itemLink, 1, itemTexture, self.LOOT_SLOT_TYPE.ITEM)
 end
 
 --

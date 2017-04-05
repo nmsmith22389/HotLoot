@@ -1579,6 +1579,9 @@ function HotLoot:CreateILootButton(slot)
 
     if isRealUILootOn() then
         i:SetPoint("RIGHT", _G["ButsuSlot"..slot], "LEFT", -35, 0)
+    --[[elseif IsAddOnLoaded("ElvUI") then
+        i:SetPoint("RIGHT", _G["ElvLootSlot"..slot], "LEFT", -10, 0)
+        i:SetPoint("RIGHT", _G["ElvLootSlot"..slot], "LEFT", -10, 0)]]
     else
         i:SetPoint("RIGHT", _G["LootButton"..slot], "LEFT", -10, 0)
     end

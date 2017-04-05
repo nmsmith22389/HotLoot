@@ -1,0 +1,21 @@
+-------------------------------------------------------
+--==             _____ ___  ___   ___              ==--
+--==            |_   _/ _ \|   \ / _ \             ==--
+--==              | || (_) | |) | (_) |            ==--
+--==              |_| \___/|___/ \___/             ==--
+-------------------------------------------------------
+- Make Include & Exclude button look better (texture)
+- Export and update localizations (for artifact and heirloom qualities and other stuff maybe)
+- Optimize Code
+- Option to adjust "close loot window (auto)" delay
+- add (which) chat frame output option
+- Overhaul appearance options
+- Fix anchor spacing
+- Update MM button tooltip
+- Masque support
+- Add "filter caught in" as an option in addtion to "item type" *either or*
+- Move loot icon generation to `SLOT_LOOTED` event (use a table to transfer looted items in between)
+    - Maybe even an option to show ALL looted item (ie not it filter)
+- Custom Filters?
+
+-------------------------------------------------------

@@ -1,5 +1,5 @@
 ## HotLoot is BACK!
-### Welcome to v3.0.x!
+### Updated for 7.2!
 
 ## Description
 **HotLoot** is an autoloot filter designed to streamline the looting process. This AddOn will allow you to automatically loot various items related to professions and quests. 
@@ -7,8 +7,8 @@
 ## Issues
 [Please post any issues here on GitHub](https://github.com/nmsmith22389/HotLoot/issues)
 
-## Tutorial *NEW*
-This is an amazing and in depth tutorial made by BetaWhale. Check it out! (if I got your name wrong tell me)
+## Tutorial
+This is an amazing and in depth tutorial made by BetaWhale. Check it out!
 
 [http://youtu.be/_Pt3LOqT4Jo](http://youtu.be/_Pt3LOqT4Jo)
 
@@ -25,10 +25,26 @@ Credit will be made where due
 
 _If you have ideas for new features you would like to see implemented please open a ticket in [GitHub issues](https://github.com/nmsmith22389/HotLoot/issues) and we will do our best to implement them!_
 
+## Know Issues
+* For the most part it work with elvUI but some things might appear a little wonky. *(ie Include Button)*
+* The `Exclude Button` is still broken...
+* Still adding more support for some items that **Blizzard** put in the wrong categories.
+* The Include/Exclude filters still don't validate input enough.
+
 ## Recent Changes
-## v3.0.7
+## v3.1.0
+### Added
+* Added `Font Color` option.
+* Added RealUI support.
+* Added a `+` sign on the include button.
+* Added support for *some* proffesion items not in the proffesion type. *(currently only leatherworking but more to come)*
+
 ### Fixed
-Fixed Add to Exclude List
+* Tried to fix `Exclude Button` but it's still broken :(
+* Locale updated.
+* Interface bump.
+* **Greatly** improved the `Test Monitor` function. *(now it uses a random item from your backpack)*
+* Misc error fixes.
 
 ### Removed
-Removed Old Changelog
+* Removed glow and shine animations.

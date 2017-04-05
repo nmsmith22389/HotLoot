@@ -1660,7 +1660,9 @@ end
 function HotLoot:LOOT_OPENED()
     if HotLoot:GetSystemEnable() then
     
-    mFocus = GetMouseFocus():GetName()
+    mFocus = GetMouseFocus()
+    mFocus = (mFocus) and mFocus:GetName() or 'nil'
+
     skinModeTrigger = 0
         for i=1, GetNumLootItems() do
             -- Show Include Buttons
@@ -1700,10 +1702,6 @@ function HotLoot:LOOT_OPENED()
                 HotLoot:Debug("Item NOT Looted")
                 ToSkin(i)
             end
-        end
-
-        if mFocus == nil then
-            mFocus = "nil"
         end
 
         if HotLoot:GetCloseLootWindow() and not CloseKeyDown() and (string.find(mFocus, "WorldFrame") or isRealUILootOn()) then

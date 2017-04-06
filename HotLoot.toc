@@ -1,7 +1,7 @@
 ## Interface: 70200
 ## Title: HotLoot
 ## Notes: Auto looting AddOn.
-## Version: 3.1.0
+## Version: 3.1.1
 ## SavedVariables: HotLootDB
 ## Author: Neil & Jessica
 

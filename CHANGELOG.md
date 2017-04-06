@@ -1,4 +1,8 @@
 # CHANGELOG
+## v3.1.1
+### Fixed
+* Fixed `itemSubType` nil error
+
 ## v3.1.0
 ### Added
 * Added `Font Color` option.

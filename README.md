@@ -32,12 +32,16 @@ _If you have ideas for new features you would like to see implemented please ope
 * The Include/Exclude filters still don't validate input enough.
 
 ## Recent Changes
+## v3.1.1
+### Fixed
+* Fixed `itemSubType` nil error
+
 ## v3.1.0
 ### Added
 * Added `Font Color` option.
 * Added RealUI support.
 * Added a `+` sign on the include button.
-* Added support for *some* proffesion items not in the proffesion type. *(currently only leatherworking but more to come)*
+* Added support for *some* profession items not in the profession type. *(currently only leatherworking but more to come)*
 
 ### Fixed
 * Tried to fix `Exclude Button` but it's still broken :(

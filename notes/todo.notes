@@ -18,4 +18,5 @@
     - Maybe even an option to show ALL looted item (ie not it filter)
 - Custom Filters?
 
+- *Take all values that concat with string and make sure they tostring to avoid nil concat*
 -------------------------------------------------------

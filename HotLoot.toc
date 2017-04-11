@@ -9,7 +9,7 @@
 
 embeds.xml
 Locales\Locales.xml
-
+media\load_media.xml
 HotLoot.lua
 Options.lua
 Templates.xml

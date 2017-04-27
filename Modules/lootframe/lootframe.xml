@@ -1,0 +1,224 @@
+<Ui 
+    xmlns="http://www.blizzard.com/wow/ui/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+    <Frame name="HotLoot_LootFrameTemplate" virtual="true" hidden="true">
+        <Anchors>
+            <Anchor point="CENTER" relativePoint="CENTER"/>
+        </Anchors>
+        <Size>
+            <AbsDimension y='400' x="200"/>
+        </Size>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture name="$parentBackground" parentKey="background" setAllPoints="true">
+                    <Color r="0" g="0" b="0"/>
+                    <Gradient orientation="HORIZONTAL">
+                        <MinColor r="0" g="0" b="0" a="0.6"/>
+                        <MaxColor r="0" g="0" b="0" a="0"/>
+                    </Gradient>
+                </Texture>
+            </Layer>
+            <Layer level="BORDER">
+                <Texture name="$parentBorderTop" parentKey="borderTop">
+                    <Size>
+                        <AbsDimension y="1"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT"/>
+                        <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT"/>
+                    </Anchors>
+                    <Color r="1.0" g="0.843137255" b="0.250980392"/>
+                    <Gradient orientation="HORIZONTAL">
+                        <MinColor r="1.0" g="1.0" b="1.0" a="1.0"/>
+                        <MaxColor r="1.0" g="1.0" b="1.0" a="0"/>
+                    </Gradient>
+                </Texture>
+                <Texture name="$parentBorderLeft" parentKey="borderLeft">
+                    <Size>
+                        <AbsDimension x="1"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT"/>
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT"/>
+                    </Anchors>
+                    <Color r="1.0" g="0.843137255" b="0.250980392"/>
+                </Texture>
+                <Texture name="$parentBorderBottom" parentKey="borderBottom">
+                    <Size>
+                        <AbsDimension y="1"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT"/>
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT"/>
+                    </Anchors>
+                    <Color r="1.0" g="0.843137255" b="0.250980392"/>
+                    <Gradient orientation="HORIZONTAL">
+                        <MinColor r="1.0" g="1.0" b="1.0" a="1.0"/>
+                        <MaxColor r="1.0" g="1.0" b="1.0" a="0"/>
+                    </Gradient>
+                </Texture>
+            </Layer>
+        </Layers>
+        <Frames>
+            <Frame name="$parentUnitFrame" parentKey="unitFrame">
+                <Size>
+                    <AbsDimension y="64"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT"/>
+                    <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT"/>
+                </Anchors>
+                <Layers>
+                    <Layer level="BORDER">
+                        <Texture name="$parentBorderBottom" parentKey="borderBottom">
+                            <Size>
+                                <AbsDimension y="1"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="TOP" relativePoint="BOTTOM"/>
+                                <Anchor point="LEFT" relativePoint="LEFT"/>
+                                <Anchor point="RIGHT" relativePoint="RIGHT"/>
+                            </Anchors>
+                            <Color r="1.0" g="0.843137255" b="0.250980392"/>
+                            <Gradient orientation="HORIZONTAL">
+                                <MinColor r="1.0" g="1.0" b="1.0" a="1.0"/>
+                                <MaxColor r="1.0" g="1.0" b="1.0" a="0"/>
+                            </Gradient>
+                        </Texture>
+                    </Layer>
+                    <Layer level="ARTWORK">
+                        <Texture name="$parentPortrait" parentKey="portrait">
+                            <Size>
+                                <AbsDimension x="64" y="64"/>
+                            </Size>
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="LEFT">
+                                    <Offset>
+                                        <AbsDimension x="1" y="0"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </Texture>
+                        <FontString name="$parentName" parentKey="name">
+                            <Anchors>
+                                <Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeKey="$parent.portrait">
+                                    <Offset>
+                                        <AbsDimension x="8" y="0"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+            </Frame>
+        </Frames>
+    </Frame>
+    <Frame name="HotLoot_LootSlotTemplate" virtual="true">
+        <Size>
+            <AbsDimension x="200" y="40"/>
+        </Size>
+        <Layers>
+            <Layer level="BACKGROUND">
+                <Texture name="$parentBackground" parentKey="background">
+                    <Size>
+                        <AbsDimension y="40"/>
+                    </Size>
+                    <Anchors>
+                        <!--<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent.icon">
+                            <Offset>
+                                <AbsDimension x="8" y="0"/>
+                            </Offset>
+                        </Anchor>-->
+                        <Anchor point="RIGHT" relativePoint="RIGHT"/>
+                    </Anchors>
+                    <Color r="0" g="0" b="0"/>
+                    <Gradient orientation="HORIZONTAL">
+                        <MinColor r="0" g="0" b="0" a="0.6"/>
+                        <MaxColor r="0" g="0" b="0" a="0"/>
+                    </Gradient>
+                </Texture>
+            </Layer>
+            <Layer level="BORDER">
+                <Texture name="$parentBorderTop" parentKey="borderTop">
+                    <Size>
+                        <AbsDimension y="1"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeKey="$parent.background"/>
+                        <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeKey="$parent.background"/>
+                    </Anchors>
+                    <Color r="1.0" g="0.843137255" b="0.250980392"/>
+                    <Gradient orientation="HORIZONTAL">
+                        <MinColor r="1.0" g="1.0" b="1.0" a="1.0"/>
+                        <MaxColor r="1.0" g="1.0" b="1.0" a="0"/>
+                    </Gradient>
+                </Texture>
+                <Texture name="$parentBorderLeft" parentKey="borderLeft">
+                    <Size>
+                        <AbsDimension x="1"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeKey="$parent.background"/>
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.background"/>
+                    </Anchors>
+                    <Color r="1.0" g="0.843137255" b="0.250980392"/>
+                </Texture>
+                <Texture name="$parentBorderBottom" parentKey="borderBottom">
+                    <Size>
+                        <AbsDimension y="1"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.background"/>
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeKey="$parent.background"/>
+                    </Anchors>
+                    <Color r="1.0" g="0.843137255" b="0.250980392"/>
+                    <Gradient orientation="HORIZONTAL">
+                        <MinColor r="1.0" g="1.0" b="1.0" a="1.0"/>
+                        <MaxColor r="1.0" g="1.0" b="1.0" a="0"/>
+                    </Gradient>
+                </Texture>
+            </Layer>
+            <Layer level="ARTWORK">
+                <Texture name="$parentIcon" parentKey="icon">
+                    <Size>
+                        <AbsDimension x="40" y="40"/>
+                    </Size>
+                    <Anchors>
+                        <Anchor point="LEFT" relativePoint="LEFT">
+                            <Offset>
+                                <AbsDimension x="8" y="0"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </Texture>
+                <FontString name="$parentName" parentKey="name">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeKey="$parent.background">
+                            <Offset>
+                                <AbsDimension x="9" y="-6"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentSpace1" parentKey="space1">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.background">
+                            <Offset>
+                                <AbsDimension x="9" y="6"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+                <FontString name="$parentSpace2" parentKey="space2">
+                    <Anchors>
+                        <Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.space1">
+                            <Offset>
+                                <AbsDimension x="16" y="6"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
+        </Layers>
+    </Frame>
+</Ui>

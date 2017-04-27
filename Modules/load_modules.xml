@@ -1,3 +1,5 @@
 <Ui xmlns="http://www.blizzard.com/wow/ui/">	
+	<Include file="util\load_util.xml"/>
+	<Include file="options\load_options.xml"/>
 	<Include file="lootframe\load_lootframe.xml"/>
 </Ui>

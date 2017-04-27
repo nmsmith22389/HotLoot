@@ -1,5 +1,7 @@
-<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
-   <Frame name="HotLoot_ToastLargeTemplate" virtual="true">
+<Ui 
+    xmlns="http://www.blizzard.com/wow/ui/" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
+    <Frame name="HotLoot_ToastLargeTemplate" virtual="true">
         <Size>
             <AbsDimension x="145" y="50"/>
         </Size>
@@ -91,13 +93,11 @@
                         </FontString>
                     </Layer>
                 </Layers>
-                <!-- <Scripts>
-                    <OnClick> autoInviteMainConfigFrame:Hide(); </OnClick>
-                </Scripts> -->
+                <!-- <Scripts><OnClick> autoInviteMainConfigFrame:Hide(); </OnClick></Scripts> -->
             </Button>
         </Frames>
-   </Frame>
-   <Frame name="HotLoot_ToastLargeFlippedTemplate" virtual="true">
+    </Frame>
+    <Frame name="HotLoot_ToastLargeFlippedTemplate" virtual="true">
         <Size>
             <AbsDimension x="145" y="50"/>
         </Size>
@@ -155,8 +155,8 @@
                 </FontString>
             </Layer>
         </Layers>
-   </Frame>
-   <Frame name="HotLoot_ToastSmallTemplate" virtual="true">
+    </Frame>
+    <Frame name="HotLoot_ToastSmallTemplate" virtual="true">
         <Size>
             <AbsDimension x="145" y="20"/>
         </Size>
@@ -197,8 +197,8 @@
                 </FontString>
             </Layer>
         </Layers>
-   </Frame>
-   <Frame name="HotLoot_ToastSmallFlippedTemplate" virtual="true">
+    </Frame>
+    <Frame name="HotLoot_ToastSmallFlippedTemplate" virtual="true">
         <Size>
             <AbsDimension x="145" y="20"/>
         </Size>
@@ -239,5 +239,5 @@
                 </FontString>
             </Layer>
         </Layers>
-   </Frame>
+    </Frame>
 </Ui>

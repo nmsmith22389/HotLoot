@@ -10,7 +10,7 @@
 embeds.xml
 Locales\Locales.xml
 media\load_media.xml
-HotLoot.lua
+constants.lua
+core.lua
 Modules\load_modules.xml
-Options.lua
 Templates.xml

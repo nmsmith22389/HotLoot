@@ -56,9 +56,8 @@ local LDB = LibStub('LibDataBroker-1.1'):NewDataObject('HotLoot', {
         end
         -- TODO: Change this and click check to reflect Left = Options, Right = Anchor
         Tip:AddLine('HotLoot', 1, 0.4, 0)
-        Tip:AddLine(L['MMIconTT'], 1, 1, 1)
-        Tip:AddLine(L['MMIconTT2'], 1, 1, 1)
-        Tip:AddLine(L['MMIconTT3'], 1, 1, 1)
+        Tip:AddLine(string.format(L['MinimapTTOptions'], Util:ColorText('Left Click', 'warning')), 1, 1, 1)
+        Tip:AddLine(string.format(L['MinimapTTAnchor'], Util:ColorText('Right Click', 'warning')), 1, 1, 1)
     end,
 })
 
@@ -848,8 +847,7 @@ local function SetLoot(frame, loot)
                 subtypeText     = select(7, GetItemInfo(strItemLink)) or 'N/A'
                 typeTextDivider = ': '
             elseif loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
-                -- TODO: Localize 'Currency'
-                typeText = 'Currency'
+                typeText = L['Currency']
             end
 
             frame.type:SetText(typeText..typeTextDivider..subtypeText)

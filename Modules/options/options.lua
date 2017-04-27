@@ -221,9 +221,9 @@ function Options:AddToIncludeList(info, value)
         local itemName = GetItemInfo(value)
         if itemName then
             self.db.profile.tableIncludeList[itemName] = itemName
+            Util:Announce(string.format(L['AnnounceListAdd'], Util:ColorText(itemName, 'info'), L['headerIncludeList']))
         else
-            -- TODO: Localize thise
-            Util:Print('The item \"'..tostring(value)..'\" that you tried to add to the include list can\'t be found.\nPlease try again.')
+            Util:Print(string.format(L['ErrorListItemNotFound'], Util:ColorText(value, 'info'), L['headerIncludeList']))
         end
     end
 end
@@ -245,9 +245,10 @@ function Options:AddToExcludeList(info, value)
         local itemName = GetItemInfo(value)
         if itemName then
             self.db.profile.tableExcludeList[itemName] = itemName
+            Util:Announce(string.format(L['AnnounceListAdd'], Util:ColorText(itemName, 'info'), L['headerExcludeList']))
         else
             -- TODO: Localize thise
-            Util:Print('The item \"'..tostring(value)..'\" that you tried to add to the exclude list can\'t be found.\nPlease try again.')
+            Util:Print(string.format(L['ErrorListItemNotFound'], tostring(value), L['headerExcludeList']))
         end
     end
 end

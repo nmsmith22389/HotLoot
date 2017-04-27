@@ -1067,41 +1067,54 @@ function HotLoot:LOOT_OPENED()
         -- mFocus = (mFocus) and mFocus:GetName() or 'nil'
 
         skinModeTrigger = 0
-        -- WARNING: LEFT OFF HERE!
 
-        for slot=1, GetNumLootItems() do
-            -- TODO: Change to support only HL LootFrame
-            -- Show Include Buttons
-            -- local _, lootName = GetLootSlotInfo(i)
-            -- if HotLoot:GetShowIncludeButton() and not HotLoot:GetIncludeList()[lootName] then
-            --     if self:GetLootFrameEnable() then
-            --         -- Show HL LootFrame Include Buttons
-            --     else
-            --         incButtons[i] = HotLoot:CreateILootButton(i)
-            --     end
-            -- end
+        local lootInfo = GetLootInfo()
+        -- For staggering the fades
+        local staggerCount = 0
 
-            -- Send to Filters
+        for slot, lootItem in pairs(lootInfo) do
+            lootInfo[slot].link = GetLootSlotLink(slot)
+            lootInfo[slot].slotType = (Util:SlotIsGold(slot)     and HL_LOOT_SLOT_TYPE.COIN) or
+                                      (Util:SlotIsCurrency(slot) and HL_LOOT_SLOT_TYPE.CURRENCY) or
+                                      HL_LOOT_SLOT_TYPE.ITEM
+            -- TODO: Convert to take: (slot, loot info object, virtual or not)
             local filtered, reason = FilterSlot(slot)
-            if filtered then
-                -- TODO: Localize
-                Util:Debug("Item Looted in " .. Util:ColorText(reason, 'info') .. ".")
 
-                local lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(slot)
-                local itemLink = GetLootSlotLink(slot)
+            if filtered then
+                if self.options.toggleDebugMode then
+                    print("Item Looted in " .. Util:ColorText(reason, 'info') .. ".")
+                end
 
                 if self.options.toggleEnableLootMonitor then
-                    if Util:SlotIsGold(slot) then
-                        lootName = GetCoinTextureString(Util:ToCopper(lootName))
-                        self:CreateLootIcon(lootName, itemLink, lootQuantity, lootIcon, HL_LOOT_SLOT_TYPE.COIN)
-                    elseif Util:SlotIsCurrency(slot) then
-                        local currencyName, _, currencyTexture = GetCurrencyInfo(itemLink)
-                        self:CreateLootIcon(currencyName, itemLink, lootQuantity, currencyTexture, HL_LOOT_SLOT_TYPE.CURRENCY)
+                    local frame
+                    local nextIndex = self:GetNextToastIndex()
+                    staggerCount = staggerCount + 1
+                    if not nextIndex then
+                        frame = self:CreateLootToast()
+                        self:ShiftToastPosUp()
+                        frame:SetLoot(lootInfo[slot])
+                        table.insert(self.toasts, frame)
                     else
-                        self:CreateLootIcon(lootName, itemLink, lootQuantity, lootIcon, HL_LOOT_SLOT_TYPE.ITEM)
+                        frame = self.toasts[nextIndex]
+                        self:ShiftToastPosUp()
+                        frame:SetLoot(lootInfo[slot])
                     end
+
+                    self:UpdateAnchors()
+
+                    -- frame:SetScript('OnShow', function(self)
+                        frame.timer = HotLoot:ScheduleTimer(function()
+                            if frame.animation and HotLoot.options.toggleShowAnimation then
+                                frame.animation:Play()
+                            else
+                                frame:Hide()
+                            end
+                        end, HotLoot.options.rangeDisplayTime + HotLoot.options.rangeMultipleDelay * 1)
+                    -- end)
+
+                    frame:Show()
                 end
-                
+
                 LootSlot(slot)
             else
                 Util:Debug('Item NOT looted. '..Util:ColorText('('..reason..')', 'alert'))
@@ -1116,8 +1129,9 @@ function HotLoot:LOOT_OPENED()
             else
                 CloseLoot()
             end
-        else
             -- TODO: Turn into elseif
+        else
+            -- TODO: Add back RealUI and ElvUI support
             if HotLoot.options.toggleCloseLootWindow and not Util:IsCloseKeyDown()--[[ and (string.find(mFocus, "WorldFrame") or Util:IsRealUILootOn())]] then
                 -- TODO: Figure out if this is needed
                 closeEL = 1;

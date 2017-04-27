@@ -95,6 +95,7 @@ local defaults = {
         toggleShowItemType = true,
         rangeIconSize = 16, 
         rangeTransparency = 1,
+        rangeToastPadding = 8,
         fThemeColorR = 0,
         fThemeColorG = 0,
         fThemeColorB = 0,
@@ -107,8 +108,8 @@ local defaults = {
         selectTheme = "paper",
         selectGrowthDirection = -1, 
         inputMinWidth = "145",
-        rangeInitialDelay = 5,
-        rangeSecondaryDelay = 1,
+        rangeDisplayTime = 4,
+        rangeMultipleDelay = 0.5,
         rangeFadeSpeed = 5,
         toggleColorByQuality = true,
         toggleShowAnimation = true,
@@ -522,6 +523,18 @@ optionsTable = {
                             values = tableDirectionVertical,
                             order = 3
                         },
+                        rangeToastPadding = {
+                            name = L["rangeToastPaddingName"],
+                            desc = L["rangeToastPaddingDesc"],
+                            type = "range",
+                            min = 1,
+                            max = 16,
+                            step = 1, 
+                            bigStep = 1,
+                            -- TODO: Figure out if this should be Advanced or not.
+                            -- hidden = "Advanced",
+                            order = 4
+                        },
                         selectTheme = {
                             name = L["selectThemeName"],
                             -- desc = L["selectThemeDesc"],
@@ -581,9 +594,10 @@ optionsTable = {
                             hidden = "Advanced",
                             order = 9
                         },
-                        rangeInitialDelay = {
-                            name = L["rangeInitialDelayName"],
-                            desc = L["rangeInitialDelayDesc"],
+                        -- NOTE: Changed from rangeInitialDelay
+                        rangeDisplayTime = {
+                            name = L["rangeDisplayTimeName"],
+                            desc = L["rangeDisplayTimeDesc"],
                             type = "range",
                             min = 1,
                             max = 10,
@@ -592,14 +606,15 @@ optionsTable = {
                             hidden = "Advanced",
                             order = 10
                         },
-                        rangeSecondaryDelay = {
-                            name = L["rangeSecondaryDelayName"],
-                            desc = L["rangeSecondaryDelayDesc"],
+                        -- NOTE: Changed from rangeSecondaryDelay
+                        rangeMultipleDelay = {
+                            name = L["rangeMultipleDelayName"],
+                            desc = L["rangeMultipleDelayDesc"],
                             type = "range",
-                            min = 1,
-                            max = 10,
-                            step = 1, 
-                            bigStep = 1,
+                            min = 0.5,
+                            max = 5,
+                            step = 0.5, 
+                            bigStep = 0.5,
                             --width = "half",
                             hidden = "Advanced",
                             order = 11
@@ -1370,8 +1385,8 @@ local function TransferAllSettings()
     TransferOldSetting("lootGrowthDirection", "selectGrowthDirection");
     TransferOldSetting("textSide",            "selectTextSide");
     TransferOldSetting("minWidth",            "inputMinWidth");
-    TransferOldSetting("initialDelay",        "rangeInitialDelay");
-    TransferOldSetting("secondaryDelay",      "rangeSecondaryDelay");
+    -- TransferOldSetting("initialDelay",        "rangeInitialDelay");
+    -- TransferOldSetting("secondaryDelay",      "rangeSecondaryDelay");
     TransferOldSetting("fadeSpeed",           "rangeFadeSpeed");
     TransferOldSetting("colorQual",           "toggleColorByQuality");
     TransferOldSetting("showAnimation",       "toggleShowAnimation");

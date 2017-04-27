@@ -15,7 +15,7 @@ https://github.com/nmsmith22389/HotLoot
 MIT License
 --]]
 -- ────────────────────────────────────────────────────────────────────────────────
-
+-- TODO: Remove uneeded libs
 HotLoot = LibStub('AceAddon-3.0'):NewAddon('HotLoot', 'AceConsole-3.0', 'AceEvent-3.0', 'AceTimer-3.0')
 local L = LibStub('AceLocale-3.0'):GetLocale('HotLoot')
 HotLoot.minimapIcon = LibStub('LibDBIcon-1.0')
@@ -51,10 +51,10 @@ local LDB = LibStub('LibDataBroker-1.1'):NewDataObject('HotLoot', {
             end
     end,
     OnTooltipShow = function(Tip)
-        if not Tip or not Tip.AddLine then 
+        if not Tip or not Tip.AddLine then
             return
         end
-        -- TODO: Change this and click check to reflect Left = Options, Right = Anchor
+
         Tip:AddLine('HotLoot', 1, 0.4, 0)
         Tip:AddLine(string.format(L['MinimapTTOptions'], Util:ColorText('Left Click', 'warning')), 1, 1, 1)
         Tip:AddLine(string.format(L['MinimapTTAnchor'], Util:ColorText('Right Click', 'warning')), 1, 1, 1)
@@ -101,9 +101,9 @@ local themes = {
         ["themeSize"] = "large",
         ["iconSizable"] = false,
         ["height"] = 50,
-        ["bgFile"] = [[Interface\Tooltips\CHATBUBBLE-BACKGROUND]], 
-        ["edgeFile"] = [[Interface\Tooltips\UI-Tooltip-Border]], 
-        ["tile"] = true, ["tileSize"] = 32, ["edgeSize"] = 12, 
+        ["bgFile"] = [[Interface\Tooltips\CHATBUBBLE-BACKGROUND]],
+        ["edgeFile"] = [[Interface\Tooltips\UI-Tooltip-Border]],
+        ["tile"] = true, ["tileSize"] = 32, ["edgeSize"] = 12,
         ["insets"] = { left = 3, right = 3, top = 3, bottom = 3 }
     },
 }
@@ -171,56 +171,6 @@ function HotLoot:OnEnable()
 end
 
 --
--- ─── TOAST FADING ───────────────────────────────────────────────────────────────
---
-
-local function ResetTimer()
-    tStart = GetTime()
-end
-local isFirst = 0
-local function fadeItems()
-    -- ElvUI Fix
-    -- TODO: Figure out if i still need
-    if closeEL == 1 and _G["ElvLootFrame"] then
-        _G["ElvLootFrame"]:Hide()
-        closeEL = 0
-    end
-    -- ────────────────────────────────────────────────────────────────────────────────
-
-    local iframe, alpha, fDelay, iDelay, sDelay, fSpeed
-    iDelay = HotLoot.options.rangeInitialDelay
-    sDelay = HotLoot.options.rangeSecondaryDelay
-    fSpeed = HotLoot.options.rangeFadeSpeed * 0.01
-    if (isFirst == 0) then
-        --isFirst = 0
-        fDelay = iDelay -- 5
-    else
-        fDelay = sDelay -- 1
-    end
-    if (icons[#icons] == nil) then
-        isFirst = 0
-    end
-    if (icons[#icons] ~= nil) and (tStart < (GetTime() - fDelay)) then
-        iframe = icons[#icons]
-        alpha = iframe:GetAlpha()
-        if (alpha == 1) then
-            
-        end
-        if (alpha > 0) then 
-            if HotLoot.options.toggleShowAnimation and iframe.ani then
-                iframe.ani:Play()
-            end
-            iframe:SetAlpha(alpha - fSpeed) -- fSpeed = 0.05
-        elseif (alpha <= 0) then 
-            iframe:Hide()
-            table.remove(icons)
-            ResetTimer()
-            isFirst = isFirst + 1
-        end
-    end
-end
-
---
 -- ─── ANCHOR FRAME ───────────────────────────────────────────────────────────────
 --
 
@@ -243,7 +193,7 @@ function HotLoot:CreateAnchorFrame()
     anchor.text:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
     anchor.text:SetText("HotLoot Anchor")
     anchor:SetWidth(145)
-    
+
     anchor:RegisterForDrag("LeftButton")
     anchor:SetMovable(true)
     anchor:EnableMouse(true)
@@ -319,8 +269,8 @@ local function DeleteLeftovers()
     if not Util:IsEmpty(tItemsToDelete) then
         -- TODO: Rename
         Util:Announce(L["SkinAnnounce1"]);
-        for bag = 0, NUM_BAG_SLOTS do 
-            for slot = 1, GetContainerNumSlots(bag) do 
+        for bag = 0, NUM_BAG_SLOTS do
+            for slot = 1, GetContainerNumSlots(bag) do
                 local itemLink = GetContainerItemLink(bag, slot);
                 local itemName
                 if itemLink then
@@ -347,7 +297,7 @@ end
 -- Helper Functions
 local function HasRoom(room)
     local numFSlots = 0
-    for b = 0, 4 do 
+    for b = 0, 4 do
         numFSlots = numFSlots + select(1, GetContainerNumFreeSlots(b))
     end
     if  numFSlots >= room then
@@ -361,8 +311,8 @@ local function CanStack(iname, scount, lquant)
     --if scount then
     local q, stackRoom, n
     stackRoom = 0
-    for b = 0, 4 do 
-        for s = 1, GetContainerNumSlots(b) do 
+    for b = 0, 4 do
+        for s = 1, GetContainerNumSlots(b) do
             n = select(1, GetItemInfo(GetContainerItemID(b, s)))
             if n == iname then
                 q = select(2, GetContainerItemInfo(b, s))
@@ -371,7 +321,7 @@ local function CanStack(iname, scount, lquant)
         end
     end
     if lquant <= stackRoom then
-        return true 
+        return true
     else
         return false
     end
@@ -407,7 +357,7 @@ local function CheckThreshold(itemType, sellAmount, itemQuantity)
     else
         value = sellAmount
     end
-    
+
     if HotLoot.options.selectThresholdType1 == itemType then
         if Util:ToCopper(HotLoot.options.inputThresholdValue1) <= value then
             return true
@@ -455,17 +405,15 @@ local function FilterSlot(slot, virtualMode)
     --      1: result [boolean]
     --      2: filter caught in [string]
 
-    -- TODO: Localize 'filter caught in' return (2nd return var)
-
     if not virtualMode then
         lootIcon, lootName, lootQuantity, lootQuality, locked = GetLootSlotInfo(slot)
         lootLink = GetLootSlotLink(slot)
-        
+
         -- Check Gold
         if Util:SlotIsGold(slot) and HotLoot.options.toggleGoldFilter then
             return true, 'Gold Filter'
         end
-        
+
         if Util:SlotIsCurrency(slot) and HotLoot.options.toggleCurrencyFilter then
             return true, 'Currency Filter'
         end
@@ -484,7 +432,7 @@ local function FilterSlot(slot, virtualMode)
         local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, _, _, itemSellPrice = GetItemInfo(lootLink)
 
         if (HasRoom(1) or CanStack(itemName, itemStackCount, lootQuantity)) then
-            
+
             -- TODO: Normalize these so that the check order is (pref, type, subtype, other) (there may be special cases)
 
             -- Debug
@@ -502,79 +450,79 @@ local function FilterSlot(slot, virtualMode)
             end
 
             -- Include List
-            if HotLoot.options.tableIncludeList[itemName] then 
+            if HotLoot.options.tableIncludeList[itemName] then
                 return true, 'Include List'
             end
 
             -- Quest
-            if HotLoot.options.toggleQuestFilter and itemType == L["Quest"]and CheckThreshold("Quest", itemSellPrice, lootQuantity) then 
+            if HotLoot.options.toggleQuestFilter and itemType == L["Quest"]and CheckThreshold("Quest", itemSellPrice, lootQuantity) then
                 return true, 'Quest Item Filter'
             end
 
             -- Pickpocket
-            if IsStealthed() and itemRarity ~= 0 and HotLoot.options.togglePickpocketFilter then 
+            if IsStealthed() and itemRarity ~= 0 and HotLoot.options.togglePickpocketFilter then
                 return true, 'Pickpocket Filter'
 
             end
 
             -- Cloth
-            if ((itemSubType == L["Cloth"] and itemType == L["Tradeskill"]) or itemType == "Item Enhancement!") and HotLoot.options.toggleClothFilter and CheckThreshold("Cloth", itemSellPrice, lootQuantity) then 
+            if ((itemSubType == L["Cloth"] and itemType == L["Tradeskill"]) or itemType == "Item Enhancement!") and HotLoot.options.toggleClothFilter and CheckThreshold("Cloth", itemSellPrice, lootQuantity) then
                     return true, 'Cloth Filter'
 
             end
 
             -- Mining
-            if itemSubType == L["Metal & Stone"] and HotLoot.options.toggleMiningFilter and CheckThreshold("Metal & Stone", itemSellPrice, lootQuantity) then 
+            if itemSubType == L["Metal & Stone"] and HotLoot.options.toggleMiningFilter and CheckThreshold("Metal & Stone", itemSellPrice, lootQuantity) then
                 return true, 'Mining Filter'
 
             end
 
             -- Gems
-            if (itemType == L["Gem"] or (itemType == "Item Enhancement!" and itemSubType == "Jewelcrafting")) and HotLoot.options.toggleGemFilter and CheckThreshold("Gem", itemSellPrice, lootQuantity) then 
+            if (itemType == L["Gem"] or (itemType == "Item Enhancement!" and itemSubType == "Jewelcrafting")) and HotLoot.options.toggleGemFilter and CheckThreshold("Gem", itemSellPrice, lootQuantity) then
                 return true, 'Gem Filter'
 
             end
 
             -- Herbs
-            if itemSubType == L["Herb"] and HotLoot.options.toggleHerbFilter and CheckThreshold("Herb", itemSellPrice, lootQuantity) then 
+            if itemSubType == L["Herb"] and HotLoot.options.toggleHerbFilter and CheckThreshold("Herb", itemSellPrice, lootQuantity) then
                 return true, 'Herb Filter'
 
             end
 
             -- Leather
-            if HotLoot.options.toggleLeatherFilter and (((itemType == L["Tradeskill"] or itemType == "Item Enhancement!") and itemSubType == L["Leather"]) or CheckUntyped('leather', itemLink)) and CheckThreshold("Leather", itemSellPrice, lootQuantity) then 
+            if HotLoot.options.toggleLeatherFilter and (((itemType == L["Tradeskill"] or itemType == "Item Enhancement!") and itemSubType == L["Leather"]) or CheckUntyped('leather', itemLink)) and CheckThreshold("Leather", itemSellPrice, lootQuantity) then
                 return true, 'Leather Filter'
 
             end
 
             -- Fishing (-junk)
-            if IsFishingLoot() and HotLoot.options.toggleFishingFilter and itemSubType ~= L["Junk"] then 
+            if IsFishingLoot() and HotLoot.options.toggleFishingFilter and itemSubType ~= L["Junk"] then
                 return true, 'Fishing Filter'
             end
 
             -- Enchanting
-            if HotLoot.options.toggleEnchantingFilter and itemSubType == L["Enchanting"] and CheckThreshold("Enchanting", itemSellPrice, lootQuantity) then 
+            if HotLoot.options.toggleEnchantingFilter and itemSubType == L["Enchanting"] and CheckThreshold("Enchanting", itemSellPrice, lootQuantity) then
                 return true, 'Enchanting Filter'
             end
-            
+
             -- Pigments
             -- TODO: Need to localize "Pigment"?
-            if HotLoot.options.togglePigmentsFilter and string.find(itemName, "Pigment") then 
+            if HotLoot.options.togglePigmentsFilter and string.find(itemName, "Pigment") then
                 return true, 'Pigment Filter'
             end
-            
+
             -- Cooking
-            if HotLoot.options.toggleCookingFilter and itemSubType == L["Cooking"] and CheckThreshold("Cooking Ingredient", itemSellPrice, lootQuantity) then 
+            if HotLoot.options.toggleCookingFilter and itemSubType == L["Cooking"] and CheckThreshold("Cooking Ingredient", itemSellPrice, lootQuantity) then
                 return true, 'Cooking Filter'
             end
-            
+
             -- Recipe
-            if HotLoot.options.toggleRecipeFilter and itemType == L["Recipe"] then 
+            if HotLoot.options.toggleRecipeFilter and itemType == L["Recipe"] then
                 return true, 'Recipe Filter'
             end
-            
+
             -- Pots
-            if itemSubType == L["Potion"] and HotLoot.options.togglePotionFilter and CheckThreshold("Potion", itemSellPrice, lootQuantity) then 
+            if itemSubType == L["Potion"] and HotLoot.options.togglePotionFilter and CheckThreshold("Potion", itemSellPrice, lootQuantity) then
                 if HotLoot.options.selectPotionType == "both" then
                     return true, 'Potion Filter'
                 elseif HotLoot.options.selectPotionType == "healing" and string.find(itemName, L["Healing"])  then
@@ -585,61 +533,61 @@ local function FilterSlot(slot, virtualMode)
                     return false, 'Unsupported Potion'
                 end
             end
-            
+
             -- Flasks
-            if itemSubType == L["Flask"] and HotLoot.options.toggleFlaskFilter and CheckThreshold("Flask", itemSellPrice, lootQuantity) then 
+            if itemSubType == L["Flask"] and HotLoot.options.toggleFlaskFilter and CheckThreshold("Flask", itemSellPrice, lootQuantity) then
                 return true, 'Flask Filter'
             end
-            
+
             -- Elixirs
-            if itemSubType == L["Elixir"] and HotLoot.options.toggleElixirFilter and CheckThreshold("Elixir", itemSellPrice, lootQuantity) then 
+            if itemSubType == L["Elixir"] and HotLoot.options.toggleElixirFilter and CheckThreshold("Elixir", itemSellPrice, lootQuantity) then
                 return true, 'Elixir Filter'
             end
-            
+
             -- Motes
-            if itemSubType == L["Elemental"] and HotLoot.options.toggleElementalFilter and CheckThreshold("Elemental", itemSellPrice, lootQuantity) then 
+            if itemSubType == L["Elemental"] and HotLoot.options.toggleElementalFilter and CheckThreshold("Elemental", itemSellPrice, lootQuantity) then
                 return true, 'Elemental Filter'
             end
-            
+
             -- QUALITY
 
             -- Poor
-            if HotLoot.options.togglePoorQualityFilter and itemRarity == 0 and CheckThreshold("z1Poor", itemSellPrice, lootQuantity) then 
+            if HotLoot.options.togglePoorQualityFilter and itemRarity == 0 and CheckThreshold("z1Poor", itemSellPrice, lootQuantity) then
                 return true, 'Poort Quality Filter'
             end
 
             -- Common
-            if HotLoot.options.toggleCommonQualityFilter and itemRarity == 1 and CheckThreshold("z2Common", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then 
+            if HotLoot.options.toggleCommonQualityFilter and itemRarity == 1 and CheckThreshold("z2Common", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then
                 return true, 'Common Quality Filter'
             end
 
             -- Uncommon
-            if HotLoot.options.toggleUncommonQualityFilter and itemRarity == 2 and CheckThreshold("z3Uncommon", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then 
+            if HotLoot.options.toggleUncommonQualityFilter and itemRarity == 2 and CheckThreshold("z3Uncommon", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then
                 return true, 'Uncommon Quality Filter'
             end
 
             -- Rare
-            if HotLoot.options.toggleRareQualityFilter and itemRarity == 3 and CheckThreshold("z4Rare", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then 
+            if HotLoot.options.toggleRareQualityFilter and itemRarity == 3 and CheckThreshold("z4Rare", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then
                 return true, 'Rare Quality Filter'
             end
 
             -- Epic
-            if HotLoot.options.toggleEpicQualityFilter and itemRarity == 4 and CheckThreshold("z5Epic", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then 
+            if HotLoot.options.toggleEpicQualityFilter and itemRarity == 4 and CheckThreshold("z5Epic", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then
                 return true, 'Epic Quality Filter'
             end
 
             -- Legendary
-            if HotLoot.options.toggleLegendaryQualityFilter and itemRarity == 5 and CheckThreshold("z6Legendary", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then 
+            if HotLoot.options.toggleLegendaryQualityFilter and itemRarity == 5 and CheckThreshold("z6Legendary", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then
                 return true, 'Legendary Quality Filter'
             end
 
             -- Artifact
-            if HotLoot.options.toggleArtifactQualityFilter and itemRarity == 6 and CheckThreshold("z7Artifact", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then 
+            if HotLoot.options.toggleArtifactQualityFilter and itemRarity == 6 and CheckThreshold("z7Artifact", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then
                 return true, 'Artifact Quality Filter'
             end
 
             -- Heirloom
-            if HotLoot.options.toggleHeirloomQualityFilter and itemRarity == 7 and CheckThreshold("z8Heirloom", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then 
+            if HotLoot.options.toggleHeirloomQualityFilter and itemRarity == 7 and CheckThreshold("z8Heirloom", itemSellPrice, lootQuantity) and CheckILvl(itemLevel) then
                 return true, 'Heirloom Quality Filter'
             end
 
@@ -688,8 +636,8 @@ end
 local function InBags(iName, lquant)
     local q, inBags, n, scount
     inBags = lquant
-    for b = 0, 4 do 
-        for s = 1, GetContainerNumSlots(b) do 
+    for b = 0, 4 do
+        for s = 1, GetContainerNumSlots(b) do
             if GetContainerItemID(b, s) then
             n = select(1, GetItemInfo(GetContainerItemID(b, s)))
             if n == iName then
@@ -1017,7 +965,7 @@ function HotLoot:CreateILootButton(slot)
     i:SetHeight(30)
     --[[
     if (IsAddOnLoaded("XLoot Frame")) then
-        
+
         i:SetPoint("RIGHT", _G["XLootFrameButton"..slot], "LEFT", -10, 0)
         i:SetPoint("RIGHT", _G["XLootFrameButton"..slot], "LEFT", -10, 0)
     elseif (IsAddOnLoaded("ElvUI")) then
@@ -1035,7 +983,7 @@ function HotLoot:CreateILootButton(slot)
     else
         i:SetPoint("RIGHT", _G["LootButton"..slot], "LEFT", -10, 0)
     end
-    
+
     i.texture = i:CreateTexture("iTexture"..slot )
     i.texture:SetColorTexture(0, 1, 0, 0.7)
     i.texture:SetAllPoints(i)
@@ -1052,7 +1000,7 @@ function HotLoot:CreateILootButton(slot)
     i:SetScript("OnEnter", function(self) IBOnEnter(slot) end)
     i:SetScript("OnLeave", function(self) IBOnLeave() end)
     i:SetScript("OnClick", function(self) IButtonClicked(slot) end)
-    
+
     return i
 end
 

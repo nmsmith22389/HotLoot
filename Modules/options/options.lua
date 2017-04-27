@@ -534,7 +534,6 @@ optionsTable = {
                             desc = L["toggleColorByQualityDesc"],
                             type = "toggle",
                             hidden = "GetThemeColorDisabled",
-                            --disabled = true,
                             order = 6
                         },
                         colorThemeBG = {

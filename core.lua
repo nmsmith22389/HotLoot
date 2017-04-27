@@ -915,73 +915,71 @@ local function SetLoot(frame, loot)
     frame.pos = 1
 end
 
-function HotLoot:CreateLootToast(index)
+function HotLoot:CreateLootToast()
     local templateSize = Util:UCFirst(self:GetThemeSetting("themeSize"))
     local templateIsFlipped = (self.options.selectTextSide == 0) and "" or "Flipped"
-    
-    local frame = CreateFrame("Frame", "HotLoot_Toast"..index, nil, "HotLoot_Toast"..strThemeSize..strFlipped.."Template")
 
-    frame.index = index
+    local frame = CreateFrame("Frame", "HotLoot_Toast", nil, "HotLoot_Toast"..templateSize..templateIsFlipped.."Template")
+
+    -- frame.index = index
 
     frame.SetLoot = SetLoot
 
-    frame:SetScript('OnShow', function(self)
-        self.timer = HotLoot:ScheduleTimer(
-            function()
-                if self.animation and HotLoot.options.toggleShowAnimation then
-                    self.animation:Play()
-                else
-                    self:Hide()
-                end
-            end
-        , rangeInitialDelay)
-    )
+    frame:Hide()
 
-    self:SetToastAnchor(index)
-    
-    self.toasts[index] = frame
+    -- self:SetToastAnchor(index)
+
+    -- self.toasts[index] = frame
+
+    return frame
 end
 
-function HotLoot:GetLootToast(index)
-    if not self.toasts[index] then
-        self:CreateLootToast(index)
-    end
+-- function HotLoot:GetLootToast()
+--     local nextIndex = self:GetNextToastIndex()
+--     if not nextIndex then
+--         self:CreateLootToast(index)
+--     end
 
-    return self.toasts[index]
-end
+--     return self.toasts[index]
+-- end
 
-function HotLoot:UpdateMonitor()
-    local i = 1
-    local yOffset
-    local xOffset
-    local row, column = 0, 0
-    while i <= #icons do
-        if HotLoot:GetThemeSetting("themeSize") == "large" then
-            yOffset = (i * ((32 + 18) * self.options.selectGrowthDirection))
-        else
-            yOffset = (i * ((self.options.rangeIconSize + 3) * self.options.selectGrowthDirection))
-        end
-        if self.options.selectTextSide == 0 then
-            icons[i]:SetPoint("LEFT", HotLoot.Anchor, "LEFT", 0, yOffset)
-        else
-            icons[i]:SetPoint("RIGHT", HotLoot.Anchor, "RIGHT", 0, yOffset)
-        end
-        i = i + 1
+function HotLoot:UpdateAnchors()
+    for i, frame in ipairs(self.toasts) do
+        self:SetToastAnchor(frame)
     end
 end
 
-function HotLoot:SetToastAnchor(index)
+function HotLoot:SetToastAnchor(frame)
     -- TODO: Make padding an option
-    local padding = 8
-    local offset = (self:GetThemeSetting("themeSize") == "large") 
-        and ((index - 1) * (tonumber(self:GetThemeSetting("height") + padding) * self.options.selectGrowthDirection))
-        or  ((index - 1) * (tonumber(self.options.rangeIconSize + 3 + padding) * self.options.selectGrowthDirection))
+    local pos = frame.pos
+    local padding = self.options.rangeToastPadding
+    local offset = (self:GetThemeSetting("themeSize") == "large")
+        and ((pos - 1) * (tonumber(self:GetThemeSetting("height") + padding) * self.options.selectGrowthDirection))
+        or  ((pos - 1) * (tonumber(self.options.rangeIconSize + 3 + padding) * self.options.selectGrowthDirection))
 
     local vertAnchor = (self.options.selectGrowthDirection == 1) and 'BOTTOM' or 'TOP'
     local horzAnchor = (self.options.selectTextSide        == 0) and 'LEFT'   or 'RIGHT'
     local anchor     = vertAnchor..horzAnchor
 
-    self.toasts[index]:SetPoint(anchor, HotLoot.Anchor, anchor, 0, offset)
+    frame:ClearAllPoints()
+    frame:SetPoint(anchor, HotLoot.Anchor, anchor, 0, offset)
+end
+
+-- Returns the next inactive index
+function HotLoot:GetNextToastIndex()
+    for i, frame in ipairs(self.toasts) do
+        if not frame:IsVisible() then
+            return i
+        end
+    end
+
+    return false
+end
+
+function HotLoot:ShiftToastPosUp()
+    for i, frame in ipairs(self.toasts) do
+        frame.pos = frame.pos + 1
+    end
 end
 
 --

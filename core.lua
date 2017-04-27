@@ -706,15 +706,11 @@ end
 -- ─── NEW LOOT ICON FUNCTIONS ────────────────────────────────────────────────────
 --
 
+-- TODO: Add option to change text outline (ie outline, thickoutline, mono, none)
 local function SetLoot(frame, loot)
-    --> Get Loot Type
-    -- local slotType = (Util:SlotIsGold(frame.slot)     and HL_LOOT_SLOT_TYPE.COIN) or
-                    --  (Util:SlotIsCurrency(frame.slot) and HL_LOOT_SLOT_TYPE.CURRENCY) or
-                                                        --   HL_LOOT_SLOT_TYPE.ITEM
-
     --> Set ToolTip
     if loot.link then
-        -- NOTE: loot.link needs to be set before calling this func
+        -- NOTE: loot.link and loot.slotType need to be set before calling this func
         frame.item = loot.link
         frame.ShowTooltip = function(self)
             if self.item then
@@ -731,6 +727,11 @@ local function SetLoot(frame, loot)
             GameTooltip:Hide()
             ResetCursor()
         end)
+    else
+        frame.item = nil
+        frame.ShowTooltip = nil
+        frame:SetScript('OnEnter', nil)
+        frame:SetScript('OnLeave', nil)
     end
 
     --> Set Theme
@@ -743,6 +744,11 @@ local function SetLoot(frame, loot)
         insets   = HotLoot:GetThemeSetting("insets")
     })
 
+    --> Coin Type
+    if loot.slotType == HL_LOOT_SLOT_TYPE.COIN then
+        loot.name = GetCoinTextureString(Util:ToCopper(loot.name))
+    end
+
     --> Set Theme Color
     if not Options:GetThemeColorDisabled() then
         -- TODO: Have the actual options return an object
@@ -751,7 +757,7 @@ local function SetLoot(frame, loot)
         local bgBlue  = HotLoot.options.fThemeColorB
         local bgAlpha = HotLoot.options.fThemeColorA
 
-        frameToast:SetBackdropColor(bgRed, bgGreen, bgBlue, bgAlpha)
+        frame:SetBackdropColor(bgRed, bgGreen, bgBlue, bgAlpha)
 
         local borderRed   = HotLoot.options.fThemeBorderColorR
         local borderGreen = HotLoot.options.fThemeBorderColorG
@@ -759,11 +765,11 @@ local function SetLoot(frame, loot)
         local borderAlpha = HotLoot.options.fThemeBorderColorA
 
         if HotLoot.options.toggleColorByQuality and loot.quantity > 0 and loot.quality then
-            borderRed, borderGreen, borderBlue = GetItemQualityColor(intQuality)
+            borderRed, borderGreen, borderBlue = GetItemQualityColor(loot.quality)
             borderAlpha = 1
         end
 
-        frameToast:SetBackdropBorderColor(borderRed, borderGreen, borderBlue, borderAlpha)
+        frame:SetBackdropBorderColor(borderRed, borderGreen, borderBlue, borderAlpha)
     end
 
     --> Set Opacity
@@ -784,10 +790,10 @@ local function SetLoot(frame, loot)
     }
 
     if HotLoot.options.toggleFontColorByQual and loot.quality then
-        colorFont.red, colorFont.green, colorFont.blue = GetItemQualityColor(intQuality)
+        colorFont.red, colorFont.green, colorFont.blue = GetItemQualityColor(loot.quality)
         colorFont.alpha = 1.0
     end
-        
+
     --> Set Name
     local nameText = loot.link or loot.name
     frame.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot.options.selectTextFont], HotLoot.options.rangeFontSize, "OUTLINE")
@@ -803,8 +809,9 @@ local function SetLoot(frame, loot)
 
             if HotLoot.options.toggleShowTotalQuant and loot.slotType ~= nil then
                 if loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
-                    -- TODO: Don't display a total quant above the currency cap
-                    countText = loot.quantity..' ['..tostring(select(2, GetCurrencyInfo(strItemLink)) + loot.quantity)..']'
+                    local _, currencyCurrentAmount, _, _, _, currencyMax, _ = GetCurrencyInfo(index)
+                    local currencyTotalText = (currencyCurrentAmount + loot.quantity < currencyMax) and (currencyCurrentAmount + loot.quantity) or currencyMax
+                    countText = loot.quantity..' ['..tostring(currencyTotalText)..']'
                 else
                     countText = loot.quantity..' ['..tostring(InBags(loot.name, loot.quantity))..']'
                 end
@@ -826,9 +833,9 @@ local function SetLoot(frame, loot)
         if HotLoot.options.toggleShowSellPrice and loot.quantity > 0 and loot.slotType == HL_LOOT_SLOT_TYPE.ITEM then
             local itemValue = select(11, GetItemInfo(loot.link)) or 0
 
-            frameToast.value:SetText(GetCoinTextureString(itemValue))
+            frame.value:SetText(GetCoinTextureString(itemValue))
 
-            frameToast.value:Show()
+            frame.value:Show()
         else
             frame.value:Hide()
         end
@@ -843,8 +850,8 @@ local function SetLoot(frame, loot)
             local typeText, subtypeText, typeTextDivider = '', '', ''
 
             if loot.slotType == HL_LOOT_SLOT_TYPE.ITEM then
-                typeText        = select(6, GetItemInfo(strItemLink)) or 'N/A'
-                subtypeText     = select(7, GetItemInfo(strItemLink)) or 'N/A'
+                typeText        = select(6, GetItemInfo(loot.link)) or 'N/A'
+                subtypeText     = select(7, GetItemInfo(loot.link)) or 'N/A'
                 typeTextDivider = ': '
             elseif loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
                 typeText = L['Currency']
@@ -882,7 +889,7 @@ local function SetLoot(frame, loot)
     if HotLoot.options.toggleShowAnimation then
         local animationGroup = frame:CreateAnimationGroup()
         animationGroup:SetScript('OnFinished', function(self)
-            self:Hide()
+            frame:Hide()
         end)
 
         local animationTrans = animationGroup:CreateAnimation("Translation")
@@ -890,19 +897,22 @@ local function SetLoot(frame, loot)
         animationTrans:SetOffset(0, transOffset)
         animationTrans:SetDuration(1.0)
         animationTrans:SetSmoothing("IN")
-        
+
         local animationFade = animationGroup:CreateAnimation("Alpha")
-        animationFade:SetChange(-1.0)
+        animationFade:SetFromAlpha(HotLoot.options.rangeTransparency)
+        animationFade:SetToAlpha(0)
         animationFade:SetDuration(1.0)
         animationFade:SetSmoothing("IN")
 
         frame.animation = animationGroup
     end
-        
+
     -- NOTE: Removed Shine and Glow for now because it's not absolutely necessary but will add in later.
 
     --> Exclude Button
     -- TODO: Implement later and do it better (maybe no button and just shift+rightclick or something?)
+
+    frame.pos = 1
 end
 
 function HotLoot:CreateLootToast(index)

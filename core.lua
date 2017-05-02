@@ -129,9 +129,6 @@ function HotLoot:OnEnable()
     -- Minimap Icon
     self.minimapIcon:Register('HotLoot', LDB, self.options.minimapIcon)
 
-    -- Create Main Anchor Frame
-    self:CreateAnchorFrame()
-
     -- TODO: Find a better way to do this!
     StaticPopupDialogs["CONFIRM_SKINNING_MODE"] = {
         text = L["dialogConfirmSkinningMode"],
@@ -156,6 +153,9 @@ function HotLoot:OnEnable()
         Options:Set('selectTheme', 'paper')
     end
 
+    -- Create Main Anchor Frame
+    self:CreateAnchorFrame()
+
     -- For toast fading
     -- TODO: find a better way
     tStart = 0
@@ -175,24 +175,40 @@ end
 --
 
 function HotLoot:CreateAnchorFrame()
-    -- TODO: make same size as current theme (actually maybe dont do this... idk)
+    local anchor = CreateFrame("Frame", 'HotLoot_Anchor', UIParent)
 
-    local anchor = CreateFrame("Frame", 'HotLoot_Anchor', UIParent, 'ThinGoldEdgeTemplate')
-    anchor:SetHeight(16)
     anchor:ClearAllPoints()
     if self.options.anchorPosition.x and self.options.anchorPosition.y then
         anchor:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMLEFT', self.options.anchorPosition.x, self.options.anchorPosition.y)
     else
         anchor:SetPoint('CENTER', UIParent, 'CENTER', 0, 0)
     end
-    anchor:SetScript("OnUpdate", fadeItems)
+
+    anchor:SetBackdrop({
+        bgFile   = self:GetThemeSetting("bgFile"),
+        edgeFile = self:GetThemeSetting("edgeFile"),
+        tile     = self:GetThemeSetting("tile"),
+        tileSize = self:GetThemeSetting("tileSize"),
+        edgeSize = self:GetThemeSetting("edgeSize"),
+        insets   = self:GetThemeSetting("insets")
+    })
+
+    anchor:SetBackdropColor(0, 0, 0, 0.7)
+    anchor:SetBackdropBorderColor(1, 1, 1, 1.0)
+
+    local frameWidth    = tonumber(self.options.inputMinWidth)
+    local frameHeight = (self:GetThemeSetting('themeSize') == 'small') and (self.options.rangeIconSize + 4) or self:GetThemeSetting('height')
+
+    anchor:SetSize(frameWidth, frameHeight)
+
     anchor:SetClampedToScreen(true)
 
     anchor.text = anchor:CreateFontString('Text', "OVERLAY")
     anchor.text:SetPoint("CENTER", anchor, "CENTER", 0, 0)
     anchor.text:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
     anchor.text:SetText("HotLoot Anchor")
-    anchor:SetWidth(145)
+    anchor.text:SetTextColor(1, 0.24, 0, 0)
+
 
     anchor:RegisterForDrag("LeftButton")
     anchor:SetMovable(true)
@@ -256,7 +272,7 @@ function HotLoot:TestLootMonitor()
     local itemName = GetItemInfo(itemLink)
     local loot = {
         texture     = itemTexture,
-        name        = itemName,
+        item        = itemName,
         quantity    = 1,
         quality     = itemQuality,
         locked      = isLocked,
@@ -272,7 +288,7 @@ function HotLoot:TestLootMonitor()
     -- NOTE: (UPDATE) I did notice this is slightly different than the loot one so a func for all might not work
     local frame
     local nextIndex = self:GetNextToastIndex()
-    local staggerCount = 1
+
     if not nextIndex then
         frame = self:CreateLootToast()
         self:ShiftToastPosUp()
@@ -292,7 +308,7 @@ function HotLoot:TestLootMonitor()
         else
             frame:Hide()
         end
-    end, self.options.rangeDisplayTime + self.options.rangeMultipleDelay * 1)
+    end, self.options.rangeDisplayTime)
 
     frame:Show()
 end

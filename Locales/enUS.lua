@@ -2,6 +2,7 @@ local L = LibStub("AceLocale-3.0"):NewLocale("HotLoot", "enUS", true)
 
 L["AllGreysSold"] = "Sold %d Poor items for a total of %s."
 L["AnchorReset"] = "Loot Monitor position reset."
+L["AnnounceItemExcluded"] = "%s has been excluded from looting."
 L["AnnounceListAdd"] = "%s has been added to the %s."
 L["AnnounceLoadingTheme"] = "Loading theme: %s."
 L["BagsFull"] = "Your bags are full. Please make room for HotLoot to keep looting."
@@ -53,8 +54,6 @@ L["Elixirs"] = true
 L["Enchanting"] = true
 L["Epic"] = true
 L["ErrorListItemNotFound"] = "The item %q that you tried to add to the %s can't be found. Please try again."
-L["ExcludeAnnounce1"] = " has been excluded."
-L["Excluded"] = true
 L["Extras"] = true
 L["ExtrasDesc"] = "Extras are optional modules that provide extra features and functionality. Extra modules can be enabled/disabled in your AddOn manager."
 L["FishingModeLureName"] = "Apply Lure"
@@ -268,6 +267,9 @@ L["toggleCurrencyFilterDesc"] = [=[Check to autoloot Currency.
 L["toggleCurrencyFilterName"] = "Loot Currency"
 L["toggleDebugModegDesc"] = "Check to enable debugging."
 L["toggleDebugModegName"] = "Debug Mode"
+L["toggleDisableInRaidDesc"] = "Check this option to stop HotLoot from automatically looting items while in a raid."
+L["toggleDisableInRaidDescNote"] = "(gold and currency will still be automatically looted if the corresponding filter options are enabled)"
+L["toggleDisableInRaidName"] = "Disable Autolooting In Raids"
 L["toggleElementalFilterDesc"] = [=[Check to autoloot Elemental items.
 (i.e. Mote of Water)]=]
 L["toggleElementalFilterName"] = "Loot Elementals"
@@ -295,6 +297,8 @@ L["toggleHerbFilterDesc"] = "Check to autoloot herbs."
 L["toggleHerbFilterName"] = "Loot Herbs"
 L["toggleHideMinimapButtonDesc"] = "Check to hide the minimap button."
 L["toggleHideMinimapButtonName"] = "Hide Minimap Button"
+L["toggleItemQualityFilterDesc"] = "Check to autoloot %s items."
+L["toggleItemQualityFilterName"] = "Loot %s Items"
 L["toggleJunkFilterDesc"] = [=[Check to autoloot junk items.
 (not just poor quality items)]=]
 L["toggleJunkFilterName"] = "Loot Junk"
@@ -327,10 +331,6 @@ L["toggleShowExcludeButtonDesc"] = "Shows an exclude button next to items on the
 L["toggleShowExcludeButtonName"] = "Show Exclude Button"
 L["toggleShowIncludeButtonDesc"] = "Check to show a button next to loot items in the loot window. When clicked, it will add the item to the Include List"
 L["toggleShowIncludeButtonName"] = "Show Include Button"
-L["toggleShowItemNamesDesc"] = [=[Shows the item names next to the icons in the Loot Monitor.
-
-|cFFFF0000(must be off to use grid mode)|r]=]
-L["toggleShowItemNamesName"] = "Show Item Names"
 L["toggleShowItemQuantDesc"] = "Show the quantities of items in the Loot Monitor."
 L["toggleShowItemQuantName"] = "Show Item Quantities"
 L["toggleShowItemTypeDesc"] = [=[Shows the item type of the looted item on the Loot Monitor.
@@ -354,4 +354,3 @@ L["toggleUseQuantValueName"] = "Use Quantity Value"
 L["Tradeskill"] = true
 L["Uncommon"] = true
 L["Up"] = true
-L["WatchListName"] = "Watch List"

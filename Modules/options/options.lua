@@ -55,7 +55,7 @@ local tableFilterTypes = {
     ["z6Legendary"] = ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC.."|r",
     ["z7Artifact"] = ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC.."|r",
     ["z8Heirloom"] = ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC.."|r",
-    ["Include"] = L["Include List"],
+    ["Include"] = L["headerIncludeList"],
 }
 
 local tableThemes = {
@@ -248,7 +248,6 @@ function Options:AddToExcludeList(info, value)
             self.db.profile.tableExcludeList[itemName] = itemName
             Util:Announce(string.format(L['AnnounceListAdd'], Util:ColorText(itemName, 'info'), L['headerExcludeList']))
         else
-            -- TODO: Localize thise
             Util:Print(string.format(L['ErrorListItemNotFound'], tostring(value), L['headerExcludeList']))
         end
     end
@@ -421,7 +420,6 @@ optionsTable = {
                     type = "execute",
                     order = 3,
                     func = function()
-                        -- TODO: Make sure to reset the saved var aswell
                         HotLoot.Anchor:ClearAllPoints()
                         HotLoot.Anchor:SetPoint("CENTER", 0, 0)
                         Options.db.profile.anchorPosition.x = anchor:GetLeft()
@@ -859,7 +857,7 @@ optionsTable = {
                             order = 9
                         },
                         togglePigmentsFilter = {
-                            name = L["togglePigmentsFilterName"],
+                            name = L["togglePigmentsFilterName"]..Util:ColorText(' (experimental)', 'warning'),
                             desc = L["togglePigmentsFilterDesc"],
                             type = "toggle",
                             order = 10
@@ -988,8 +986,8 @@ optionsTable = {
                     end
                 },
                 togglePoorQualityFilter = {
-                    name = L["togglePoorQualityFilterName"],
-                    desc = L["togglePoorQualityFilterDesc"],
+                    name = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC.."|r"),
+                    desc = L["toggleItemQualityFilterDesc"]:format(ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC.."|r"),
                     type = "toggle",
                     width = "full",
                     order = 3,
@@ -1002,50 +1000,50 @@ optionsTable = {
                     order = 4,
                 },
                 toggleCommonQualityFilter = {
-                    name = L["toggleCommonQualityFilterName"],
-                    desc = L["toggleCommonQualityFilterDesc"],
+                    name = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC.."|r"),
+                    desc = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC.."|r"),
                     type = "toggle",
                     width = "full",
                     order = 6,
                 },
                 toggleUncommonQualityFilter = {
-                    name = L["toggleUncommonQualityFilterName"],
-                    desc = L["toggleUncommonQualityFilterDesc"],
+                    name = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC.."|r"),
+                    desc = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC.."|r"),
                     type = "toggle",
                     order = 8,
                     width = "full",
                 },  
                 toggleRareQualityFilter = {
-                    name = L["toggleRareQualityFilterName"],
-                    desc = L["toggleRareQualityFilterDesc"],
+                    name = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[3].hex..ITEM_QUALITY3_DESC.."|r"),
+                    desc = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[3].hex..ITEM_QUALITY3_DESC.."|r"),
                     type = "toggle",
                     width = "full",
                     order = 10,
                 },
                 toggleEpicQualityFilter = {
-                    name = L["toggleEpicQualityFilterName"],
-                    desc = L["toggleEpicQualityFilterDesc"],
+                    name = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[4].hex..ITEM_QUALITY4_DESC.."|r"),
+                    desc = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[4].hex..ITEM_QUALITY4_DESC.."|r"),
                     type = "toggle",
                     width = "full",
                     order = 12,
                 },
                 toggleLegendaryQualityFilter = {
-                    name = L["toggleLegendaryQualityFilterName"],
-                    desc = L["toggleLegendaryQualityFilterDesc"],
+                    name = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC.."|r"),
+                    desc = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC.."|r"),
                     type = "toggle",
                     width = "full",
                     order = 14,
                 },
                 toggleArtifactQualityFilter = {
-                    name = L["toggleArtifactQualityFilterName"],
-                    desc = L["toggleArtifactQualityFilterDesc"],
+                    name = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC.."|r"),
+                    desc = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC.."|r"),
                     type = "toggle",
                     width = "full",
                     order = 16,
                 },
                 toggleHeirloomQualityFilter = {
-                    name = L["toggleHeirloomQualityFilterName"],
-                    desc = L["toggleHeirloomQualityFilterDesc"],
+                    name = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC.."|r"),
+                    desc = L["toggleItemQualityFilterName"]:format(ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC.."|r"),
                     type = "toggle",
                     width = "full",
                     order = 18,

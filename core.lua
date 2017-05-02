@@ -1082,7 +1082,7 @@ function HotLoot:LOOT_OPENED()
                 if self.options.toggleEnableLootMonitor then
                     local frame
                     local nextIndex = self:GetNextToastIndex()
-                    staggerCount = staggerCount + 1
+
                     if not nextIndex then
                         frame = self:CreateLootToast()
                         self:ShiftToastPosUp()
@@ -1103,8 +1103,11 @@ function HotLoot:LOOT_OPENED()
                             else
                                 frame:Hide()
                             end
-                        end, HotLoot.options.rangeDisplayTime + HotLoot.options.rangeMultipleDelay * 1)
+                        end, HotLoot.options.rangeDisplayTime + HotLoot.options.rangeMultipleDelay * staggerCount)
                     -- end)
+
+                    -- Increase Stagger Count
+                    staggerCount = staggerCount + 1
 
                     frame:Show()
                 end

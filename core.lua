@@ -457,12 +457,12 @@ local function CheckILvl(iLvl)
     end
 end
 
--- TODO: Convert to take: (slot, loot info object) && if slot == nil then its virtual mode
 -- NOTE: Returns 2 vars...
 --      1: result [boolean]
---      2: filter caught in [string]
+--      2: filter caught in / reason not caught [string]
 local function FilterSlot(loot)
-    if HotLoot.options.tableExcludeList[loot.item] and loot.link then
+    if HotLoot.options.tableExcludeList[loot.item] and loot.link and not HotLoot.options.toggleDisableInRaid then
+        -- TODO: Consider moving this inside the item section
         -- Don't Loot
         Util:Announce(L["AnnounceItemExcluded"]:format(loot.link))
         return false, 'Exclude List'
@@ -478,17 +478,17 @@ local function FilterSlot(loot)
         if HotLoot.options.toggleCurrencyFilter then
             return true, 'Currency Filter'
         end
-    elseif loot.slotType == HL_LOOT_SLOT_TYPE.ITEM then
+    elseif loot.slotType == HL_LOOT_SLOT_TYPE.ITEM and not HotLoot.options.toggleDisableInRaid then
         local _, _, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice = GetItemInfo(loot.link)
 
-        if (HasRoom(1) or CanStack(loot.item, itemStackCount, lootQuantity)) then
+        if (HasRoom(1) or CanStack(loot.item, itemStackCount, loot.quantity)) then
 
             -- TODO: Normalize these so that the check order is (pref, type, subtype, other) (there may be special cases)
 
             -- Debug
             if HotLoot.options.toggleDebugMode then
                 local strFilterDebug = "-------------\n"..
-                    tostring(loot.link)..' x'..tostring(lootQuantity)..'\n'..
+                    tostring(loot.link)..' x'..tostring(loot.quantity)..'\n'..
                     '    - '..tostring(itemType)..' > '..tostring(itemSubType)
                 Util:Debug(strFilterDebug);
             end

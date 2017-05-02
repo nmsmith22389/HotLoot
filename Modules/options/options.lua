@@ -83,6 +83,7 @@ local defaults = {
         toggleSystemEnable = true,
         toggleDebugMode = false,
         toggleAnnounceEvents = true,
+        toggleDisableInRaid = false,
         toggleAdvancedOptions = false,
         toggleCloseLootWindow = false,
         selectCloseLootWindowModifier = "0",
@@ -319,24 +320,30 @@ optionsTable = {
                     type = "toggle",
                     order = 3
                 },
+                toggleDisableInRaid = {
+                    name = L["toggleDisableInRaidName"],
+                    desc = L["toggleDisableInRaidDesc"]..'\n'..Util:ColorText(L["toggleDisableInRaidDescNote"], 'info'),
+                    type = "toggle",
+                    order = 4
+                },
                 toggleAdvancedOptions = {
                     name = L["toggleAdvancedOptionsName"],
                     desc = L["toggleAdvancedOptionsDesc"],
                     type = "toggle",
-                    order = 4
+                    order = 5
                 },
                 toggleDebugMode = {
                     name = L["toggleDebugModegName"],
                     desc = L["toggleDebugModegDesc"],
                     type = "toggle",
                     hidden = 'Advanced',
-                    order = 5
+                    order = 6
                 },
                 -- TODO: Add Enable/Disable select option to decide which one the mod key does.
                 groupCloseLootWindow = {
                     name = L["groupCloseLootWindow"],
                     type = "group",
-                    order = 6,
+                    order = 7,
                     inline = true,
                     args = {
                         toggleCloseLootWindow = {

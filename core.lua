@@ -652,7 +652,8 @@ end
 
 local function SellPoorItems()
     local bag, slot
-    local totalPrice=0
+    local totalPrice = 0
+    local totalCount = 0
     for bag=0, NUM_BAG_SLOTS do
         for slot = 1, GetContainerNumSlots(bag) do
             local item = GetContainerItemID(bag,slot)
@@ -661,15 +662,16 @@ local function SellPoorItems()
                 local sellPrice = select(11,GetItemInfo(item))
                 if itemQuality == 0 and sellPrice > 0 then
                     local itemCount = select(2,GetContainerItemInfo(bag,slot))
-                    Util:Announce(string.format(L["GreyItemSold"], itemLink, itemCount, GetCoinTextureString(sellPrice * itemCount)))
+                    Util:Debug(string.format(L["GreyItemSold"], itemLink, itemCount, GetCoinTextureString(sellPrice * itemCount)))
                     UseContainerItem(bag,slot)
                     totalPrice = totalPrice + sellPrice * itemCount
+                    totalCount = totalCount + itemCount
                 end
             end
         end
     end
     if totalPrice > 0 then
-        Util:Announce(string.format(L["AllGreysSold"], GetCoinTextureString(totalPrice)))
+        Util:Announce(string.format(L["AllGreysSold"], totalCount, GetCoinTextureString(totalPrice)))
     end
 end
 

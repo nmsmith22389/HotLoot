@@ -740,7 +740,7 @@ local function SetLoot(frame, loot)
 
     --> Coin Type
     if loot.slotType == HL_LOOT_SLOT_TYPE.COIN then
-        loot.name = GetCoinTextureString(Util:ToCopper(loot.name))
+        loot.item = GetCoinTextureString(Util:ToCopper(loot.item))
     end
 
     --> Set Theme Color
@@ -789,7 +789,7 @@ local function SetLoot(frame, loot)
     end
 
     --> Set Name
-    local nameText = loot.link or loot.name
+    local nameText = loot.link or loot.item
     frame.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot.options.selectTextFont], HotLoot.options.rangeFontSize, "OUTLINE")
     frame.name:SetText(nameText)
 
@@ -803,11 +803,11 @@ local function SetLoot(frame, loot)
 
             if HotLoot.options.toggleShowTotalQuant and loot.slotType ~= nil then
                 if loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
-                    local _, currencyCurrentAmount, _, _, _, currencyMax, _ = GetCurrencyInfo(index)
+                    local _, currencyCurrentAmount, _, _, _, currencyMax, _ = GetCurrencyInfo(loot.link)
                     local currencyTotalText = (currencyCurrentAmount + loot.quantity < currencyMax) and (currencyCurrentAmount + loot.quantity) or currencyMax
                     countText = loot.quantity..' ['..tostring(currencyTotalText)..']'
                 else
-                    countText = loot.quantity..' ['..tostring(InBags(loot.name, loot.quantity))..']'
+                    countText = loot.quantity..' ['..tostring(InBags(loot.item, loot.quantity))..']'
                 end
             end
 

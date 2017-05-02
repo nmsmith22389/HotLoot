@@ -454,41 +454,33 @@ optionsTable = {
                             order = 2,
                             set = 'SetShowLootMonitorAnchor'
                         },
-                        toggleShowItemNames = {
-                            name = L["toggleShowItemNamesName"],
-                            desc = L["toggleShowItemNamesDesc"],
-                            type = "toggle",
-                            hidden = true,
-                            width = "double",
-                            order = 3
-                        },
                         toggleShowItemQuant = {
                             name = L["toggleShowItemQuantName"],
                             desc = L["toggleShowItemQuantDesc"],
                             type = "toggle",
                             width = "double",
-                            order = 4
+                            order = 3
                         },
                         toggleShowTotalQuant = {
                             name = L["toggleShowTotalQuantName"],
                             desc = L["toggleShowTotalQuantDesc"],
                             type = "toggle",
                             width = "double",
-                            order = 6
+                            order = 4
                         },
                         toggleShowSellPrice = {
                             name = L["toggleShowSellPriceName"],
                             desc = L["toggleShowSellPriceDesc"],
                             type = "toggle",
                             width = "double",
-                            order = 7
+                            order = 5
                         },
                         toggleShowItemType = {
                             name = L["toggleShowItemTypeName"],
                             desc = L["toggleShowItemTypeDesc"],
                             type = "toggle",
                             width = "double",
-                            order = 8
+                            order = 6
                         },
                     }
                 },

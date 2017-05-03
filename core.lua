@@ -16,6 +16,8 @@ MIT License
 --]]
 -- ────────────────────────────────────────────────────────────────────────────────
 -- TODO: Remove uneeded libs
+-- TODO: The new gold pattern for options doesn't work
+-- TODO: Change the tt for Include List Add input to reflect how it really works or just change it to work the right way
 HotLoot = LibStub('AceAddon-3.0'):NewAddon('HotLoot', 'AceConsole-3.0', 'AceEvent-3.0', 'AceTimer-3.0')
 local L = LibStub('AceLocale-3.0'):GetLocale('HotLoot')
 HotLoot.minimapIcon = LibStub('LibDBIcon-1.0')
@@ -944,7 +946,6 @@ function HotLoot:UpdateAnchors()
 end
 
 function HotLoot:SetToastAnchor(frame)
-    -- TODO: Make padding an option
     local pos = frame.pos
     local padding = self.options.rangeToastPadding
     local offset = (self:GetThemeSetting("themeSize") == "large")

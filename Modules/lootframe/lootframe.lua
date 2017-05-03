@@ -132,7 +132,69 @@ function module:NewLootSlot()
     return newObj
 end
 
-function module:Update()
+local function SetUnit()
+    local unitFrame =    module.LootFrame.unitFrame
+    local targetExists = UnitExists('target')
+    local targetDead =   UnitIsDead('target')
+
+    if targetExists and targetDead then
+        SetPortraitTexture(unitFrame.portrait, 'target')
+        unitFrame.portrait:SetTexCoord(0.15,0.85,0.15,0.85)
+        unitFrame.name:SetText(GetUnitName("target", false))
+    end
+end
+
+local function SetLoot(frame, loot)
+    
+
+        
+
+        if lootName then
+            local lootLink = GetLootSlotLink(i)
+
+            -- Make Slot
+            local lootSlotObj = self:NewLootSlot()
+
+            lootSlotObj.slot = i
+
+            -- Icon
+            lootSlotObj.frame.icon:SetTexture(lootIcon)
+
+            -- Name
+            lootSlotObj.frame.name:SetText(lootName)
+
+            -- Click
+            lootSlotObj.frame:EnableMouse(true)
+            lootSlotObj.frame:SetScript("OnMouseDown", function(self, button)
+                if button == 'LeftButton' then
+                    module:LootSlot(i, slot)
+                end
+            end)
+
+            -- TODO: CLEAN THIS UP AND FIX THE RELATED XMl... all the anchors for the slots need to be in lua because of no name
+            if slot == 1 then
+                lootSlotObj.frame:SetPoint('TOP', self.LootFrame.unitFrame, 'BOTTOM', 0, -9)
+                -- TODO: maybe move these icon ones to the NewFrame method )slot)
+                lootSlotObj.frame.background:SetPoint('LEFT', lootSlotObj.frame.icon, 'RIGHT', 8, 0)
+                lootSlotObj.frame.background:SetPoint('RIGHT', lootSlotObj.frame, 'RIGHT', 0, 0)
+                -- lootSlotObj.frame:SetPoint('LEFT', HotLoot_LootFrame, 'LEFT', 0, 0)
+                -- lootSlotObj.frame:SetPoint('RIGHT', HotLoot_LootFrame, 'RIGHT', 0, 0)
+            else
+                lootSlotObj.frame:SetPoint('TOP', slotFrames[slot - 1].frame, 'BOTTOM', 0, -8)
+                lootSlotObj.frame.background:SetPoint('LEFT', lootSlotObj.frame.icon, 'RIGHT', 8, 0)
+                lootSlotObj.frame.background:SetPoint('RIGHT', lootSlotObj.frame, 'RIGHT', 0, 0)
+                -- lootSlotObj.frame:SetPoint('LEFT', HotLoot_LootFrame, 'LEFT', 0, 0)
+                -- lootSlotObj.frame:SetPoint('RIGHT', HotLoot_LootFrame, 'RIGHT', 0, 0)
+            end
+
+            slotFrames[slot] = lootSlotObj
+
+            slot = slot + 1
+        end
+
+    end
+    -- ────────────────────────────────────────────────────────────────────────────────
+
     -- Set Unit
     local unitFrame = self.LootFrame.unitFrame
     local targetExists = UnitExists('target')
@@ -233,12 +295,49 @@ function module:LootSlot(slot, slotFrameIndex)
     LootSlot(slot)
 end
 
+function module:Update()
+
+    local lootInfo = GetLootInfo()
+
+    for slot, lootItem in pairs(lootInfo) do
+        lootInfo[slot].link = GetLootSlotLink(slot)
+        lootInfo[slot].slotType = (Util:SlotIsGold(slot)     and HL_LOOT_SLOT_TYPE.COIN) or
+                                  (Util:SlotIsCurrency(slot) and HL_LOOT_SLOT_TYPE.CURRENCY) or
+                                  HL_LOOT_SLOT_TYPE.ITEM
+
+        local frame
+        local nextIndex = self:GetNextLootSlotIndex()
+
+        if not nextIndex then
+            frame = self:CreateLootSlot()
+            self:ShiftToastPosUp()
+            frame:SetLoot(lootItem)
+            table.insert(self.slots, frame)
+        else
+            frame = self.slots[nextIndex]
+            self:ShiftToastPosUp()
+            frame:SetLoot(lootInfo[slot])
+        end
+    end
+end
+
 function module:Show()
     self.LootFrame:Show()
 end
 
 function module:Hide()
     self.LootFrame:Hide()
+end
+
+-- Returns the next inactive index
+function module:GetNextToastIndex()
+    for i, frame in ipairs(self.slots) do
+        if not frame:IsVisible() then
+            return i
+        end
+    end
+
+    return false
 end
 
 -- function module:LOOT_OPENED()

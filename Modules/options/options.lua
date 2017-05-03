@@ -1166,8 +1166,9 @@ optionsTable = {
                         inputThresholdValue1 = {
                             name = L["inputThresholdValueName"],
                             type = "input",
-                            -- TODO: accept more than 2 digits each? (technically at least gold)
-                            pattern = "(%d?%d?)[gsc]?%s*(%d?%d?)[gsc]?%s*(%d?%d)[gsc]",
+                            -- pattern = "(%d?%d?)[gsc]?%s*(%d?%d?)[gsc]?%s*(%d?%d)[gsc]",
+                            -- BREAKING: This newer patter wouldn't work so either fix or just figure out a better way to do it
+                            pattern = "((%d+g)|((%d+g)%s*(%d?%d[sc]))|((%d+g)%s*(%d?%ds)%s*(%d?%dc))|((%d+s)%s*(%d?%dc))|((%d?%d[sc])))$",
                             usage = L["inputThresholdValueDesc"],
                             order = 2
                         },

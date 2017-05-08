@@ -58,15 +58,26 @@
                     </Gradient>
                 </Texture>
             </Layer>
+            <Layer level="ARTWORK">
+                <FontString name="$parentName" parentKey="name">
+                    <Anchors>
+                        <Anchor point="BOTTOMLEFT" relativePoint="TOPLEFT">
+                            <Offset>
+                                <AbsDimension x="8" y="1"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                </FontString>
+            </Layer>
         </Layers>
-        <Frames>
+        <!--<Frames>
             <Frame name="$parentUnitFrame" parentKey="unitFrame">
                 <Size>
                     <AbsDimension y="64"/>
                 </Size>
                 <Anchors>
-                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT"/>
-                    <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT"/>
+                    <Anchor point="TOPLEFT" relativePoint="TOPLEFT" x="0" y="-1"/>
+                    <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" x="0" y="-1"/>
                 </Anchors>
                 <Layers>
                     <Layer level="BORDER">
@@ -111,12 +122,16 @@
                     </Layer>
                 </Layers>
             </Frame>
-        </Frames>
+        </Frames>-->
     </Frame>
     <Frame name="HotLoot_LootSlotTemplate" virtual="true">
         <Size>
             <AbsDimension x="200" y="40"/>
         </Size>
+        <Anchors>
+            <Anchor point="RIGHT" relativePoint="RIGHT"/>
+            <Anchor point="LEFT" relativePoint="LEFT"/>
+        </Anchors>
         <Layers>
             <Layer level="BACKGROUND">
                 <Texture name="$parentBackground" parentKey="background">
@@ -124,11 +139,12 @@
                         <AbsDimension y="40"/>
                     </Size>
                     <Anchors>
-                        <!--<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parent.icon">
+                        <Anchor point="LEFT" relativePoint="LEFT">
                             <Offset>
-                                <AbsDimension x="8" y="0"/>
+                                <AbsDimension x="54" y="0"/>
                             </Offset>
-                        </Anchor>-->
+                        </Anchor>
+                        <!--<Anchor point="TOPRIGHT" relativePoint="RIGHT"/>-->
                         <Anchor point="RIGHT" relativePoint="RIGHT"/>
                     </Anchors>
                     <Color r="0" g="0" b="0"/>
@@ -181,7 +197,7 @@
             <Layer level="ARTWORK">
                 <Texture name="$parentIcon" parentKey="icon">
                     <Size>
-                        <AbsDimension x="40" y="40"/>
+                        <AbsDimension x="38" y="38"/>
                     </Size>
                     <Anchors>
                         <Anchor point="LEFT" relativePoint="LEFT">
@@ -195,7 +211,7 @@
                     <Anchors>
                         <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeKey="$parent.background">
                             <Offset>
-                                <AbsDimension x="9" y="-6"/>
+                                <AbsDimension x="8" y="-5"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
@@ -204,20 +220,47 @@
                     <Anchors>
                         <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.background">
                             <Offset>
-                                <AbsDimension x="9" y="6"/>
+                                <AbsDimension x="8" y="5"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
                 </FontString>
                 <FontString name="$parentSpace2" parentKey="space2">
                     <Anchors>
-                        <Anchor point="LEFT" relativePoint="RIGHT" relativeKey="$parent.space1">
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeKey="$parent.background">
                             <Offset>
-                                <AbsDimension x="16" y="6"/>
+                                <AbsDimension x="-16" y="6"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
                 </FontString>
+            </Layer>
+            <Layer level="HIGHLIGHT">
+                <Texture name="$parentHover" parentKey="hover" file="Interface\COMMON\Search" alphaMode="ADD" hidden="true">
+                    <Anchors>
+                        <Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeKey="$parent.background">
+                            <Offset>
+                                <AbsDimension x="1" y="-1"/>
+                            </Offset>
+                        </Anchor>
+                        <Anchor point="TOPRIGHT" relativePoint="TOPRIGHT" relativeKey="$parent.background">
+                            <Offset>
+                                <AbsDimension x="0" y="-1"/>
+                            </Offset>
+                        </Anchor>
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeKey="$parent.background">
+                            <Offset>
+                                <AbsDimension x="0" y="1"/>
+                            </Offset>
+                        </Anchor>
+                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeKey="$parent.background">
+                            <Offset>
+                                <AbsDimension x="1" y="1"/>
+                            </Offset>
+                        </Anchor>
+                    </Anchors>
+                    <TexCoords left="0.0625" right="0.5" top="0.2265625" bottom="0.6015625" />
+                </Texture>
             </Layer>
         </Layers>
     </Frame>

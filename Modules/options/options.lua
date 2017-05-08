@@ -59,10 +59,20 @@ local tableFilterTypes = {
 }
 
 local tableThemes = {
-    ['customSmall'] = 'Custom '..Util:ColorText('(Small)', 'info'),
-    ['customLarge'] = 'Custom '..Util:ColorText('(Large)', 'info'),
-    ['tooltip']     = 'Tooltip '..Util:ColorText('(Large)', 'info'),
-    ['paper']       = 'Paper '..Util:ColorText('(Large)', 'info'),
+    -- ['customSmall'] = 'Custom '..Util:ColorText('(Small)', 'info'),
+    -- ['customLarge'] = 'Custom '..Util:ColorText('(Large)', 'info'),
+    -- ['tooltip']     = 'Tooltip '..Util:ColorText('(Large)', 'info'),
+    -- ['paper']       = 'Paper '..Util:ColorText('(Large)', 'info'),
+    ['10plain']      = 'Plain',
+    ['11metalLarge'] = 'Metal (large)',
+    ['12metalSmall'] = 'Metal (small)',
+    ['13goldLarge']  = 'Gold (large)',
+    ['14goldSmall']  = 'Gold (small)',
+    ['15legendary']  = 'Legendary',
+    ['16chest']      = 'Chest',
+    ['17explorer']   = 'Explorer',
+    ['18horde']      = 'Horde',
+    ['19alliance']   = 'Alliance',
 }
 
 --
@@ -96,6 +106,7 @@ local defaults = {
         toggleShowItemType = true,
         rangeIconSize = 16, 
         rangeTransparency = 1,
+        rangeToastScale = 0,
         rangeToastPadding = 8,
         fThemeColorR = 0,
         fThemeColorG = 0,
@@ -497,9 +508,9 @@ optionsTable = {
                             max = 32,
                             step = 4, 
                             bigStep = 4,
-                            disabled = function()
-                                return not HotLoot:GetThemeSetting('iconSizable')
-                            end,
+                            -- disabled = function()
+                            --     return not HotLoot:GetThemeSetting('iconSizable')
+                            -- end,
                             hidden = "Advanced",
                             order = 1
                         },
@@ -520,6 +531,20 @@ optionsTable = {
                             values = tableDirectionVertical,
                             order = 3
                         },
+                        rangeToastScale = {
+                            -- TODO: FIXME: Localize these!
+                            name = 'Scale Offset',
+                            -- name = L["rangeToastScaleName"],
+                            desc = 'Adjusts the overall scale of each loot toast.',
+                            -- desc = L["rangeToastScaleDesc"],
+                            type = "range",
+                            min = -1,
+                            max = 1,
+                            step = 0.1, 
+                            bigStep = 0.1,
+                            hidden = "Advanced",
+                            order = 4
+                        },
                         rangeToastPadding = {
                             name = L["rangeToastPaddingName"],
                             desc = L["rangeToastPaddingDesc"],
@@ -530,21 +555,21 @@ optionsTable = {
                             bigStep = 1,
                             -- TODO: Figure out if this should be Advanced or not.
                             -- hidden = "Advanced",
-                            order = 4
+                            order = 5
                         },
                         selectTheme = {
                             name = L["selectThemeName"],
                             -- desc = L["selectThemeDesc"],
                             type = "select",
                             values = tableThemes,
-                            order = 5
+                            order = 6
                         },
                         toggleColorByQuality = {
                             name = L["toggleColorByQualityName"],
                             desc = L["toggleColorByQualityDesc"],
                             type = "toggle",
                             hidden = "GetThemeColorDisabled",
-                            order = 6
+                            order = 7
                         },
                         colorThemeBG = {
                             name = L["colorThemeBGName"],
@@ -552,7 +577,7 @@ optionsTable = {
                             type = "color",
                             hidden = "GetThemeColorDisabled",
                             hasAlpha = true,
-                            order = 7,
+                            order = 8,
                             set = function(info, r, g, b, a)
                                 Options.db.profile.fThemeColorR = r
                                 Options.db.profile.fThemeColorG = g
@@ -571,7 +596,7 @@ optionsTable = {
                             type = "color",
                             hidden = "GetThemeColorDisabled",
                             hasAlpha = true,
-                            order = 8,
+                            order = 9,
                             set = function(info, r, g, b, a)
                                 Options.db.profile.fThemeBorderColorR = r
                                 Options.db.profile.fThemeBorderColorG = g
@@ -589,7 +614,7 @@ optionsTable = {
                             desc = L["inputMinWidthDesc"],
                             type = "input",
                             hidden = "Advanced",
-                            order = 9
+                            order = 10
                         },
                         -- NOTE: Changed from rangeInitialDelay
                         rangeDisplayTime = {
@@ -601,7 +626,7 @@ optionsTable = {
                             step = 1, 
                             bigStep = 1,
                             hidden = "Advanced",
-                            order = 10
+                            order = 11
                         },
                         -- NOTE: Changed from rangeSecondaryDelay
                         rangeMultipleDelay = {
@@ -614,7 +639,7 @@ optionsTable = {
                             bigStep = 0.5,
                             --width = "half",
                             hidden = "Advanced",
-                            order = 11
+                            order = 12
                         },
                         rangeFadeSpeed = {
                             name = L["rangeFadeSpeedName"],
@@ -625,13 +650,13 @@ optionsTable = {
                             step = 1, 
                             bigStep = 1,
                             hidden = "Advanced",
-                            order = 12
+                            order = 13
                         },
                         toggleShowAnimation = {
                             name = L["toggleShowAnimationName"],
                             desc = L["toggleShowAnimationDesc"], -- TODO: Needs to be updated for shines and etc.
                             type = "toggle",
-                            order = 13
+                            order = 14
                         }
                     }
                 },

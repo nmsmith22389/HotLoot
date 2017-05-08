@@ -14,3 +14,4 @@ constants.lua
 core.lua
 Modules\load_modules.xml
 Templates.xml
+loottoasts.xml

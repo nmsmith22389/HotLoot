@@ -110,8 +110,307 @@ local themes = {
     },
 }
 
+local newThemes = {
+    ['10plain'] = {
+        name = 'Plain',
+        defaultScale = 0.7,
+        background = {
+            width       = 251,
+            height      = 70,
+            texture     = [[Interface\LootFrame\LootToast]],
+            coordinates = {left = 0.5625, right = 0.807617188, top = 0.0078125, bottom = 0.28125}
+        },
+        icon = {
+            size = 37,
+            left = 17,
+            top  = -16
+        },
+        text = {
+            name = {
+                left = 64,
+                top  = -13
+            },
+            type = {
+                left = 64,
+                top  = -28
+            },
+            value = {
+                left   = 64,
+                top = -43
+            }
+        }
+    },
+    ['11metalLarge'] = {
+        name = 'Metal (large)',
+        defaultScale = 0.7,
+        background = {
+            width       = 273,
+            height      = 94,
+            texture     = [[Interface\LootFrame\LootToast]],
+            coordinates = {left = 0.284179688, right = 0.55078125, top = 0.58203125, bottom = 0.94921875}
+        },
+        icon = {
+            size = 48,
+            left = 23,
+            top  = -23
+        },
+        text = {
+            name = {
+                left = 84,
+                top  = -17
+            },
+            type = {
+                left = 84,
+                top  = -40
+            },
+            value = {
+                left   = 84,
+                bottom = 23
+            }
+        }
+    },
+    ['12metalSmall'] = {
+        name = 'Metal (small)',
+        defaultScale = 0.75,
+        background = {
+            width       = 274,
+            height      = 78,
+            texture     = [[Interface\LootFrame\LootToast]],
+            coordinates = {left = 0.556640625, right = 0.82421875, top = 0.390625, bottom = 0.6953125}
+        },
+        icon = {
+            size = 39,
+            left = 25,
+            top  = -19
+        },
+        text = {
+            name = {
+                left = 80,
+                top  = -22
+            },
+            type = {
+                left = 80,
+                top  = -22,
+                hidden = true
+            },
+            value = {
+                left   = 80,
+                bottom = 22
+            }
+        }
+    },
+    ['13goldLarge'] = {
+        name = 'Gold (large)',
+        defaultScale = 0.7,
+        background = {
+            width       = 276,
+            height      = 96,
+            texture     = [[Interface\LootFrame\LootToastAtlas]],
+            coordinates = {left = 0.283203125, right = 0.552734375, top = 0.3984375, bottom = 0.7734375}
+        },
+        icon = {
+            size = 48,
+            left = 22,
+            top  = -23
+        },
+        text = {
+            name = {
+                left = 80,
+                top  = -20
+            },
+            type = {
+                left = 84,
+                top  = -40
+            },
+            value = {
+                left   = 84,
+                bottom = 23
+            }
+        }
+    },
+    ['14goldSmall'] = {
+        name = 'Gold (small)',
+        defaultScale = 0.75,
+        background = {
+            width       = 274,
+            height      = 78,
+            texture     = [[Interface\LootFrame\LootToast]],
+            coordinates = {left = 0.5625, right = 0.807617188, top = 0.29296875, bottom = 0.56640625}
+        },
+        icon = {
+            size = 38,
+            left = 17,
+            top  = -16
+        },
+        text = {
+            name = {
+                left = 61,
+                top  = -14
+            },
+            type = {
+                left = 80,
+                top  = -22,
+                hidden = true
+            },
+            value = {
+                left   = 64,
+                bottom = 22
+            }
+        }
+    },
+    ['15legendary'] = {
+        name = 'Legendary',
+        defaultScale = 0.75,
+        background = {
+            width       = 302,
+            height      = 118,
+            texture     = [[Interface\LootFrame\LegendaryToast]],
+            coordinates = {left = 0.39453125, right = 0.984375, top = 0, bottom = 0.23046875}
+        },
+        icon = {
+            size = 48,
+            left = 51,
+            top  = -35
+        },
+        text = {
+            name = {
+                left = 112,
+                top  = -32
+            },
+            type = {
+                left = 112,
+                top  = -51
+            },
+            value = {
+                left   = 112,
+                bottom = 35
+            }
+        }
+    },
+    ['16chest'] = {
+        name = 'Chest',
+        defaultScale = 0.7,
+        background = {
+            width       = 278,
+            height      = 100,
+            texture     = [[Interface\LootFrame\PetToast]],
+            coordinates = {left = 0, right = 0.54296875, top = 0, bottom = 0.775193798}
+        },
+        icon = {
+            size = 46,
+            left = 29,
+            top  = -28
+        },
+        text = {
+            name = {
+                left = 83,
+                top  = -25
+            },
+            type = {
+                left = 87,
+                top  = -43
+            },
+            value = {
+                left   = 87,
+                bottom = 25
+            }
+        }
+    },
+    ['17explorer'] = {
+        name = 'Explorer',
+        defaultScale = 0.7,
+        background = {
+            width       = 280,
+            height      = 96,
+            texture     = [[Interface\LootFrame\MountToast]],
+            coordinates = {left = 0, right = 0.546875, top = 0, bottom = 0.765625}
+        },
+        icon = {
+            size = 46,
+            left = 28,
+            top  = -28
+        },
+        text = {
+            name = {
+                left = 82,
+                top  = -25
+            },
+            type = {
+                left = 86,
+                top  = -42
+            },
+            value = {
+                left   = 86,
+                bottom = 22
+            }
+        }
+    },
+    ['18horde'] = {
+        name = 'Horde',
+        defaultScale = 0.7,
+        background = {
+            width       = 282,
+            height      = 99,
+            texture     = [[Interface\LootFrame\LootToastAtlas]],
+            coordinates = {left = 0, right = 0.275390625, top = 0.4375, bottom = 0.82421875}
+        },
+        icon = {
+            size = 46,
+            left = 30,
+            top  = -28
+        },
+        text = {
+            name = {
+                left = 84,
+                top  = -25
+            },
+            type = {
+                left = 88,
+                top  = -43
+            },
+            value = {
+                left   = 80,
+                bottom = 23
+            }
+        }
+    },
+    ['19alliance'] = {
+        name = 'Alliance',
+        defaultScale = 0.7,
+        background = {
+            width       = 282,
+            height      = 99,
+            texture     = [[Interface\LootFrame\LootToastAtlas]],
+            coordinates = {left = 0.282226562, right = 0.555664062, top = 0, bottom = 0.390625}
+        },
+        icon = {
+            size = 46,
+            left = 30,
+            top  = -28
+        },
+        text = {
+            name = {
+                left = 84,
+                top  = -25
+            },
+            type = {
+                left = 88,
+                top  = -43
+            },
+            value = {
+                left   = 80,
+                bottom = 23
+            }
+        }
+    },
+}
+
 function HotLoot:GetThemeSetting(setting)
-    return themes[self.options.selectTheme][setting];
+    return themes['tooltip'][setting];
+end
+
+function HotLoot:GetThemeSettings()
+    return newThemes[self.options.selectTheme];
 end
 
 --
@@ -151,8 +450,8 @@ function HotLoot:OnEnable()
     }
 
     -- If an old (nonexistant) theme is set then switch it
-    if self.options.selectTheme == nil or themes[self.options.selectTheme] == nil then
-        Options:Set('selectTheme', 'paper')
+    if not self.options.selectTheme or not newThemes[self.options.selectTheme] then
+        Options:Set('selectTheme', 'plain')
     end
 
     -- Create Main Anchor Frame
@@ -730,15 +1029,24 @@ local function SetLoot(frame, loot)
         frame:SetScript('OnLeave', nil)
     end
 
+    local theme = HotLoot:GetThemeSettings()
+
     --> Set Theme
-    frame:SetBackdrop({
+    --[[frame:SetBackdrop({
         bgFile   = HotLoot:GetThemeSetting("bgFile"),
         edgeFile = HotLoot:GetThemeSetting("edgeFile"),
         tile     = HotLoot:GetThemeSetting("tile"),
         tileSize = HotLoot:GetThemeSetting("tileSize"),
         edgeSize = HotLoot:GetThemeSetting("edgeSize"),
         insets   = HotLoot:GetThemeSetting("insets")
-    })
+    })]]
+    frame.background:SetTexture(theme.background.texture)
+    frame.background:SetTexCoord(
+        theme.background.coordinates.left,
+        theme.background.coordinates.right,
+        theme.background.coordinates.top,
+        theme.background.coordinates.bottom
+    )
 
     --> Coin Type
     if loot.slotType == HL_LOOT_SLOT_TYPE.COIN then
@@ -746,7 +1054,7 @@ local function SetLoot(frame, loot)
     end
 
     --> Set Theme Color
-    if not Options:GetThemeColorDisabled() then
+    --[[if not Options:GetThemeColorDisabled() then
         -- TODO: Have the actual options return an object
         local bgRed   = HotLoot.options.fThemeColorR
         local bgGreen = HotLoot.options.fThemeColorG
@@ -766,16 +1074,19 @@ local function SetLoot(frame, loot)
         end
 
         frame:SetBackdropBorderColor(borderRed, borderGreen, borderBlue, borderAlpha)
-    end
+    end]]
 
     --> Set Opacity
     frame:SetAlpha(HotLoot.options.rangeTransparency)
 
     --> Set Icon
     frame.icon:SetTexture(loot.texture)
-    if HotLoot:GetThemeSetting("themeSize") == "small" then
+    frame.icon:SetSize(theme.icon.size, theme.icon.size)
+    frame.icon:ClearAllPoints()
+    frame.icon:SetPoint('TOPLEFT', frame, 'TOPLEFT', theme.icon.left, theme.icon.top)
+    --[[if HotLoot:GetThemeSetting("themeSize") == "small" then
         frame.icon:SetSize(HotLoot.options.rangeIconSize, HotLoot.options.rangeIconSize)
-    end
+    end]]
 
     --> Font Color
     local colorFont = {
@@ -794,6 +1105,8 @@ local function SetLoot(frame, loot)
     local nameText = loot.link or loot.item
     frame.name:SetFont(AceGUIWidgetLSMlists.font[HotLoot.options.selectTextFont], HotLoot.options.rangeFontSize, "OUTLINE")
     frame.name:SetText(nameText)
+    frame.name:ClearAllPoints()
+    frame.name:SetPoint('TOPLEFT', frame, 'TOPLEFT', theme.text.name.left, theme.text.name.top)
 
     --> Set Count
     if frame.count then
@@ -813,7 +1126,9 @@ local function SetLoot(frame, loot)
                 end
             end
 
-            frame.count:SetText("x"..countText)
+            frame.count:SetText(countText)
+            -- frame.count:ClearAllPoints()
+            -- frame.count:SetPoint()
 
             frame.count:Show()
         else
@@ -830,6 +1145,12 @@ local function SetLoot(frame, loot)
             local itemValue = select(11, GetItemInfo(loot.link)) or 0
 
             frame.value:SetText(GetCoinTextureString(itemValue))
+            frame.value:ClearAllPoints()
+            if theme.text.value.top then
+                frame.value:SetPoint('TOPLEFT', frame, 'TOPLEFT', theme.text.value.left, theme.text.value.top)
+            else
+                frame.value:SetPoint('BOTTOMLEFT', frame, 'BOTTOMLEFT', theme.text.value.left, theme.text.value.bottom)
+            end
 
             frame.value:Show()
         else
@@ -842,7 +1163,7 @@ local function SetLoot(frame, loot)
         frame.type:SetFont(AceGUIWidgetLSMlists.font[HotLoot.options.selectTextFont], HotLoot.options.rangeFontSize, "OUTLINE")
         frame.type:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha)
 
-        if HotLoot.options.toggleShowItemType then
+        if HotLoot.options.toggleShowItemType and not theme.text.type.hidden then
             local typeText, subtypeText, typeTextDivider = '', '', ''
 
             if loot.slotType == HL_LOOT_SLOT_TYPE.ITEM then
@@ -854,6 +1175,9 @@ local function SetLoot(frame, loot)
             end
 
             frame.type:SetText(typeText..typeTextDivider..subtypeText)
+            frame.type:ClearAllPoints()
+            frame.type:SetPoint('TOPLEFT', frame, 'TOPLEFT', theme.text.type.left, theme.text.type.top)
+
             frame.type:Show()
         else
             frame.type:Hide()
@@ -862,24 +1186,29 @@ local function SetLoot(frame, loot)
 
     --> Set Size
     --> ==> Width
-    local iconWidth   = frame.icon:GetWidth()
-    local nameWidth   = frame.name:GetStringWidth()
-    local typeWidth   = (frame.type and HotLoot.options.toggleShowItemType) and frame.type:GetStringWidth() or 0
-    local countWidth  = (frame.count and HotLoot.options.toggleShowItemQuant) and frame.count:GetStringWidth() or 0
-    local spacerWidth = 16
-    local minWidth    = tonumber(HotLoot.options.inputMinWidth)
+    -- local iconWidth   = frame.icon:GetWidth()
+    -- local nameWidth   = frame.name:GetStringWidth()
+    -- local typeWidth   = (frame.type and HotLoot.options.toggleShowItemType) and frame.type:GetStringWidth() or 0
+    -- local countWidth  = (frame.count and HotLoot.options.toggleShowItemQuant) and frame.count:GetStringWidth() or 0
+    -- local spacerWidth = 16
+    -- local minWidth    = tonumber(HotLoot.options.inputMinWidth)
 
-    local frameWidth = max(
+    --[[local frameWidth = max(
         iconWidth + nameWidth  + spacerWidth,
         iconWidth + typeWidth  + spacerWidth,
         iconWidth + countWidth + spacerWidth,
         minWidth
-    )
+    )]]
 
     --> ==> Height
-    local frameHeight = (HotLoot:GetThemeSetting('themeSize') == 'small') and (HotLoot.options.rangeIconSize + 4) or HotLoot:GetThemeSetting('height')
+    -- local frameHeight = (HotLoot:GetThemeSetting('themeSize') == 'small') and (HotLoot.options.rangeIconSize + 4) or HotLoot:GetThemeSetting('height')
 
-    frame:SetSize(frameWidth, frameHeight)
+    -- frame:SetSize(frameWidth, frameHeight)
+    frame:SetSize(theme.background.width, theme.background.height)
+
+    --> Set Scale
+    local defaultScale = theme.defaultScale or 1
+    frame:SetScale(defaultScale + HotLoot.options.rangeToastScale)
 
     --> Fade Animation
     if HotLoot.options.toggleShowAnimation then
@@ -912,10 +1241,10 @@ local function SetLoot(frame, loot)
 end
 
 function HotLoot:CreateLootToast()
-    local templateSize = Util:UCFirst(self:GetThemeSetting("themeSize"))
-    local templateIsFlipped = (self.options.selectTextSide == 0) and "" or "Flipped"
+    -- local templateSize = Util:UCFirst(self:GetThemeSetting("themeSize"))
+    -- local templateIsFlipped = (self.options.selectTextSide == 0) and "" or "Flipped"
 
-    local frame = CreateFrame("Frame", "HotLoot_Toast", nil, "HotLoot_Toast"..templateSize..templateIsFlipped.."Template")
+    local frame = CreateFrame("Frame", "HotLoot_Toast", nil, "HotLoot_Toast"--[[..templateSize..templateIsFlipped]].."Template")
 
     -- frame.index = index
 
@@ -949,7 +1278,7 @@ function HotLoot:SetToastAnchor(frame)
     local pos = frame.pos
     local padding = self.options.rangeToastPadding
     local offset = (self:GetThemeSetting("themeSize") == "large")
-        and ((pos - 1) * (tonumber(self:GetThemeSetting("height") + padding) * self.options.selectGrowthDirection))
+        and ((pos - 1) * (tonumber(self:GetThemeSettings().background.height + padding) * self.options.selectGrowthDirection))
         or  ((pos - 1) * (tonumber(self.options.rangeIconSize + 3 + padding) * self.options.selectGrowthDirection))
 
     local vertAnchor = (self.options.selectGrowthDirection == 1) and 'BOTTOM' or 'TOP'

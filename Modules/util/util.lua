@@ -19,7 +19,11 @@ function Util:ColorText(text, hex)
         hex = 'ff5555'
     end
 
-    return '|c'..'FF'..tostring(hex):upper()..tostring(text)..'|r'
+    if string.len(hex) == 6 then
+        hex = 'ff'..hex
+    end
+
+    return '|c'..tostring(hex):upper()..tostring(text)..'|r'
 end
 
 function Util:Print(text, frame)

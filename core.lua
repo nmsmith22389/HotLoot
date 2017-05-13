@@ -175,7 +175,7 @@ local newThemes = {
         background = {
             width       = 274,
             height      = 78,
-            texture     = [[Interface\LootFrame\LootToast]],
+            texture     = [[Interface\LootFrame\LootToastAtlas]],
             coordinates = {left = 0.556640625, right = 0.82421875, top = 0.390625, bottom = 0.6953125}
         },
         icon = {
@@ -398,8 +398,41 @@ local newThemes = {
                 top  = -43
             },
             value = {
-                left   = 80,
+                left   = 88,
                 bottom = 23
+            }
+        }
+    },
+    ['20customLarge'] = {
+        name = 'Custom (large)',
+        defaultScale = 1,
+        background = {
+            width       = 250,
+            height      = 48,
+            texture     = {
+                bgFile = [[Interface\AddOns\HotLoot\media\textures\statusbars\colorbg]],
+                edgeFile = [[Interface\AddOns\HotLoot\media\textures\borders\colorborder]],
+                tile = true, tileSize = 16, edgeSize = 16,
+                insets = { left = 2, right = 2, top = 2, bottom = 2 }
+            },
+        },
+        icon = {
+            size = 32,
+            left = 8,
+            top  = -8
+        },
+        text = {
+            name = {
+                left = 42,
+                top  = -8
+            },
+            type = {
+                left = 64,
+                top  = -28
+            },
+            value = {
+                left   = 64,
+                top = -43
             }
         }
     },

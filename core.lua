@@ -730,10 +730,9 @@ end
 
 -- TODO: Clean Up
 local function CheckUntyped(type, itemLink)
-    -- local itemName, _, _, itemLevel, _, itemType, itemSubType, _, _, _, _ = GetItemInfo(itemLink)
     local itemId = Util:GetItemID(itemLink)
     local items = {}
-    if (type == 'leather') then
+    if (type == HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER) then
         items = {
             [124439] = true,
             [124438] = true,
@@ -741,7 +740,7 @@ local function CheckUntyped(type, itemLink)
     end
 
     if items[itemId] then
-        Util:Debug(--[[itemLink..' ('..itemId..') is an '..]]'untyped item in the '..type..' filter.')
+        Util:Debug('Untyped item in filter. [class: '..type..']')
         return true
     else
         return false
@@ -813,11 +812,14 @@ local function FilterSlot(loot)
             return true, 'Currency Filter'
         end
     elseif loot.slotType == HL_LOOT_SLOT_TYPE.ITEM and not HotLoot.options.toggleDisableInRaid then
-        local _, _, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice = GetItemInfo(loot.link)
+        local _, _, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice, itemClass, itemSubClass = GetItemInfo(loot.link)
 
         if (HasRoom(1) or CanStack(loot.item, itemStackCount, loot.quantity)) then
 
             -- TODO: Normalize these so that the check order is (pref, type, subtype, other) (there may be special cases)
+            -- TODO: Make Recipes section
+            -- TODO: Make options for quality to loot only equipable items
+            -- TODO: Make Cut Gems & Enchantments (not tradeskill) filter
 
             -- Debug
             if HotLoot.options.toggleDebugMode then
@@ -833,74 +835,114 @@ local function FilterSlot(loot)
             end
 
             -- Quest
-            if HotLoot.options.toggleQuestFilter and itemType == L["Quest"]and CheckThreshold("Quest", itemSellPrice, loot.quantity) then
+            if
+                HotLoot.options.toggleQuestFilter and
+                itemClass == HL_ITEM_CLASS.QUEST and
+                CheckThreshold("Quest", itemSellPrice, loot.quantity)
+            then
                 return true, 'Quest Item Filter'
             end
 
             -- Pickpocket
-            if IsStealthed() and loot.quality ~= 0 and HotLoot.options.togglePickpocketFilter then
+            if IsStealthed() and HotLoot.options.togglePickpocketFilter and loot.quality ~= 0 then
                 return true, 'Pickpocket Filter'
-
             end
 
             -- Cloth
-            if ((itemSubType == L["Cloth"] and itemType == L["Tradeskill"]) or itemType == "Item Enhancement!") and HotLoot.options.toggleClothFilter and CheckThreshold("Cloth", itemSellPrice, loot.quantity) then
-                    return true, 'Cloth Filter'
-
+            if
+                HotLoot.options.toggleClothFilter and
+                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.CLOTH) and
+                CheckThreshold("Cloth", itemSellPrice, loot.quantity)
+            then
+                return true, 'Cloth Filter'
             end
 
             -- Mining
-            if itemSubType == L["Metal & Stone"] and HotLoot.options.toggleMiningFilter and CheckThreshold("Metal & Stone", itemSellPrice, loot.quantity) then
+            if
+                HotLoot.options.toggleMiningFilter and
+                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.METAL_STONE) and
+                CheckThreshold("Metal & Stone", itemSellPrice, loot.quantity)
+            then
                 return true, 'Mining Filter'
-
             end
 
             -- Gems
-            if (itemType == L["Gem"] or (itemType == "Item Enhancement!" and itemSubType == "Jewelcrafting")) and HotLoot.options.toggleGemFilter and CheckThreshold("Gem", itemSellPrice, loot.quantity) then
+            -- FIXME: Tradeskill=>Jewelcrafting is for uncut gems and Gem is for cut ones. (make 2 options?)
+            if
+                HotLoot.options.toggleGemFilter and
+                (itemClass == HL_ITEM_CLASS.GEM or (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.JEWELCRAFTING)) and
+                CheckThreshold("Gem", itemSellPrice, loot.quantity)
+            then
                 return true, 'Gem Filter'
-
             end
 
             -- Herbs
-            if itemSubType == L["Herb"] and HotLoot.options.toggleHerbFilter and CheckThreshold("Herb", itemSellPrice, loot.quantity) then
+            if
+                HotLoot.options.toggleHerbFilter and
+                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.HERB) and
+                CheckThreshold("Herb", itemSellPrice, loot.quantity)
+            then
                 return true, 'Herb Filter'
-
             end
 
             -- Leather
-            if HotLoot.options.toggleLeatherFilter and (((itemType == L["Tradeskill"] or itemType == "Item Enhancement!") and itemSubType == L["Leather"]) or CheckUntyped('leather', loot.link)) and CheckThreshold("Leather", itemSellPrice, loot.quantity) then
+            if
+                HotLoot.options.toggleLeatherFilter and
+                ((itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER) or
+                CheckUntyped(HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER, loot.link)) and
+                CheckThreshold("Leather", itemSellPrice, loot.quantity)
+            then
                 return true, 'Leather Filter'
-
             end
 
             -- Fishing (-junk)
-            if IsFishingLoot() and HotLoot.options.toggleFishingFilter and itemSubType ~= L["Junk"] then
+            if
+                IsFishingLoot() and
+                HotLoot.options.toggleFishingFilter and
+                not (itemClass == HL_ITEM_CLASS.MISCELLANEOUS and itemSubClass == HL_ITEM_SUB_CLASS.MISCELLANEOUS.JUNK)
+            then
                 return true, 'Fishing Filter'
             end
 
             -- Enchanting
-            if HotLoot.options.toggleEnchantingFilter and itemSubType == L["Enchanting"] and CheckThreshold("Enchanting", itemSellPrice, loot.quantity) then
+            if
+                HotLoot.options.toggleEnchantingFilter and
+                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.ENCHANTING) and
+                CheckThreshold("Enchanting", itemSellPrice, loot.quantity)
+            then
                 return true, 'Enchanting Filter'
             end
 
             -- Pigments
-            -- TODO: Need to localize "Pigment"?
-            if HotLoot.options.togglePigmentsFilter and string.find(loot.item, "Pigment") then
+            -- TODO: Rename to "Loot Inscription"
+            if
+                HotLoot.options.togglePigmentsFilter and
+                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.INSCRIPTION) and
+                CheckThreshold("Inscription", itemSellPrice, loot.quantity)
+            then
                 return true, 'Pigment Filter'
             end
 
             -- Cooking
-            if HotLoot.options.toggleCookingFilter and itemSubType == L["Cooking"] and CheckThreshold("Cooking Ingredient", itemSellPrice, loot.quantity) then
+            if
+                HotLoot.options.toggleCookingFilter and
+                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.COOKING) and
+                CheckThreshold("Cooking Ingredient", itemSellPrice, loot.quantity)
+            then
                 return true, 'Cooking Filter'
             end
 
             -- Recipe
-            if HotLoot.options.toggleRecipeFilter and itemType == L["Recipe"] then
+            if HotLoot.options.toggleRecipeFilter and itemClass == HL_ITEM_CLASS.RECIPE then
                 return true, 'Recipe Filter'
             end
 
             -- Pots
-            if itemSubType == L["Potion"] and HotLoot.options.togglePotionFilter and CheckThreshold("Potion", itemSellPrice, loot.quantity) then
+            if
+                HotLoot.options.togglePotionFilter and
+                (itemClass == HL_ITEM_CLASS.CONSUMABLE and itemSubClass == HL_ITEM_SUB_CLASS.CONSUMABLE.POTION) and
+                CheckThreshold("Potion", itemSellPrice, loot.quantity)
+            then
                 if HotLoot.options.selectPotionType == "both" then
                     return true, 'Potion Filter'
                 elseif HotLoot.options.selectPotionType == "healing" and string.find(loot.item, L["Healing"])  then
@@ -913,59 +955,103 @@ local function FilterSlot(loot)
             end
 
             -- Flasks
-            if itemSubType == L["Flask"] and HotLoot.options.toggleFlaskFilter and CheckThreshold("Flask", itemSellPrice, loot.quantity) then
+            if
+                HotLoot.options.toggleFlaskFilter and
+                (itemClass == HL_ITEM_CLASS.CONSUMABLE and itemSubClass == HL_ITEM_SUB_CLASS.CONSUMABLE.FLASK) and
+                CheckThreshold("Flask", itemSellPrice, loot.quantity)
+            then
                 return true, 'Flask Filter'
             end
 
             -- Elixirs
-            if itemSubType == L["Elixir"] and HotLoot.options.toggleElixirFilter and CheckThreshold("Elixir", itemSellPrice, loot.quantity) then
+            if
+                HotLoot.options.toggleElixirFilter and
+                (itemClass == HL_ITEM_CLASS.CONSUMABLE and itemSubClass == HL_ITEM_SUB_CLASS.CONSUMABLE.ELIXIR) and
+                CheckThreshold("Elixir", itemSellPrice, loot.quantity)
+            then
                 return true, 'Elixir Filter'
             end
 
             -- Motes
-            if itemSubType == L["Elemental"] and HotLoot.options.toggleElementalFilter and CheckThreshold("Elemental", itemSellPrice, loot.quantity) then
+            if
+                HotLoot.options.toggleElementalFilter and
+                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.ELEMENTAL) and
+                CheckThreshold("Elemental", itemSellPrice, loot.quantity)
+            then
                 return true, 'Elemental Filter'
             end
 
             -- QUALITY
 
             -- Poor
-            if HotLoot.options.togglePoorQualityFilter and loot.quality == 0 and CheckThreshold("z1Poor", itemSellPrice, loot.quantity) then
-                return true, 'Poort Quality Filter'
+            if
+                HotLoot.options.togglePoorQualityFilter and
+                loot.quality == LE_ITEM_QUALITY_POOR and
+                CheckThreshold("z1Poor", itemSellPrice, loot.quantity)
+            then
+                return true, 'Poor Quality Filter'
             end
 
             -- Common
-            if HotLoot.options.toggleCommonQualityFilter and loot.quality == 1 and CheckThreshold("z2Common", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) then
+            if
+                HotLoot.options.toggleCommonQualityFilter and
+                loot.quality == LE_ITEM_QUALITY_COMMON and
+                CheckThreshold("z2Common", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+            then
                 return true, 'Common Quality Filter'
             end
 
             -- Uncommon
-            if HotLoot.options.toggleUncommonQualityFilter and loot.quality == 2 and CheckThreshold("z3Uncommon", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) then
+            if
+                HotLoot.options.toggleUncommonQualityFilter and
+                loot.quality == LE_ITEM_QUALITY_UNCOMMON and
+                CheckThreshold("z3Uncommon", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+            then
                 return true, 'Uncommon Quality Filter'
             end
 
             -- Rare
-            if HotLoot.options.toggleRareQualityFilter and loot.quality == 3 and CheckThreshold("z4Rare", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) then
+            if
+                HotLoot.options.toggleRareQualityFilter and
+                loot.quality == LE_ITEM_QUALITY_RARE and
+                CheckThreshold("z4Rare", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+            then
                 return true, 'Rare Quality Filter'
             end
 
             -- Epic
-            if HotLoot.options.toggleEpicQualityFilter and loot.quality == 4 and CheckThreshold("z5Epic", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) then
+            if
+                HotLoot.options.toggleEpicQualityFilter and
+                loot.quality == LE_ITEM_QUALITY_EPIC and
+                CheckThreshold("z5Epic", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+            then
                 return true, 'Epic Quality Filter'
             end
 
             -- Legendary
-            if HotLoot.options.toggleLegendaryQualityFilter and loot.quality == 5 and CheckThreshold("z6Legendary", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) then
+            if
+                HotLoot.options.toggleLegendaryQualityFilter and
+                loot.quality == LE_ITEM_QUALITY_LEGENDARY and
+                CheckThreshold("z6Legendary", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+            then
                 return true, 'Legendary Quality Filter'
             end
 
             -- Artifact
-            if HotLoot.options.toggleArtifactQualityFilter and loot.quality == 6 and CheckThreshold("z7Artifact", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) then
+            if
+                HotLoot.options.toggleArtifactQualityFilter and
+                loot.quality == LE_ITEM_QUALITY_ARTIFACT and
+                CheckThreshold("z7Artifact", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+            then
                 return true, 'Artifact Quality Filter'
             end
 
             -- Heirloom
-            if HotLoot.options.toggleHeirloomQualityFilter and loot.quality == 7 and CheckThreshold("z8Heirloom", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) then
+            if
+                HotLoot.options.toggleHeirloomQualityFilter and
+                loot.quality == LE_ITEM_QUALITY_HEIRLOOM and
+                CheckThreshold("z8Heirloom", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+            then
                 return true, 'Heirloom Quality Filter'
             end
 

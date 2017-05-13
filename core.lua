@@ -1149,23 +1149,47 @@ local function SetLoot(frame, loot)
     end
 
     local theme = HotLoot:GetThemeSettings()
+    local isCustom = (HotLoot.options.selectTheme == '20customLarge' or HotLoot.options.selectTheme == '21customSmall') and true or false
+    local customSize = nil
+
+    if isCustom then
+        customSize = (HotLoot.options.selectTheme == '20customLarge' and 'large') or (HotLoot.options.selectTheme == '21customSmall' and 'small')
+    end
 
     --> Set Theme
-    --[[frame:SetBackdrop({
-        bgFile   = HotLoot:GetThemeSetting("bgFile"),
-        edgeFile = HotLoot:GetThemeSetting("edgeFile"),
-        tile     = HotLoot:GetThemeSetting("tile"),
-        tileSize = HotLoot:GetThemeSetting("tileSize"),
-        edgeSize = HotLoot:GetThemeSetting("edgeSize"),
-        insets   = HotLoot:GetThemeSetting("insets")
-    })]]
-    frame.background:SetTexture(theme.background.texture)
-    frame.background:SetTexCoord(
-        theme.background.coordinates.left,
-        theme.background.coordinates.right,
-        theme.background.coordinates.top,
-        theme.background.coordinates.bottom
-    )
+    if isCustom then
+        -- TODO: maybe find a better way to check if its already set
+        if frame:GetBackdrop() == nil then
+            frame:SetBackdrop({
+                bgFile   = theme.background.texture.bgFile,
+                edgeFile = theme.background.texture.edgeFile,
+                tile     = theme.background.texture.tile,
+                tileSize = theme.background.texture.tileSize,
+                edgeSize = theme.background.texture.edgeSize,
+                insets   = theme.background.texture.insets
+            })
+        end
+        frame.background:Hide()
+    else
+        -- Get old coords
+        local ULx, ULy, _, LLy, URx, _, _, _ = frame.background:GetTexCoord()
+        if
+            ULx ~= theme.background.coordinates.left or
+            URx ~= theme.background.coordinates.right or
+            ULy ~= theme.background.coordinates.top or
+            LLy ~= theme.background.coordinates.bottom
+        then
+            frame.background:SetTexture(theme.background.texture)
+            frame.background:SetTexCoord(
+                theme.background.coordinates.left,
+                theme.background.coordinates.right,
+                theme.background.coordinates.top,
+                theme.background.coordinates.bottom
+            )
+        end
+        frame:SetBackdrop(nil)
+        frame.background:Show()
+    end
 
     --> Coin Type
     if loot.slotType == HL_LOOT_SLOT_TYPE.COIN then
@@ -1173,8 +1197,7 @@ local function SetLoot(frame, loot)
     end
 
     --> Set Theme Color
-    --[[if not Options:GetThemeColorDisabled() then
-        -- TODO: Have the actual options return an object
+    if isCustom then
         local bgRed   = HotLoot.options.fThemeColorR
         local bgGreen = HotLoot.options.fThemeColorG
         local bgBlue  = HotLoot.options.fThemeColorB
@@ -1193,7 +1216,7 @@ local function SetLoot(frame, loot)
         end
 
         frame:SetBackdropBorderColor(borderRed, borderGreen, borderBlue, borderAlpha)
-    end]]
+    end
 
     --> Set Opacity
     frame:SetAlpha(HotLoot.options.rangeTransparency)

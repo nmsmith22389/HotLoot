@@ -22,7 +22,7 @@ HotLoot = LibStub('AceAddon-3.0'):NewAddon('HotLoot', 'AceConsole-3.0', 'AceEven
 local L = LibStub('AceLocale-3.0'):GetLocale('HotLoot')
 HotLoot.minimapIcon = LibStub('LibDBIcon-1.0')
 local Options, Util, HotLootFrame
-local icons, closeEL = {}, 0;
+local icons, closeEL = {}, 0
 HotLoot.toasts = {}
 
 -- WARNING: Make sure that locals are defined BEFORE they are used!
@@ -109,7 +109,7 @@ local themes = {
         ["insets"] = { left = 3, right = 3, top = 3, bottom = 3 }
     },
 }
-
+-- TODO: Make sure these all align right and use these as the ONLY themes (get rid of above)
 local newThemes = {
     ['10plain'] = {
         name = 'Plain',

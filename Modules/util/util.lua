@@ -1,6 +1,8 @@
 local Util = HotLoot:NewModule('Util')
 local module = Util -- Alias
 
+-- FIXME: Figure out a way to get the options module without errors
+
 --
 -- ─── GLOBAL ─────────────────────────────────────────────────────────────────────
 --
@@ -28,9 +30,10 @@ end
 
 function Util:Print(text, frame)
     if not frame then
-        -- TODO: Put option for chat ouput frame here
-		frame = DEFAULT_CHAT_FRAME
-	elseif type(frame) ~= 'table' or not frame.AddMessage then
+        -- TODO: add error handling
+		frame = _G[HotLoot.modules.Options:Get('selectAnnounceWindow')]
+	end
+    if type(frame) ~= 'table' or not frame.AddMessage then
 		frame = DEFAULT_CHAT_FRAME
 	end
 
@@ -38,13 +41,13 @@ function Util:Print(text, frame)
 end
 
 function Util:Announce(text)
-    if HotLoot.options.toggleAnnounceEvents then
+    if HotLoot.modules.Options:Get('toggleAnnounceEvents') then
         self:Print(text)
     end
 end
 
 function Util:Debug(text)
-    if HotLoot.options.toggleDebugMode then
+    if HotLoot.modules.Options:Get('toggleDebugMode') then
         self:Print(self:ColorText('<DEBUG> ', 'alert')..text)
     end
 end
@@ -58,11 +61,31 @@ function Util:DebugOption(option, value, old)
 end
 
 function Util:ToCopper(input)
-    local gold = tonumber(string.match(input,"(%d+)%s?[gG]")) or 0;
-    local silver = tonumber(string.match(input,"(%d+)%s?[sS]")) or 0;
-    local copper = tonumber(string.match(input,"(%d+)%s?[cC]")) or 0;
-    local total = (gold*10000)+(silver*100)+(copper);
-    return total;
+    local gold, silver, copper = 0, 0, 0
+    local goldPatColored = '(%d+)[ ]?%|cffffd700[ ]?[gG]'
+    local silverPatColored = '(%d+)[ ]?%|cffc7c7cf[ ]?[sS]'
+    local copperPatColored = '(%d+)[ ]?%|cffeda55f[ ]?[cC]'
+
+    if input:find(goldPatColored) then
+        gold = tonumber(string.match(input, goldPatColored)) or 0
+        input = input:gsub(goldPatColored, '', 1)
+    else
+        gold = tonumber(string.match(input,"(%d+)%s?[gG]")) or 0
+    end
+    if input:find(silverPatColored) then
+        silver = tonumber(string.match(input, silverPatColored)) or 0
+        input = input:gsub(silverPatColored, '', 1)
+    else
+        silver = tonumber(string.match(input,"(%d+)%s?[sS]")) or 0
+    end
+    if input:find(copperPatColored) then
+        copper = tonumber(string.match(input, copperPatColored)) or 0
+        input = input:gsub(copperPatColored, '', 1)
+    else
+        copper = tonumber(string.match(input,"(%d+)%s?[cC]")) or 0
+    end
+    local total = (gold*10000)+(silver*100)+(copper)
+    return total
 end
 -------------
 function Util:UCFirst(str)
@@ -91,7 +114,7 @@ end
 
 function Util:IsCloseKeyDown()
     local keyDown = false
-    local modKey = HotLoot.options.selectCloseLootWindowModifier
+    local modKey = HotLoot.modules.Options:Get('selectCloseLootWindowModifier')
     if     (modKey == "ctrl")  then keyDown = IsControlKeyDown()
     elseif (modKey == "shift") then keyDown = IsShiftKeyDown()
     elseif (modKey == "alt")   then keyDown = IsAltKeyDown()
@@ -101,7 +124,7 @@ end
 
 function Util:IsSkinKeyDown()
     local keyDown = false
-    local modKey = HotLoot.options.selectSkinningModeModifier
+    local modKey = HotLoot.modules.Options:Get('selectSkinningModeModifier')
     if     (modKey == "ctrl")  then keyDown = IsControlKeyDown()
     elseif (modKey == "shift") then keyDown = IsShiftKeyDown()
     elseif (modKey == "alt")   then keyDown = IsAltKeyDown()
@@ -123,4 +146,81 @@ function Util:SlotIsCurrency(slot)
     if GetLootSlotType(slot) == HL_LOOT_SLOT_TYPE.CURRENCY then 
         return true
     end
+end
+
+--Money text formatting, code taken from Scrooge by thelibrarian ( http://www.wowace.com/addons/scrooge/ )
+local COLOR_COPPER = "|cffeda55f"
+local COLOR_SILVER = "|cffc7c7cf"
+local COLOR_GOLD = "|cffffd700"
+local ICON_COPPER = "|TInterface\\MoneyFrame\\UI-CopperIcon:12:12|t"
+local ICON_SILVER = "|TInterface\\MoneyFrame\\UI-SilverIcon:12:12|t"
+local ICON_GOLD = "|TInterface\\MoneyFrame\\UI-GoldIcon:12:12|t"
+function Util:FormatMoney(amount, style, textonly)
+	local coppername = textonly and COLOR_COPPER..COPPER_AMOUNT_SYMBOL..'|r' or ICON_COPPER
+	local silvername = textonly and COLOR_SILVER..SILVER_AMOUNT_SYMBOL..'|r' or ICON_SILVER
+	local goldname = textonly and COLOR_GOLD..GOLD_AMOUNT_SYMBOL..'|r' or ICON_GOLD
+
+	local value = abs(amount)
+	local gold = floor(value / 10000)
+	local silver = floor(mod(value / 100, 100))
+	local copper = floor(mod(value, 100))
+
+	if not style or style == "SMART" then
+		local str = "";
+		if gold > 0 then
+			str = format("%d%s%s", gold, goldname, (silver > 0 or copper > 0) and " " or "")
+		end
+		if silver > 0 then
+			str = format("%s%d%s%s", str, silver, silvername, copper > 0 and " " or "")
+		end
+		if copper > 0 or value == 0 then
+			str = format("%s%d%s", str, copper, coppername)
+		end
+		return str
+	end
+
+	if style == "FULL" then
+		if gold > 0 then
+			return format("%d%s %d%s %d%s", gold, goldname, silver, silvername, copper, coppername)
+		elseif silver > 0 then
+			return format("%d%s %d%s", silver, silvername, copper, coppername)
+		else
+			return format("%d%s", copper, coppername)
+		end
+	elseif style == "SHORT" then
+		if gold > 0 then
+			return format("%.1f%s", amount / 10000, goldname)
+		elseif silver > 0 then
+			return format("%.1f%s", amount / 100, silvername)
+		else
+			return format("%d%s", amount, coppername)
+		end
+	elseif style == "SHORTINT" then
+		if gold > 0 then
+			return format("%d%s", gold, goldname)
+		elseif silver > 0 then
+			return format("%d%s", silver, silvername)
+		else
+			return format("%d%s", copper, coppername)
+		end
+	elseif style == "CONDENSED" then
+		if gold > 0 then
+			return format("%s%d|r.%s%02d|r.%s%02d|r", COLOR_GOLD, gold, COLOR_SILVER, silver, COLOR_COPPER, copper)
+		elseif silver > 0 then
+			return format("%s%d|r.%s%02d|r", COLOR_SILVER, silver, COLOR_COPPER, copper)
+		else
+			return format("%s%d|r", COLOR_COPPER, copper)
+		end
+	elseif style == "BLIZZARD" then
+		if gold > 0 then
+			return format("%s%s %d%s %d%s", BreakUpLargeNumbers(gold), goldname, silver, silvername, copper, coppername)
+		elseif silver > 0 then
+			return format("%d%s %d%s", silver, silvername, copper, coppername)
+		else
+			return format("%d%s", copper, coppername)
+		end
+	end
+
+	-- Shouldn't be here; punt
+	return self:FormatMoney(amount, "SMART")
 end

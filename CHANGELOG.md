@@ -1,4 +1,28 @@
 # CHANGELOG
+## v3.2
+#### This is such a HUGE update that I couldn't list every single change but these are some of the big ones.
+* ***The options have been changed a lot so they may not all transfer over. Make sure to double check them.***
+### Added
+* Added slash command to test the loot filter.
+* Added a warning on first run to disable other auto looting options.
+* Added an option to select which chat frame to output Announce and other info to.
+* Added 2 fonts to use.
+* Added option to disable auto looting when Master Loot is active. *(still loots gold and currency, this options will change as its use is evaluated and feedback is recieved)*
+* Added new Toast options. *(appearance, delay, padding, font)*
+### Fixed
+* Value Threshold money inputs are pretty and better.
+* Loot Monitor Anchor now saves its position.
+* Loot Filters are more accurate.
+* Switched to new custom Constants system for item typing.
+* Loot Filters no longer depend on translations. *(should work in any language!)*
+* Switched from themed toasts to completely custom appearance options.
+* Loot Toasts now reuse frames instead of creating an infinite amount. *(greatly reduces memory usage)*
+* Loot Toast timing, fading, and animations are **way** better.
+* Switched to using LibAboutPanel.
+* Code size reduced.
+### Removed
+* Removed Include and Exclude buttons until they can be better implemented. *(the actual lists still work)*
+
 ## v3.1.1
 ### Fixed
 * Fixed `itemSubType` nil error

@@ -1,4 +1,4 @@
-local L = LibStub("AceLocale-3.0"):NewLocale("HotLoot", "esMX")
+local L = LibStub("AceLocale-3.0"):NewLocale("HotLoot", "esES")
 if not L then return end
 
 L["AllGreysSold"] = "Se venden todos los grises por un total de %s"

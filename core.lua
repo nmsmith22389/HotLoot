@@ -36,6 +36,23 @@ HotLoot.toasts = {}
 -- NOTE: Put vars (hoisted) here (i suppose if everything is done right then this should be empty)
 
 --
+-- ─── DIALOGS ────────────────────────────────────────────────────────────────────
+--
+local function GetFirstRunDialogText()
+    local text = ''
+    if Util and Util.ColorText then
+        text = Util:ColorText('Thanks for using HotLoot!', 'success')..'\n\n'
+        text = text..Util:ColorText('Please ensure all other looting addons and Blizzard\'s auto loot are turned off.','warning')
+    else
+        text = 'Thanks for using HotLoot!'..'\n\n'
+        text = text..'Please ensure all other looting addons and Blizzard\'s auto loot are turned off.'
+    end
+    return text
+end
+
+
+
+--
 -- ─── MINIMAP ICON ───────────────────────────────────────────────────────────────
 --
 
@@ -78,6 +95,9 @@ function HotLoot:OnEnable()
     Util = self:GetModule('Util')
     HotLootFrame = self:GetModule('LootFrame', true)
 
+    -- Slash Commands
+    self:RegisterChatCommand("hl", "ChatCommand")
+    self:RegisterChatCommand("hotloot", "ChatCommand")
 
     -- Minimap Icon
     self.minimapIcon:Register('HotLoot', LDB, Options:Get('minimapIcon'))
@@ -93,6 +113,14 @@ function HotLoot:OnEnable()
     -- self:RegisterEvent("LOOT_CLOSED")
     self:RegisterEvent("BAG_UPDATE")
     self:RegisterEvent("MERCHANT_SHOW")
+
+    if not Options:Get('firstRun') then
+        -- Print an option here
+        self:ScheduleTimer(function()
+            Util:Print(Util:ColorText('Thanks for using HotLoot!', 'success')..'\n'..Util:ColorText('Please ensure all other looting addons and Blizzard\'s auto loot are turned off.','warning'))
+            Options:Set('firstRun', true)
+        end, 2)
+    end
 end
 
 --
@@ -1070,6 +1098,82 @@ function HotLoot:CreateILootButton(slot)
     i:SetScript("OnClick", function(self) IButtonClicked(slot) end)
 
     return i
+end
+
+--
+-- ─── CHAT COMMANDS ──────────────────────────────────────────────────────────────
+--
+
+function HotLoot:ChatCommand(input)
+    if not input or input:trim() == "" then
+        --InterfaceOptionsFrame_OpenToCategory(Options:Get('rame'))
+        LibStub("AceConfigDialog-3.0"):Open("HotLoot")
+    elseif input == "help" then
+        Util:Print('--- Available Commands ---')
+        Util:Print('UNDER CONSTRUCTION')
+        Util:Print('- '..Util:ColorText('enable', 'info')..': Enables/disables the addon')
+        -- Util:Print('- '..Util:ColorText('debug', 'info')..': Enables/disables debug mode')
+        -- Util:Print('- '..Util:ColorText('autoclose', 'info')..': Toggles the autoclose option')
+        -- Util:Print('- '..Util:ColorText('skinning', 'info')..': Toggles skinning mode')
+        -- Util:Print('- '..Util:ColorText('monitor', 'info')..': Toggles loot monitor')
+        Util:Print('- '..Util:ColorText('include', 'info')..' <item>: Adds the item to the Include List')
+        Util:Print('- '..Util:ColorText('exclude', 'info')..' <item>: Adds the item to the Exclude List')
+        Util:Print('- '..Util:ColorText('filter', 'info')..' <item>: Test to see if an item will be looted')
+    elseif string.find(input, '^enable') then
+        if Options:Get('toggleSystemEnable') then
+            Options:Set('toggleSystemEnable', false)
+            Util:Print('Auto looting DISABLED.')            
+        else
+            Options:Set('toggleSystemEnable', true)
+            Util:Print('Auto looting ENABLED.')            
+        end
+    elseif string.find(input, '^include%s') then
+        local item = string.gsub(input, '^include%s', '', 1)
+        Options:AddToIncludeList(nil, item)
+    elseif string.find(input, '^exclude%s') then
+        local item = string.gsub(input, '^exclude%s', '', 1)
+        Options:AddToExcludeList(nil, item)
+    elseif string.find(input, '^filter%s') then
+        local itemInput = string.gsub(input, '^filter%s', '', 1)
+
+        local itemName, itemLink, itemQuality, _, _, _, _, _, _, iconFileDataID, _, _, _, _, _, _, isCraftingReagent = GetItemInfo(itemInput)
+
+        if not itemName then
+            -- TODO: Do this proper and localize it
+            Util:Print(string.format(L['ErrorListItemNotFound'], Util:ColorText(itemInput, 'info'), 'filter test')..'\n'..'The item may just need to be cached, if you are sure its right just try again.')
+            return false
+        end
+
+        local loot = {
+            texture     = iconFileDataID,
+            item        = itemName,
+            quantity    = 1,
+            quality     = itemQuality,
+            locked      = false,
+            isQuestItem = false,
+            -- questId     = questId,
+            -- isActive    = isActive,
+            link        = itemLink,
+            slotType    = HL_LOOT_SLOT_TYPE.ITEM
+        }
+
+        Util:Print("Running Filter...")
+        
+        local result, reason = FilterSlot(loot)
+
+        local printStr = ''
+        if result then
+            printStr = '%s was caught in the %s.'
+            Util:Print(printStr:format(loot.link, reason))
+        else
+            printStr = '%s was not caught. Reason: %s'
+            Util:Print(printStr:format(loot.link, reason))
+        end
+    else
+        LibStub("AceConfigDialog-3.0"):Open("HotLoot")
+        print(input.." | trim: ".. input:trim())
+        -- LibStub("AceConfigCmd-3.0"):HandleCommand("hl", "HotLoot", input)
+    end
 end
 
 --

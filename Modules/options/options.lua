@@ -1471,6 +1471,9 @@ function Options:OnInitialize()
 
     -- Create Profiles section
     optionsTable.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
+    -- Create About section
+    optionsTable.args.about = LibStub('LibAboutPanel-2.0'):AboutOptionsTable('HotLoot')
+    optionsTable.args.about.order = 201
 
     -- Transfer 
     if self.db.profile.bOldSettingsTransferred ~= true then

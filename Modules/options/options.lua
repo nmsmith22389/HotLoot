@@ -909,7 +909,7 @@ optionsTable = {
                             set = 'SetColor',
                             get = 'GetColor'
                         },]]
-                        rangeNameTextXOffset = {
+                        --[[rangeNameTextXOffset = {
                             name = L['genXOffset'],
                             -- desc = L['genXOffset'],
                             type = 'range',
@@ -930,7 +930,7 @@ optionsTable = {
                             bigStep = 1,
                             hidden = true,
                             order = 8
-                        },
+                        },]]
                         --
                         -- QUANTITY
                         --
@@ -984,7 +984,7 @@ optionsTable = {
                             set = 'SetColor',
                             get = 'GetColor'
                         },
-                        rangeQuantTextXOffset = {
+                        --[[rangeQuantTextXOffset = {
                             name = L['genXOffset'],
                             -- desc = L['genXOffset'],
                             type = 'range',
@@ -1005,7 +1005,7 @@ optionsTable = {
                             bigStep = 1,
                             hidden = true,
                             order = 16
-                        },
+                        },]]
                         --
                         -- LINE 1
                         --
@@ -1051,7 +1051,7 @@ optionsTable = {
                             set = 'SetColor',
                             get = 'GetColor'
                         },
-                        rangeLine1TextXOffset = {
+                        --[[rangeLine1TextXOffset = {
                             name = L['genXOffset'],
                             -- desc = L['genXOffset'],
                             type = 'range',
@@ -1072,7 +1072,7 @@ optionsTable = {
                             bigStep = 1,
                             hidden = true,
                             order = 23
-                        },
+                        },]]
                         --
                         -- LINE 2
                         --
@@ -1118,7 +1118,7 @@ optionsTable = {
                             set = 'SetColor',
                             get = 'GetColor'
                         },
-                        rangeLine2TextXOffset = {
+                        --[[rangeLine2TextXOffset = {
                             name = L['genXOffset'],
                             -- desc = L['genXOffset'],
                             type = 'range',
@@ -1139,75 +1139,11 @@ optionsTable = {
                             bigStep = 1,
                             hidden = true,
                             order = 30
-                        },
-                        -- • • • • •
--- ────────────────────────────────────────────────────────────────────────────────
--- ────────────────────────────────────────────────────────────────────────────────
-                        --[[selectTextFont = {
-                            name = L['genFont'],
-                            desc = L['selectTextFontDesc'],
-                            type = 'select',
-                            dialogControl = 'LSM30_Font',
-                            values = AceGUIWidgetLSMlists.font,
-                            width = 'double',
-                            order = 1
-                        },
-                        selectTextSide = {
-                            name = L['selectTextSideName'],
-                            desc = L['selectTextSideDesc'],
-                            type = 'select',
-                            values = tableDirectionHorizontal,
-                            order = 2
-                        },
-                        rangeFontSize = {
-                            name = L['rangeFontSizeName'],
-                            desc = L['rangeFontSizeDesc'],
-                            type = 'range',
-                            min = 6,
-                            max = 16,
-                            step = 1, 
-                            bigStep = 1,
-                            hidden = 'Advanced',
-                            order = 3
-                        },
-                        colorFontColor = {
-                            name = L['colorFontColorName'],
-                            desc = L['colorFontColorDesc'],
-                            type = 'color',
-                            hidden = 'Advanced',
-                            hasAlpha = true,
-                            order = 4,
-                            set = function(info, r, g, b, a)
-                                Options.db.profile.colorFontColor = {
-                                    ['r'] = r,
-                                    ['g'] = g,
-                                    ['b'] = b,
-                                    ['a'] = a
-                                }
-
-                                Util:DebugOption(
-                                    'colorFontColor{}',
-                                    tostring(r)..', '..
-                                    tostring(g)..', '..
-                                    tostring(b)..', '..
-                                    tostring(a)
-                                )
-                            end,
-                            get = function(info)
-                                local fontColor = Options:Get('colorFontColor')
-                                return fontColor.r,
-                                fontColor.g,
-                                fontColor.b,
-                                fontColor.a
-                            end
                         },]]
                     }
                 }
             }
         },
-        -- FIXME:
-        -- BREAKING:
-        -- TODO: MAKE THESE NAMES MATCH THE THRESHOLD TYPES (the thresh types are the right ones)
         groupLootFilters = {
             name = L['groupLootFilters'],
             type = 'group',
@@ -1612,6 +1548,7 @@ optionsTable = {
                     name = L['toggleShowIncludeButtonName'],
                     desc = L['toggleShowIncludeButtonDesc'],
                     type = 'toggle',
+                    hidden = true,
                     order = 5,
                 },
                 headerExcludeList = {
@@ -1647,6 +1584,7 @@ optionsTable = {
                     name = L['toggleShowExcludeButtonName'],
                     desc = L['toggleShowExcludeButtonDesc'],
                     type = 'toggle',
+                    hidden = true,
                     order = 10,
                 },
             },

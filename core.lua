@@ -498,8 +498,7 @@ local function FilterSlot(loot)
                 return true, 'Mining Filter'
             end
 
-            -- Gems
-            -- FIXME: Tradeskill=>Jewelcrafting is for uncut gems and Gem is for cut ones. (make 2 options?)
+            -- Jewelcrafting
             if
                 Options:Get('toggleGemFilter') and
                 --[[(itemClass == HL_ITEM_CLASS.GEM or ]](itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.JEWELCRAFTING) and
@@ -546,7 +545,6 @@ local function FilterSlot(loot)
             end
 
             -- Pigments
-            -- TODO: Rename to "Loot Inscription"
             if
                 Options:Get('togglePigmentsFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.INSCRIPTION) and
@@ -768,7 +766,6 @@ local function SetLoot(frame, loot)
     frame:SetBackdrop({
         bgFile   = LSM:Fetch('background', Options:Get('selectThemeBackground')),
         edgeFile = LSM:Fetch('border', Options:Get('selectThemeBorder')),
-        -- TODO: Make options for these
         tile     = Options:Get('toggleThemeBackgroundTile'),
         tileSize = Options:Get('rangeThemeBackgroundTileSize'),
         edgeSize = Options:Get('rangeThemeBorderEdgeSize'),

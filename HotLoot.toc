@@ -3,13 +3,27 @@
 ## Notes: Auto looting AddOn.
 ## Version: 3.1.1
 ## SavedVariables: HotLootDB
-## Author: Neil & Jessica
+## Author: Neilo & Feindsong
+
+## X-Author-Server: The Forgotten Coast
+## X-Author-Faction: Horde
+## X-Email: nmsmith22389 AT gmail DOT com
+## X-License: MIT
+## X-Donate: There is a donation button in the top-right corner of the Curse page. Support your devs!
+
+## X-credits: ©2017 Neil Smith$nTesting:$ndsblack115$nTranslations:$nphilipp5796 - German$nMad_Ti - French
+
+## X-Localizations: enUS, deDE, esMX, frFR, ruRU, zhCN
+## X-Website: http://www.curse.com/addons/wow/hotloot
+## X-Feedback: https://github.com/nmsmith22389/HotLoot/issues
 
 # I Love You Jessica!
 
 embeds.xml
 Locales\Locales.xml
-
-HotLoot.lua
-Options.lua
+media\load_media.xml
+constants.lua
+core.lua
+Modules\load_modules.xml
 Templates.xml
+# loottoasts.xml

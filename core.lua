@@ -16,8 +16,8 @@ MIT License
 --]]
 -- ────────────────────────────────────────────────────────────────────────────────
 -- TODO: Remove uneeded libs
--- TODO: The new gold pattern for options doesn't work
 -- TODO: Change the tt for Include List Add input to reflect how it really works or just change it to work the right way
+-- TODO: Remove LibDialog
 HotLoot = LibStub('AceAddon-3.0'):NewAddon('HotLoot', 'AceConsole-3.0', 'AceEvent-3.0', 'AceTimer-3.0')
 local L = LibStub('AceLocale-3.0'):GetLocale('HotLoot')
 local LSM = LibStub('LibSharedMedia-3.0')
@@ -25,6 +25,9 @@ HotLoot.minimapIcon = LibStub('LibDBIcon-1.0')
 local Options, Util, HotLootFrame
 local icons, closeEL = {}, 0
 HotLoot.toasts = {}
+
+-- NOTE: These are the returns for GetItemInfo()
+-- local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, iconFileDataID, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, isCraftingReagent = GetItemInfo(itemID)
 
 -- WARNING: Make sure that locals are defined BEFORE they are used!
 

@@ -3,10 +3,25 @@
 --
 
 _G.HL_LOOT_SLOT_TYPE = {
-    ['ITEM'] = 1,
-    ['COIN'] = 2,
-    ['CURRENCY'] = 3,
+    ITEM     = 1,
+    COIN     = 2,
+    CURRENCY = 3
 }
+
+_G.HL_THEME_SIZE = {
+    SMALL = 0,
+    LARGE = 1
+}
+
+_G.HL_TEXT_SIDE = {
+    RIGHT = 0,
+    LEFT  = 1
+}
+
+-- @usage
+-- *to return the localized name*
+-- GetItemClassInfo(itemClassEnum)
+-- GetItemSubClassInfo(itemClassEnum, subClassEnum)
 
 _G.HL_ITEM_CLASS = {
     CONSUMABLE       = _G.LE_ITEM_CLASS_CONSUMABLE,       -- 'Consumable'
@@ -20,11 +35,11 @@ _G.HL_ITEM_CLASS = {
     ITEM_ENHANCEMENT = _G.LE_ITEM_CLASS_ITEM_ENHANCEMENT, -- 'Item Enhancement'
     RECIPE           = _G.LE_ITEM_CLASS_RECIPE,           -- 'Recipe'
     QUIVER           = _G.LE_ITEM_CLASS_QUIVER,           -- 'Quiver'
-    QUEST            = _G.LE_ITEM_CLASS_QUESTITEM,            -- 'Quest'
+    QUEST            = _G.LE_ITEM_CLASS_QUESTITEM,        -- 'Quest'
     KEY              = _G.LE_ITEM_CLASS_KEY,              -- 'Key'
     MISCELLANEOUS    = _G.LE_ITEM_CLASS_MISCELLANEOUS,    -- 'Miscellaneous'
     GLYPH            = _G.LE_ITEM_CLASS_GLYPH,            -- 'Glyph'
-    BATTLE_PETS      = _G.LE_ITEM_CLASS_BATTLEPET,      -- 'Battle Pets'
+    BATTLE_PETS      = _G.LE_ITEM_CLASS_BATTLEPET,        -- 'Battle Pets'
     WOW_TOKEN        = _G.LE_ITEM_CLASS_WOW_TOKEN         -- 'WoW Token'
 }
 

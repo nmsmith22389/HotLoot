@@ -33,9 +33,9 @@
                 </FontString>
                 <FontString name="$parentCount" parentKey="count">
                     <Anchors>
-                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT">
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeKey="$parent.icon">
                             <Offset>
-                                <AbsDimension x="-6" y="8"/>
+                                <AbsDimension x="-4" y="4"/>
                             </Offset>
                         </Anchor>
                     </Anchors>
@@ -60,8 +60,7 @@
                 </FontString>
             </Layer>
         </Layers>
-        <Frames>
-            <!-- inherits="OptionsButtonTemplate" -->
+        <!--<Frames>
             <Button name="$parentButtonExclude" parentKey="exclude" enableMouse="true" hidden="true">
                 <Size x="16" y="50"/>
                 <Anchors>
@@ -93,9 +92,8 @@
                         </FontString>
                     </Layer>
                 </Layers>
-                <!-- <Scripts><OnClick> autoInviteMainConfigFrame:Hide(); </OnClick></Scripts> -->
             </Button>
-        </Frames>
+        </Frames>-->
     </Frame>
     <Frame name="HotLoot_ToastLargeFlippedTemplate" virtual="true">
         <Size>
@@ -119,9 +117,9 @@
             <Layer level="OVERLAY">
                 <FontString name="$parentCount" parentKey="count">
                     <Anchors>
-                        <Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT">
+                        <Anchor point="BOTTOMRIGHT" relativePoint="BOTTOMRIGHT" relativeKey="$parent.icon">
                             <Offset>
-                                <AbsDimension x="6" y="8"/>
+                                <AbsDimension x="-4" y="4"/>
                             </Offset>
                         </Anchor>
                     </Anchors>

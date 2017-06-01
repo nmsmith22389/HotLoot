@@ -76,7 +76,7 @@ function HotLoot:OnEnable()
     -- Get Modules
     Options = self:GetModule('Options')
     Util = self:GetModule('Util')
-    HotLootFrame = self:GetModule('LootFrame')
+    HotLootFrame = self:GetModule('LootFrame', true)
 
 
     -- Minimap Icon

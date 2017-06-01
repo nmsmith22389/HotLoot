@@ -1255,12 +1255,18 @@ optionsTable = {
         groupAnnounce = {
             name = "Loot Frame",
             type = "group",
+        groupLootFrame = {
+                            -- TODO: Localize
+            name = 'Loot Frame',
+            type = 'group',
+            hidden = true,
             order = 9,
             args = {
                 toggleLootFrameEnable = {
-                    name = 'Enable',
+                            -- TODO: Localize
+                    name = L['genEnable'],
                     desc = 'Enables the '..Util:ColorText('HotLoot', 'addon')..' Loot Frame.',
-                    type = "toggle",
+                    type = 'toggle',
                     order = 1
                 },
             }

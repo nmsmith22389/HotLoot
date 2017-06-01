@@ -20,6 +20,7 @@ MIT License
 -- TODO: Change the tt for Include List Add input to reflect how it really works or just change it to work the right way
 HotLoot = LibStub('AceAddon-3.0'):NewAddon('HotLoot', 'AceConsole-3.0', 'AceEvent-3.0', 'AceTimer-3.0')
 local L = LibStub('AceLocale-3.0'):GetLocale('HotLoot')
+local LSM = LibStub('LibSharedMedia-3.0')
 HotLoot.minimapIcon = LibStub('LibDBIcon-1.0')
 local Options, Util, HotLootFrame
 local icons, closeEL = {}, 0

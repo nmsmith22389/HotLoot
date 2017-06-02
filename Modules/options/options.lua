@@ -515,6 +515,7 @@ optionsTable = {
                             name = L['toggleAnnounceBagsFullRaidName'],
                             desc = L['toggleAnnounceBagsFullRaidDesc'],
                             type = 'toggle',
+                            width = 'double',
                             order = 3
                         },
                     },

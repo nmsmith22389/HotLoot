@@ -366,7 +366,7 @@ end
 local function CheckUntyped(type, itemLink)
     local itemId = Util:GetItemID(itemLink)
     local items = {}
-    if (type == HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER) then
+    if type == 'Leather' then
         items = {
             [124439] = true,
             [124438] = true,
@@ -540,7 +540,7 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleLeatherFilter') and
                 ((itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER) or
-                CheckUntyped(HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER, loot.link)) and
+                CheckUntyped('Leather', loot.link)) and
                 CheckThreshold("Leather", itemSellPrice, loot.quantity)
             then
                 return true, 'Leather Filter'

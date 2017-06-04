@@ -53,7 +53,10 @@ local function GetFirstRunDialogText()
     return text
 end
 
-
+local function OpenOptionsWindow()
+    local Ace = LibStub('AceConfigDialog-3.0')
+    Ace:Open('HotLoot')
+end
 
 --
 -- ─── MINIMAP ICON ───────────────────────────────────────────────────────────────
@@ -64,7 +67,7 @@ local LDB = LibStub('LibDataBroker-1.1'):NewDataObject('HotLoot', {
     icon = 'Interface\\AddOns\\HotLoot\\icon',
     OnClick = function(clickedframe, button)
             if button == 'LeftButton' then
-                LibStub('AceConfigDialog-3.0'):Open('HotLoot')
+                OpenOptionsWindow()
             elseif button == 'RightButton' or button == 'RightButton' then
                 if HotLoot.Anchor:IsVisible() then
                     Options:SetShowLootMonitorAnchor('toggleShowLootMonitorAnchor', false)
@@ -1144,7 +1147,7 @@ end
 function HotLoot:ChatCommand(input)
     if not input or input:trim() == "" then
         --InterfaceOptionsFrame_OpenToCategory(Options:Get('rame'))
-        LibStub("AceConfigDialog-3.0"):Open("HotLoot")
+        OpenOptionsWindow()
     elseif input == "help" then
         Util:Print('--- Available Commands ---')
         Util:Print('UNDER CONSTRUCTION')
@@ -1207,7 +1210,7 @@ function HotLoot:ChatCommand(input)
             Util:Print(printStr:format(loot.link, reason))
         end
     else
-        LibStub("AceConfigDialog-3.0"):Open("HotLoot")
+        OpenOptionsWindow()
         print(input.." | trim: ".. input:trim())
         -- LibStub("AceConfigCmd-3.0"):HandleCommand("hl", "HotLoot", input)
     end

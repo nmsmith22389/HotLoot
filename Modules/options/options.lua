@@ -1785,7 +1785,9 @@ function Options:OnInitialize()
     -- Create Options
     LibStub('AceConfig-3.0'):RegisterOptionsTable('HotLoot', optionsTable)
 
-    -- Transfer 
+    LibStub('AceConfigDialog-3.0'):SetDefaultSize('HotLoot', 700, 650)
+
+    -- Transfer
     -- if self.db.profile.bOldSettingsTransferred ~= true then
     --     TransferAllSettings()
     --     self.db.profile.bOldSettingsTransferred = true

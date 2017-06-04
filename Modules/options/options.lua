@@ -1389,7 +1389,56 @@ optionsTable = {
                             order = 7
                         }
                     }
-                }
+                },
+                -- TODO: Localize these!
+                groupLegion = {
+                    name = 'Legion',
+                    type = 'group',
+                    order = 4,
+                    inline = true,
+                    args = {
+                        buttonEnableAllFiltersLegion = {
+                            name = L['buttonEnableAll'],
+                            type = 'execute',
+                            order = 1,
+                            func = function()
+                                Options:Set('toggleAugmentRuneFilter', true)
+                                Options:Set('toggleKnowledgeScrollFilter', true)
+                                Options:Set('toggleSentinaxBeaconFilter', true)
+                            end
+                        },
+                        buttonDisableAllFiltersLegion = {
+                            name = L['buttonDisableAll'],
+                            type = 'execute',
+                            order = 2,
+                            func = function()
+                                Options:Set('toggleAugmentRuneFilter', false)
+                                Options:Set('toggleKnowledgeScrollFilter', false)
+                                Options:Set('toggleSentinaxBeaconFilter', false)
+                            end
+                        },
+                        toggleAugmentRuneFilter = {
+                            name = L['FilterNameTemplate']:format('Defiled Augment Runes'),
+                            desc = L['FilterDescTemplate']:format('Defiled Augment Runes'),
+                            type = 'toggle',
+                            width = 'double',
+                            order = 3
+                        },
+                        toggleKnowledgeScrollFilter = {
+                            name = L['FilterNameTemplate']:format('Artifact Research Notes'),
+                            desc = L['FilterDescTemplate']:format('Artifact Research Notes'),
+                            type = 'toggle',
+                            width = 'double',
+                            order = 4
+                        },
+                        toggleSentinaxBeaconFilter = {
+                            name = L['FilterNameTemplate']:format('Sentiax Beacons'),
+                            desc = L['FilterDescTemplate']:format('Sentiax Beacons'),
+                            type = 'toggle',
+                            order = 5
+                        },
+                    }
+                },
             }
         },
         groupItemQualityFilters = {

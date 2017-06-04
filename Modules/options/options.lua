@@ -428,7 +428,12 @@ optionsTable = {
     get = 'Get',
     args = {
         descHotLoot = {
-            name = L['descHotLoot'],           
+            -- name = L['descHotLoot'],
+            name = '',
+            image = [[Interface\AddOns\HotLoot\media\textures\Logo]],
+            imageCoords = {0.0390625, 0.96484375, 0.109375, 0.8125},
+            imageWidth = 237,
+            imageHeight = 90,
             type = 'description',
             order = 1
         },

@@ -53,7 +53,10 @@ local function GetFirstRunDialogText()
     return text
 end
 
-
+local function OpenOptionsWindow()
+    local Ace = LibStub('AceConfigDialog-3.0')
+    Ace:Open('HotLoot')
+end
 
 --
 -- ─── MINIMAP ICON ───────────────────────────────────────────────────────────────
@@ -64,7 +67,7 @@ local LDB = LibStub('LibDataBroker-1.1'):NewDataObject('HotLoot', {
     icon = 'Interface\\AddOns\\HotLoot\\icon',
     OnClick = function(clickedframe, button)
             if button == 'LeftButton' then
-                LibStub('AceConfigDialog-3.0'):Open('HotLoot')
+                OpenOptionsWindow()
             elseif button == 'RightButton' or button == 'RightButton' then
                 if HotLoot.Anchor:IsVisible() then
                     Options:SetShowLootMonitorAnchor('toggleShowLootMonitorAnchor', false)
@@ -366,10 +369,30 @@ end
 local function CheckUntyped(type, itemLink)
     local itemId = Util:GetItemID(itemLink)
     local items = {}
-    if (type == HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER) then
+    if type == 'Leather' then
         items = {
             [124439] = true,
             [124438] = true,
+        }
+    elseif type == 'Defiled Augment Rune' then
+        items = {
+            [140587] = true,
+        }
+    elseif type == 'Artifact Research Notes' then
+        items = {
+            [139390] = true,
+        }
+    elseif type == 'Sentinax Beacons' then
+        items = {
+            [146909] = true, [146908] = true, [146907] = true,
+            [146906] = true, [146905] = true, [146903] = true,
+            [146915] = true, [146914] = true, [146913] = true,
+            [146912] = true, [146911] = true, [146910] = true,
+            [146921] = true, [146920] = true, [146919] = true,
+            [146918] = true, [146917] = true, [146916] = true,
+            [147355] = true, [146923] = true, [146922] = true,
+            [147893] = true, [147889] = true, [147892] = true,
+            [147891] = true, [147894] = true,
         }
     end
 
@@ -453,7 +476,7 @@ local function FilterSlot(loot)
             -- TODO: Normalize these so that the check order is (pref, type, subtype, other) (there may be special cases)
             -- TODO: Make options for quality to loot only equipable items
 
-            -- Debug
+            --> Debug
             if Options:Get('toggleDebugMode') then
                 local strFilterDebug = "-------------\n"..
                     tostring(loot.link)..' x'..tostring(loot.quantity)..'\n'..
@@ -461,12 +484,12 @@ local function FilterSlot(loot)
                 Util:Debug(strFilterDebug);
             end
 
-            -- Include List
+            --> Include List
             if Options:Get('tableIncludeList')[loot.item] then
                 return true, 'Include List'
             end
 
-            -- Quest
+            --> Quest
             if
                 Options:Get('toggleQuestFilter') and
                 itemClass == HL_ITEM_CLASS.QUEST and
@@ -475,12 +498,12 @@ local function FilterSlot(loot)
                 return true, 'Quest Item Filter'
             end
 
-            -- Pickpocket
+            --> Pickpocket
             if IsStealthed() and Options:Get('togglePickpocketFilter') and loot.quality ~= 0 then
                 return true, 'Pickpocket Filter'
             end
 
-            -- Cloth
+            --> Cloth
             if
                 Options:Get('toggleClothFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.CLOTH) and
@@ -489,7 +512,7 @@ local function FilterSlot(loot)
                 return true, 'Cloth Filter'
             end
 
-            -- Mining
+            --> Mining
             if
                 Options:Get('toggleMiningFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.METAL_STONE) and
@@ -498,7 +521,7 @@ local function FilterSlot(loot)
                 return true, 'Mining Filter'
             end
 
-            -- Jewelcrafting
+            --> Jewelcrafting
             if
                 Options:Get('toggleGemFilter') and
                 --[[(itemClass == HL_ITEM_CLASS.GEM or ]](itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.JEWELCRAFTING) and
@@ -507,7 +530,7 @@ local function FilterSlot(loot)
                 return true, 'Gem Filter'
             end
 
-            -- Herbs
+            --> Herbs
             if
                 Options:Get('toggleHerbFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.HERB) and
@@ -516,17 +539,17 @@ local function FilterSlot(loot)
                 return true, 'Herb Filter'
             end
 
-            -- Leather
+            --> Leather
             if
                 Options:Get('toggleLeatherFilter') and
                 ((itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER) or
-                CheckUntyped(HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER, loot.link)) and
+                CheckUntyped('Leather', loot.link)) and
                 CheckThreshold("Leather", itemSellPrice, loot.quantity)
             then
                 return true, 'Leather Filter'
             end
 
-            -- Fishing (-junk)
+            --> Fishing (-junk)
             if
                 IsFishingLoot() and
                 Options:Get('toggleFishingFilter') and
@@ -535,7 +558,7 @@ local function FilterSlot(loot)
                 return true, 'Fishing Filter'
             end
 
-            -- Enchanting
+            --> Enchanting
             if
                 Options:Get('toggleEnchantingFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.ENCHANTING) and
@@ -544,7 +567,7 @@ local function FilterSlot(loot)
                 return true, 'Enchanting Filter'
             end
 
-            -- Pigments
+            --> Inscription
             if
                 Options:Get('togglePigmentsFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.INSCRIPTION) and
@@ -553,7 +576,7 @@ local function FilterSlot(loot)
                 return true, 'Pigment Filter'
             end
 
-            -- Cooking
+            --> Cooking
             if
                 Options:Get('toggleCookingFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.COOKING) and
@@ -562,12 +585,12 @@ local function FilterSlot(loot)
                 return true, 'Cooking Filter'
             end
 
-            -- Recipe
+            --> Recipe
             if Options:Get('toggleRecipeFilter') and itemClass == HL_ITEM_CLASS.RECIPE then
                 return true, 'Recipe Filter'
             end
 
-            -- Pots
+            --> Pots
             if
                 Options:Get('togglePotionFilter') and
                 (itemClass == HL_ITEM_CLASS.CONSUMABLE and itemSubClass == HL_ITEM_SUB_CLASS.CONSUMABLE.POTION) and
@@ -585,7 +608,7 @@ local function FilterSlot(loot)
                 end
             end
 
-            -- Flasks
+            --> Flasks
             if
                 Options:Get('toggleFlaskFilter') and
                 (itemClass == HL_ITEM_CLASS.CONSUMABLE and itemSubClass == HL_ITEM_SUB_CLASS.CONSUMABLE.FLASK) and
@@ -594,7 +617,7 @@ local function FilterSlot(loot)
                 return true, 'Flask Filter'
             end
 
-            -- Elixirs
+            --> Elixirs
             if
                 Options:Get('toggleElixirFilter') and
                 (itemClass == HL_ITEM_CLASS.CONSUMABLE and itemSubClass == HL_ITEM_SUB_CLASS.CONSUMABLE.ELIXIR) and
@@ -603,7 +626,7 @@ local function FilterSlot(loot)
                 return true, 'Elixir Filter'
             end
 
-            -- Motes
+            --> Motes
             if
                 Options:Get('toggleElementalFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.ELEMENTAL) and
@@ -612,9 +635,26 @@ local function FilterSlot(loot)
                 return true, 'Elemental Filter'
             end
 
+            -- LEGION
+
+            --> Defiled Augment Rune
+            if Options:Get('toggleAugmentRuneFilter') and CheckUntyped('Defiled Augment Rune', loot.link) then
+                return true, 'Defiled Augment Rune Filter'
+            end
+
+            --> Artifact Research Notes
+            if Options:Get('toggleKnowledgeScrollFilter') and CheckUntyped('Artifact Research Notes', loot.link) then
+                return true, 'Artifact Research Notes Filter'
+            end
+
+            --> Sentinax Beacons
+            if Options:Get('toggleSentinaxBeaconFilter') and CheckUntyped('Sentinax Beacons', loot.link) then
+                return true, 'Sentinax Beacons Filter'
+            end
+
             -- QUALITY
 
-            -- Poor
+            --> Poor
             if
                 Options:Get('togglePoorQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_POOR and
@@ -623,7 +663,7 @@ local function FilterSlot(loot)
                 return true, 'Poor Quality Filter'
             end
 
-            -- Common
+            --> Common
             if
                 Options:Get('toggleCommonQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_COMMON and
@@ -632,7 +672,7 @@ local function FilterSlot(loot)
                 return true, 'Common Quality Filter'
             end
 
-            -- Uncommon
+            --> Uncommon
             if
                 Options:Get('toggleUncommonQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_UNCOMMON and
@@ -641,7 +681,7 @@ local function FilterSlot(loot)
                 return true, 'Uncommon Quality Filter'
             end
 
-            -- Rare
+            --> Rare
             if
                 Options:Get('toggleRareQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_RARE and
@@ -650,7 +690,7 @@ local function FilterSlot(loot)
                 return true, 'Rare Quality Filter'
             end
 
-            -- Epic
+            --> Epic
             if
                 Options:Get('toggleEpicQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_EPIC and
@@ -659,7 +699,7 @@ local function FilterSlot(loot)
                 return true, 'Epic Quality Filter'
             end
 
-            -- Legendary
+            --> Legendary
             if
                 Options:Get('toggleLegendaryQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_LEGENDARY and
@@ -668,7 +708,7 @@ local function FilterSlot(loot)
                 return true, 'Legendary Quality Filter'
             end
 
-            -- Artifact
+            --> Artifact
             if
                 Options:Get('toggleArtifactQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_ARTIFACT and
@@ -677,7 +717,7 @@ local function FilterSlot(loot)
                 return true, 'Artifact Quality Filter'
             end
 
-            -- Heirloom
+            --> Heirloom
             if
                 Options:Get('toggleHeirloomQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_HEIRLOOM and
@@ -733,6 +773,34 @@ end
 --
 -- ─── NEW LOOT ICON FUNCTIONS ────────────────────────────────────────────────────
 --
+
+local function GetItemValueText(itemLink, useTSM)
+    local itemValue
+    local prefixText = ''
+
+    -- FIXME: Replace dummy opts and add input for source
+    if useTSM and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
+        local tsmSources = TSMAPI:GetPriceSources()
+        local priceSource = (tsmSources[Options:Get('inputValueTSMSource')]) and Options:Get('inputValueTSMSource') or 'DBMarket'
+        prefixText = tsmSources[priceSource]
+
+        if prefixText:len() > 20 then
+           prefixText = prefixText:match('^%a+%s%-%s([%w%s]+)') or priceSource
+        end
+
+        itemValue = TSMAPI:GetItemValue(_G.TSMAPI.Item:ToItemString(itemLink), priceSource)
+        if not itemValue then
+            return GetItemValueText(itemLink, false)
+        end
+    else
+        itemValue = select(11, GetItemInfo(itemLink))
+        -- TODO: Localize
+        prefixText = 'Vendor'
+    end
+
+    prefixText = (prefixText ~= '' and Options:Get('toggleShowValuePrefix')) and prefixText..': ' or ''
+    return prefixText..Util:FormatMoney(itemValue, 'SMART', true)
+end
 
 -- TODO: Add option to change text outline (ie outline, thickoutline, mono, none)
 local function SetLoot(frame, loot)
@@ -865,9 +933,9 @@ local function SetLoot(frame, loot)
         frame.value:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha)
 
         if Options:Get('toggleShowSellPrice') and loot.quantity > 0 and loot.slotType == HL_LOOT_SLOT_TYPE.ITEM then
-            local itemValue = select(11, GetItemInfo(loot.link)) or 0
 
-            frame.value:SetText(Util:FormatMoney(itemValue, 'SMART', true))
+            frame.value:SetText(GetItemValueText(loot.link, Options:Get('toggleShowTSMValue')))
+
             -- frame.value:ClearAllPoints()
             --[[if theme.text.value.top then
                 frame.value:SetPoint('TOPLEFT', frame, 'TOPLEFT', theme.text.value.left, theme.text.value.top)
@@ -912,14 +980,14 @@ local function SetLoot(frame, loot)
     local iconWidth   = frame.icon:GetWidth()
     local nameWidth   = frame.name:GetStringWidth()
     local typeWidth   = (frame.type and Options:Get('toggleShowItemType')) and frame.type:GetStringWidth() or 0
-    local countWidth  = (frame.count and Options:Get('toggleShowItemQuant')) and frame.count:GetStringWidth() or 0
+    local valueWidth  = (frame.count and Options:Get('toggleShowSellPrice')) and frame.value:GetStringWidth() or 0
     local spacerWidth = 16
     local minWidth    = tonumber(Options:Get('inputMinWidth'))
 
     local frameWidth = max(
         iconWidth + nameWidth  + spacerWidth,
         iconWidth + typeWidth  + spacerWidth,
-        iconWidth + countWidth + spacerWidth,
+        iconWidth + valueWidth + spacerWidth,
         minWidth
     )
 
@@ -1107,7 +1175,7 @@ end
 function HotLoot:ChatCommand(input)
     if not input or input:trim() == "" then
         --InterfaceOptionsFrame_OpenToCategory(Options:Get('rame'))
-        LibStub("AceConfigDialog-3.0"):Open("HotLoot")
+        OpenOptionsWindow()
     elseif input == "help" then
         Util:Print('--- Available Commands ---')
         Util:Print('UNDER CONSTRUCTION')
@@ -1170,7 +1238,7 @@ function HotLoot:ChatCommand(input)
             Util:Print(printStr:format(loot.link, reason))
         end
     else
-        LibStub("AceConfigDialog-3.0"):Open("HotLoot")
+        OpenOptionsWindow()
         print(input.." | trim: ".. input:trim())
         -- LibStub("AceConfigCmd-3.0"):HandleCommand("hl", "HotLoot", input)
     end

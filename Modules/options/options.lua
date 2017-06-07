@@ -37,6 +37,7 @@ local tablePotionType = {
     ['mana'] = L['Mana'],
 }
 
+-- FIXME: Make sure these reflect ALL the filter types
 local tableFilterTypes = {
     ['0None'] = L['None'],
     ['Quest'] = GetItemClassInfo(HL_ITEM_CLASS.QUEST),
@@ -84,7 +85,7 @@ local function GetDefaultChatWindow()
             first = window
         end
     end
-    
+
     return first
 end
 
@@ -123,8 +124,8 @@ local defaults = {
 
         --== Appearance ==--
         --> General
-        selectGrowthDirection = -1, 
-        selectThemeSize = 1,        
+        selectGrowthDirection = -1,
+        selectThemeSize = 1,
         rangeTransparency = 1,
         rangeToastPadding = 8,
         inputMinWidth = '145',
@@ -152,7 +153,7 @@ local defaults = {
         rangeThemeBorderInset = 2,
 
         --> Icon
-        rangeIconSize = 16, 
+        rangeIconSize = 16,
 
         --> Animation
         toggleShowAnimation = true,
@@ -185,7 +186,7 @@ local defaults = {
         rangeNameTextYOffset = 0,
 
         --> Quantity
-        toggleShowItemQuant = true, 
+        toggleShowItemQuant = true,
         toggleShowTotalQuant = true,
         selectQuantTextFont   = 'Roboto Condensed Bold',
         rangeQuantTextSize    = 8,
@@ -210,7 +211,7 @@ local defaults = {
         },
         rangeLine1TextXOffset = 0,
         rangeLine1TextYOffset = 0,
-        
+
         --> Line 2
         toggleShowSellPrice = true,
         selectLine2TextFont = 'Roboto Condensed Bold',
@@ -221,9 +222,12 @@ local defaults = {
             b = 1.0,
             a = 1.0
         },
+        toggleShowTSMValue = false,
+        toggleShowValuePrefix = false,
+        inputValueTSMSource = 'DBMinBuyout',
         rangeLine2TextXOffset = 0,
         rangeLine2TextYOffset = 0,
-        
+
         toggleGoldFilter             = true,
         toggleQuestFilter            = true,
         toggleCurrencyFilter         = true,
@@ -262,7 +266,7 @@ local defaults = {
         -- Exclude List
         tableExcludeList = {},
         toggleShowExcludeButton = false,
-        
+
         selectThresholdType1 = '0None',
         inputThresholdValue1 = 0,
         selectThresholdType2 = '0None',
@@ -428,12 +432,17 @@ optionsTable = {
     get = 'Get',
     args = {
         descHotLoot = {
-            name = L['descHotLoot'],           
+            -- name = L['descHotLoot'],
+            name = '',
+            image = [[Interface\AddOns\HotLoot\media\textures\Logo]],
+            imageCoords = {0.0390625, 0.96484375, 0.109375, 0.8125},
+            imageWidth = 237,
+            imageHeight = 90,
             type = 'description',
             order = 1
         },
         descHotLootNote = {
-            name = Util:ColorText(L['descHotLootNote'], 'alert'),  
+            name = Util:ColorText(L['descHotLootNote'], 'alert'),
             type = 'description',
             order = 2
         },
@@ -441,7 +450,7 @@ optionsTable = {
             name = L['groupSystem'],
             type = 'group',
             order = 3,
-            
+
             args = {
                 toggleSystemEnable = {
                     name = L['genEnable'],
@@ -515,6 +524,7 @@ optionsTable = {
                             name = L['toggleAnnounceBagsFullRaidName'],
                             desc = L['toggleAnnounceBagsFullRaidDesc'],
                             type = 'toggle',
+                            width = 'double',
                             order = 3
                         },
                     },
@@ -563,12 +573,12 @@ optionsTable = {
                         },
                     },
                 },
-            }, 
+            },
         },
         groupLootMonitor = {
-            name = L['groupLootMonitor'], 
-            type = 'group', 
-            order = 4, 
+            name = L['groupLootMonitor'],
+            type = 'group',
+            order = 4,
             childGroups = 'tab',
             args = {
                 toggleEnableLootMonitor = {
@@ -602,9 +612,9 @@ optionsTable = {
                     end
                 },
                 groupLootMonitorGeneral = {
-                    name = L['genGeneral'], 
-                    type = 'group', 
-                    order = 4, 
+                    name = L['genGeneral'],
+                    type = 'group',
+                    order = 4,
                     args = {
                         toggleShowLootMonitorAnchor = {
                             name = L['toggleShowLootMonitorAnchorName'],
@@ -617,9 +627,9 @@ optionsTable = {
                     }
                 },
                 groupLootMonitorAppearance = {
-                    name = L['genAppearance'], 
-                    type = 'group', 
-                    order = 5, 
+                    name = L['genAppearance'],
+                    type = 'group',
+                    order = 5,
                     args = {
                         -------
                         -- NEW
@@ -652,7 +662,7 @@ optionsTable = {
                             type = 'range',
                             min = 0,
                             max = 1,
-                            step = 0.1, 
+                            step = 0.1,
                             bigStep = 0.1,
                             order = 4
                         },
@@ -662,7 +672,7 @@ optionsTable = {
                             type = 'range',
                             min = 1,
                             max = 16,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             order = 5
                         },
@@ -734,7 +744,7 @@ optionsTable = {
                             type = 'range',
                             min = 1,
                             max = 32,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             order = 14
                         },
@@ -744,7 +754,7 @@ optionsTable = {
                             type = 'range',
                             min = 1,
                             max = 32,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             order = 15
                         },
@@ -754,7 +764,7 @@ optionsTable = {
                             type = 'range',
                             min = 1,
                             max = 32,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             order = 16
                         },
@@ -772,7 +782,7 @@ optionsTable = {
                             type = 'range',
                             min = 16,
                             max = 32,
-                            step = 4, 
+                            step = 4,
                             bigStep = 4,
                             disabled = function()
                                 return Options.db.profile.selectThemeSize == 1
@@ -794,7 +804,7 @@ optionsTable = {
                             type = 'range',
                             min = 1,
                             max = 10,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
                             order = 20
@@ -806,7 +816,7 @@ optionsTable = {
                             type = 'range',
                             min = 0.5,
                             max = 5,
-                            step = 0.5, 
+                            step = 0.5,
                             bigStep = 0.5,
                             --width = 'half',
                             -- hidden = 'Advanced',
@@ -818,7 +828,7 @@ optionsTable = {
                             type = 'range',
                             min = 5,
                             max = 15,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
                             order = 22
@@ -836,24 +846,24 @@ optionsTable = {
                             type = 'range',
                             min = -1,
                             max = 1,
-                            step = 0.1, 
+                            step = 0.1,
                             bigStep = 0.1,
                             hidden = true,
                             order = 60
                         },
-                        
-                        
-                        
-                        
+
+
+
+
                     }
                 },
                 --
                 -- TEXT
                 --
                 groupLootMonitorText = {
-                    name = L['genText'], 
-                    type = 'group', 
-                    order = 6, 
+                    name = L['genText'],
+                    type = 'group',
+                    order = 6,
                     args = {
                         --
                         -- GENERAL
@@ -894,7 +904,7 @@ optionsTable = {
                             type = 'range',
                             min = 6,
                             max = 16,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
                             order = 5
@@ -915,7 +925,7 @@ optionsTable = {
                             type = 'range',
                             min = -30,
                             max = 30,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             hidden = true,
                             order = 7
@@ -926,7 +936,7 @@ optionsTable = {
                             type = 'range',
                             min = -30,
                             max = 30,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             hidden = true,
                             order = 8
@@ -969,7 +979,7 @@ optionsTable = {
                             type = 'range',
                             min = 6,
                             max = 16,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
                             order = 13
@@ -990,7 +1000,7 @@ optionsTable = {
                             type = 'range',
                             min = -30,
                             max = 30,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             hidden = true,
                             order = 15
@@ -1001,7 +1011,7 @@ optionsTable = {
                             type = 'range',
                             min = -30,
                             max = 30,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             hidden = true,
                             order = 16
@@ -1036,7 +1046,7 @@ optionsTable = {
                             type = 'range',
                             min = 6,
                             max = 16,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
                             order = 20
@@ -1057,7 +1067,7 @@ optionsTable = {
                             type = 'range',
                             min = -30,
                             max = 30,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             hidden = true,
                             order = 22
@@ -1068,7 +1078,7 @@ optionsTable = {
                             type = 'range',
                             min = -30,
                             max = 30,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             hidden = true,
                             order = 23
@@ -1103,7 +1113,7 @@ optionsTable = {
                             type = 'range',
                             min = 6,
                             max = 16,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
                             order = 27
@@ -1118,13 +1128,40 @@ optionsTable = {
                             set = 'SetColor',
                             get = 'GetColor'
                         },
+                        groupTSMValue = {
+                            name = L['groupTSMValue'],
+                            type = 'group',
+                            order = 29,
+                            inline = true,
+                            args = {
+                                toggleShowTSMValue = {
+                                    name = L['toggleShowTSMValueName'],
+                                    desc = L['toggleShowTSMValueDesc'],
+                                    type = 'toggle',
+                                    width = 'full',
+                                    order = 1
+                                },
+                                toggleShowValuePrefix = {
+                                    name = L['toggleShowValuePrefixName'],
+                                    desc = L['toggleShowValuePrefixDesc'],
+                                    type = 'toggle',
+                                    order = 2
+                                },
+                                inputValueTSMSource = {
+                                    name = L['inputValueTSMSourceName'],
+                                    desc = L['inputValueTSMSourceDesc'],
+                                    type = 'input',
+                                    order = 3
+                                },
+                            }
+                        },
                         --[[rangeLine2TextXOffset = {
                             name = L['genXOffset'],
                             -- desc = L['genXOffset'],
                             type = 'range',
                             min = -30,
                             max = 30,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             hidden = true,
                             order = 29
@@ -1135,7 +1172,7 @@ optionsTable = {
                             type = 'range',
                             min = -30,
                             max = 30,
-                            step = 1, 
+                            step = 1,
                             bigStep = 1,
                             hidden = true,
                             order = 30
@@ -1198,7 +1235,7 @@ optionsTable = {
                             order = 5
                         },
                         togglePickpocketFilter = {
-                            name = L['togglePickpocketFilterName'], 
+                            name = L['togglePickpocketFilterName'],
                             desc = L['togglePickpocketFilterName'],
                             type = 'toggle',
                             order = 7
@@ -1388,7 +1425,56 @@ optionsTable = {
                             order = 7
                         }
                     }
-                }
+                },
+                -- TODO: Localize these!
+                groupLegion = {
+                    name = 'Legion',
+                    type = 'group',
+                    order = 4,
+                    inline = true,
+                    args = {
+                        buttonEnableAllFiltersLegion = {
+                            name = L['buttonEnableAll'],
+                            type = 'execute',
+                            order = 1,
+                            func = function()
+                                Options:Set('toggleAugmentRuneFilter', true)
+                                Options:Set('toggleKnowledgeScrollFilter', true)
+                                Options:Set('toggleSentinaxBeaconFilter', true)
+                            end
+                        },
+                        buttonDisableAllFiltersLegion = {
+                            name = L['buttonDisableAll'],
+                            type = 'execute',
+                            order = 2,
+                            func = function()
+                                Options:Set('toggleAugmentRuneFilter', false)
+                                Options:Set('toggleKnowledgeScrollFilter', false)
+                                Options:Set('toggleSentinaxBeaconFilter', false)
+                            end
+                        },
+                        toggleAugmentRuneFilter = {
+                            name = L['FilterNameTemplate']:format('Defiled Augment Runes'),
+                            desc = L['FilterDescTemplate']:format('Defiled Augment Runes'),
+                            type = 'toggle',
+                            width = 'double',
+                            order = 3
+                        },
+                        toggleKnowledgeScrollFilter = {
+                            name = L['FilterNameTemplate']:format('Artifact Research Notes'),
+                            desc = L['FilterDescTemplate']:format('Artifact Research Notes'),
+                            type = 'toggle',
+                            width = 'double',
+                            order = 4
+                        },
+                        toggleSentinaxBeaconFilter = {
+                            name = L['FilterNameTemplate']:format('Sentiax Beacons'),
+                            desc = L['FilterDescTemplate']:format('Sentiax Beacons'),
+                            type = 'toggle',
+                            order = 5
+                        },
+                    }
+                },
             }
         },
         groupItemQualityFilters = {
@@ -1458,7 +1544,7 @@ optionsTable = {
                     type = 'toggle',
                     order = 8,
                     width = 'full',
-                },  
+                },
                 toggleRareQualityFilter = {
                     name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[3].hex..ITEM_QUALITY3_DESC..'|r'),
                     desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[3].hex..ITEM_QUALITY3_DESC..'|r'),
@@ -1496,7 +1582,7 @@ optionsTable = {
                 },
                 inputMinItemLevel = {
                     name = L['inputMinItemLevelName'],
-                    desc = L['inputMinItemLevelDesc'],           
+                    desc = L['inputMinItemLevelDesc'],
                     type = 'input',
                     -- pattern = '%d+',
                     order = 19,
@@ -1720,7 +1806,7 @@ optionsTable = {
 
 function Options:OnInitialize()
     self.db = LibStub('AceDB-3.0'):New('HotLootDB', defaults)
-    
+
     self.db:RegisterDefaults(defaults)
     HotLoot.options = self.db.profile
 
@@ -1735,7 +1821,9 @@ function Options:OnInitialize()
     -- Create Options
     LibStub('AceConfig-3.0'):RegisterOptionsTable('HotLoot', optionsTable)
 
-    -- Transfer 
+    LibStub('AceConfigDialog-3.0'):SetDefaultSize('HotLoot', 700, 650)
+
+    -- Transfer
     -- if self.db.profile.bOldSettingsTransferred ~= true then
     --     TransferAllSettings()
     --     self.db.profile.bOldSettingsTransferred = true

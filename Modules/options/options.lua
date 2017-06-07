@@ -361,6 +361,10 @@ function Options:ConfirmOption(info, value)
     end
 end
 
+function Options:RefreshConfig(db)
+    HotLoot:RefreshAnchorPosition()
+end
+
 --
 -- ─── EXTERNALIZED SET FUNCTIONS ─────────────────────────────────────────────────
 --
@@ -1820,6 +1824,9 @@ function Options:OnInitialize()
 
     -- Create Options
     LibStub('AceConfig-3.0'):RegisterOptionsTable('HotLoot', optionsTable)
+    self.db.RegisterCallback(self, "OnProfileChanged", "RefreshConfig")
+    self.db.RegisterCallback(self, "OnProfileCopied", "RefreshConfig")
+    self.db.RegisterCallback(self, "OnProfileReset", "RefreshConfig")
 
     LibStub('AceConfigDialog-3.0'):SetDefaultSize('HotLoot', 700, 650)
 

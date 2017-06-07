@@ -133,8 +133,8 @@ end
 -- ─── ANCHOR FRAME ───────────────────────────────────────────────────────────────
 --
 
-function HotLoot:CreateAnchorFrame()
-    local anchor = CreateFrame("Frame", 'HotLoot_Anchor', UIParent)
+function HotLoot:RefreshAnchorPosition()
+    local anchor = self.Anchor
 
     anchor:ClearAllPoints()
     if Options:Get('anchorPosition')['x'] and Options:Get('anchorPosition')['y'] then
@@ -142,6 +142,10 @@ function HotLoot:CreateAnchorFrame()
     else
         anchor:SetPoint('CENTER', UIParent, 'CENTER', 0, 0)
     end
+end
+
+function HotLoot:CreateAnchorFrame()
+    local anchor = CreateFrame("Frame", 'HotLoot_Anchor', UIParent)
 
     anchor:SetBackdrop({
         bgFile   = LSM:Fetch('background', 'HotLoot Custom'),
@@ -188,6 +192,8 @@ function HotLoot:CreateAnchorFrame()
     anchor:Show()
 
     self.Anchor = anchor
+
+    self:RefreshAnchorPosition()
 end
 
 function HotLoot:ToggleAnchor(val)

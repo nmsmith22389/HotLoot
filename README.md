@@ -26,6 +26,16 @@ _If you have ideas for new features you would like to see implemented please ope
 * Still adding more support for some items that **Blizzard** put in the wrong categories.
 
 ## Recent Changes
+## v3.2.1
+### Added
+* Added TSM options for the value line in the loot monitor.
+* Added a logo in options.
+* Added Legion filters.
+### Fixed
+* Changed to a new logo.
+* Changed the default options window size.
+* Fixed some options formatting.
+
 ## v3.2
 #### This is such a HUGE update that I couldn't list every single change but these are some of the big ones.
 * ***The options have been changed a lot so they may not all transfer over. Make sure to double check them.***

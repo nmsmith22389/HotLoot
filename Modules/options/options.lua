@@ -221,6 +221,9 @@ local defaults = {
             b = 1.0,
             a = 1.0
         },
+        toggleShowTSMValue = false,
+        toggleShowValuePrefix = false,
+        inputValueTSMSource = 'DBMinBuyout',
         rangeLine2TextXOffset = 0,
         rangeLine2TextYOffset = 0,
         
@@ -1123,6 +1126,33 @@ optionsTable = {
                             order = 28,
                             set = 'SetColor',
                             get = 'GetColor'
+                        },
+                        groupTSMValue = {
+                            name = L['groupTSMValue'],
+                            type = 'group',
+                            order = 29,
+                            inline = true,
+                            args = {
+                                toggleShowTSMValue = {
+                                    name = L['toggleShowTSMValueName'],
+                                    desc = L['toggleShowTSMValueDesc'],
+                                    type = 'toggle',
+                                    width = 'full',
+                                    order = 1
+                                },
+                                toggleShowValuePrefix = {
+                                    name = L['toggleShowValuePrefixName'],
+                                    desc = L['toggleShowValuePrefixDesc'],
+                                    type = 'toggle',
+                                    order = 2
+                                },
+                                inputValueTSMSource = {
+                                    name = L['inputValueTSMSourceName'],
+                                    desc = L['inputValueTSMSourceDesc'],
+                                    type = 'input',
+                                    order = 3
+                                },
+                            }
                         },
                         --[[rangeLine2TextXOffset = {
                             name = L['genXOffset'],

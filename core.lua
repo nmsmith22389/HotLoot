@@ -1245,7 +1245,7 @@ function HotLoot:ChatCommand(input)
         end
     else
         OpenOptionsWindow()
-        print(input.." | trim: ".. input:trim())
+        -- print(input.." | trim: ".. input:trim())
         -- LibStub("AceConfigCmd-3.0"):HandleCommand("hl", "HotLoot", input)
     end
 end
@@ -1275,9 +1275,7 @@ function HotLoot:LOOT_OPENED()
             local filtered, reason = FilterSlot(lootInfo[slot])
 
             if filtered then
-                if Options:Get('toggleDebugMode') then
-                    print("Item Looted in " .. Util:ColorText(reason, 'info') .. ".")
-                end
+                Util:Debug("Item Looted in " .. Util:ColorText(reason, 'info') .. ".")
 
                 if Options:Get('toggleEnableLootMonitor') then
                     local frame
@@ -1358,7 +1356,7 @@ end
 
 function HotLoot:MERCHANT_SHOW(...)
     if Options:Get('toggleSystemEnable') and Options:Get('toggleSellPoorItems') then
-    Util:Debug("Merchant Window Opened")
+        Util:Debug("Merchant Window Opened")
         SellPoorItems()
     end
 end

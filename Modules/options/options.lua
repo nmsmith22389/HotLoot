@@ -565,7 +565,7 @@ optionsTable = {
                             desc = L['toggleSkinningModeDesc']..'\n\n'..Util:ColorText(L['dialogConfirmSkinningModeWarn'], 'alert'),
                             type = 'toggle',
                             confirm = 'ConfirmOption',
-                            confirmText = L["dialogConfirmSkinningMode"]..'\n\n'..Util:ColorText(L["dialogConfirmSkinningModeWarn"], 'alert'),
+                            confirmText = L['dialogConfirmSkinningMode']..'\n\n'..Util:ColorText(L['dialogConfirmSkinningModeWarn'], 'alert'),
                             order = 1
                         },
                         selectSkinningModeModifier = {
@@ -1458,23 +1458,24 @@ optionsTable = {
                             end
                         },
                         toggleAugmentRuneFilter = {
-                            name = L['FilterNameTemplate']:format('Defiled Augment Runes'),
-                            desc = L['FilterDescTemplate']:format('Defiled Augment Runes'),
+                            name = L['toggleAugmentRuneFilterName'],
+                            desc = L['toggleAugmentRuneFilterDesc'],
                             type = 'toggle',
                             width = 'double',
                             order = 3
                         },
                         toggleKnowledgeScrollFilter = {
-                            name = L['FilterNameTemplate']:format('Artifact Research Notes'),
-                            desc = L['FilterDescTemplate']:format('Artifact Research Notes'),
+                            name = L['toggleKnowledgeScrollFilterName'],
+                            desc = L['toggleKnowledgeScrollFilterDesc'],
                             type = 'toggle',
                             width = 'double',
                             order = 4
                         },
                         toggleSentinaxBeaconFilter = {
-                            name = L['FilterNameTemplate']:format('Sentiax Beacons'),
-                            desc = L['FilterDescTemplate']:format('Sentiax Beacons'),
+                            name = L['toggleSentinaxBeaconFilterName'],
+                            desc = L['toggleSentinaxBeaconFilterDesc'],
                             type = 'toggle',
+                            width = 'double',
                             order = 5
                         },
                     }

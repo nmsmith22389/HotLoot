@@ -371,38 +371,39 @@ local function CanStack(iname, scount, lquant)
     --end
 end
 
--- TODO: Clean Up
+local untypedItems = {
+    ['Leather'] = {
+        [124439] = true,
+        [124438] = true,
+    },
+    ['Defiled Augment Rune'] = {
+        [140587] = true,
+    },
+    ['Artifact Research Notes'] = {
+        [139390] = true,
+    },
+    ['Sentinax Beacons'] = {
+        [146909] = true, [146908] = true, [146907] = true,
+        [146906] = true, [146905] = true, [146903] = true,
+        [146915] = true, [146914] = true, [146913] = true,
+        [146912] = true, [146911] = true, [146910] = true,
+        [146921] = true, [146920] = true, [146919] = true,
+        [146918] = true, [146917] = true, [146916] = true,
+        [147355] = true, [146923] = true, [146922] = true,
+        [147893] = true, [147889] = true, [147892] = true,
+        [147891] = true, [147894] = true,
+    },
+}
+
 local function CheckUntyped(type, itemLink)
     local itemId = Util:GetItemID(itemLink)
-    local items = {}
-    if type == 'Leather' then
-        items = {
-            [124439] = true,
-            [124438] = true,
-        }
-    elseif type == 'Defiled Augment Rune' then
-        items = {
-            [140587] = true,
-        }
-    elseif type == 'Artifact Research Notes' then
-        items = {
-            [139390] = true,
-        }
-    elseif type == 'Sentinax Beacons' then
-        items = {
-            [146909] = true, [146908] = true, [146907] = true,
-            [146906] = true, [146905] = true, [146903] = true,
-            [146915] = true, [146914] = true, [146913] = true,
-            [146912] = true, [146911] = true, [146910] = true,
-            [146921] = true, [146920] = true, [146919] = true,
-            [146918] = true, [146917] = true, [146916] = true,
-            [147355] = true, [146923] = true, [146922] = true,
-            [147893] = true, [147889] = true, [147892] = true,
-            [147891] = true, [147894] = true,
-        }
+
+    if not untypedItems[type] then
+        Util:Debug('Invalid type for CheckUntyped()')
+        return false
     end
 
-    if items[itemId] then
+    if untypedItems[type][itemId] then
         Util:Debug('Untyped item in filter. [class: '..type..']')
         return true
     else

@@ -403,7 +403,7 @@ local function CheckUntyped(type, itemLink)
         return false
     end
 
-    if untypedItems[type][itemId] then
+    if untypedItems[type][tonumber(itemId)] then
         Util:Debug('Untyped item in filter. [class: '..type..']')
         return true
     else

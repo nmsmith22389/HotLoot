@@ -785,7 +785,7 @@ local function GetItemValueText(itemLink, useTSM)
     local itemValue
     local prefixText = ''
 
-    -- FIXME: Replace dummy opts and add input for source
+    -- FIXME: Figure out why sometimes as of 7.2.5 it gets nil as the value
     if useTSM and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
         local tsmSources = TSMAPI:GetPriceSources()
         local priceSource = (tsmSources[Options:Get('inputValueTSMSource')]) and Options:Get('inputValueTSMSource') or 'DBMarket'

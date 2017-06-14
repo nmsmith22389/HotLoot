@@ -160,6 +160,11 @@ function Util:FormatMoney(amount, style, textonly)
 	local silvername = textonly and COLOR_SILVER..SILVER_AMOUNT_SYMBOL..'|r' or ICON_SILVER
 	local goldname = textonly and COLOR_GOLD..GOLD_AMOUNT_SYMBOL..'|r' or ICON_GOLD
 
+    -- Note: Added this in to fix `abs recieved nil value` error
+    if not amount then
+        return 'N/A'
+    end
+
 	local value = abs(amount)
 	local gold = floor(value / 10000)
 	local silver = floor(mod(value / 100, 100))

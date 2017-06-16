@@ -64,6 +64,17 @@ local tableFilterTypes = {
     ['Include'] = L['headerIncludeList'],
 }
 
+local tableItemQuality = {
+    ['0'] = ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC..'|r',
+    ['1'] = ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC..'|r',
+    ['2'] = ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC..'|r',
+    ['3'] = ITEM_QUALITY_COLORS[3].hex..ITEM_QUALITY3_DESC..'|r',
+    ['4'] = ITEM_QUALITY_COLORS[4].hex..ITEM_QUALITY4_DESC..'|r',
+    ['5'] = ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC..'|r',
+    ['6'] = ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC..'|r',
+    ['7'] = ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r',
+}
+
 -- TODO: fix so that it gets all window names
 local tableChatWindows
 local function GetChatWindows()
@@ -95,6 +106,10 @@ end
 
 local defaults = {
     profile = {
+        --
+        -- ─── INTERNAL ────────────────────────────────────────────────────
+        --
+
         minimapIcon = {
             hide = false,
             radius = 80,
@@ -105,6 +120,11 @@ local defaults = {
             y = false
         },
         firstRun = false,
+
+        --
+        -- ─── GENERAL ─────────────────────────────────────────────────────
+        --
+
         toggleSystemEnable = true,
         toggleDisableInRaid = true,
         toggleDebugMode = false,
@@ -228,6 +248,10 @@ local defaults = {
         rangeLine2TextXOffset = 0,
         rangeLine2TextYOffset = 0,
 
+        --
+        -- ─── FILTERS ─────────────────────────────────────────────────────
+        --
+
         toggleGoldFilter             = true,
         toggleQuestFilter            = true,
         toggleCurrencyFilter         = true,
@@ -248,6 +272,13 @@ local defaults = {
         toggleFlaskFilter            = false,
         toggleElixirFilter           = false,
         toggleElementalFilter        = false,
+
+        --
+        -- ─── QUALITY FILTERS ─────────────────────────────────────────────
+        --
+
+        toggleOnlyEquipQuality       = false,
+        selectMinEquipQuality        = '2',
         togglePoorQualityFilter      = false,
         toggleSellPoorItems          = false,
         toggleCommonQualityFilter    = false,
@@ -1488,14 +1519,14 @@ optionsTable = {
             order = 6,
             args = {
                 descItemQualityFilters = {
-                    name = L['descItemQualityFilters']..'\n',
+                    name = Util:ColorText(L['descItemQualityFilters'], 'info')..'\n',
                     type = 'description',
-                    order = 0,
+                    order = 1,
                 },
                 buttonEnableAllFiltersQuality = {
                     name = L['buttonEnableAll'],
                     type = 'execute',
-                    order = 1,
+                    order = 2,
                     func = function()
                         Options:Set('togglePoorQualityFilter',      true)
                         Options:Set('toggleCommonQualityFilter',    true)
@@ -1510,7 +1541,7 @@ optionsTable = {
                 buttonDisableAllFiltersQuality = {
                     name = L['buttonDisableAll'],
                     type = 'execute',
-                    order = 2,
+                    order = 3,
                     func = function()
                         Options:Set('togglePoorQualityFilter',      false)
                         Options:Set('toggleCommonQualityFilter',    false)
@@ -1527,27 +1558,27 @@ optionsTable = {
                     desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC..'|r'),
                     type = 'toggle',
                     width = 'full',
-                    order = 3,
+                    order = 6,
                 },
                 toggleSellPoorItems = {
-                    name = L['toggleSellPoorItemsName'],
+                    name = '    '..L['toggleSellPoorItemsName'],
                     desc = L['toggleSellPoorItemsDesc'],
                     type = 'toggle',
                     width = 'full',
-                    order = 4,
+                    order = 8,
                 },
                 toggleCommonQualityFilter = {
                     name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC..'|r'),
                     desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC..'|r'),
                     type = 'toggle',
                     width = 'full',
-                    order = 6,
+                    order = 9,
                 },
                 toggleUncommonQualityFilter = {
                     name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC..'|r'),
                     desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC..'|r'),
                     type = 'toggle',
-                    order = 8,
+                    order = 10,
                     width = 'full',
                 },
                 toggleRareQualityFilter = {
@@ -1555,51 +1586,78 @@ optionsTable = {
                     desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[3].hex..ITEM_QUALITY3_DESC..'|r'),
                     type = 'toggle',
                     width = 'full',
-                    order = 10,
+                    order = 11,
                 },
                 toggleEpicQualityFilter = {
                     name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[4].hex..ITEM_QUALITY4_DESC..'|r'),
                     desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[4].hex..ITEM_QUALITY4_DESC..'|r'),
                     type = 'toggle',
                     width = 'full',
-                    order = 12,
+                    order = 13,
                 },
                 toggleLegendaryQualityFilter = {
                     name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC..'|r'),
                     desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC..'|r'),
                     type = 'toggle',
                     width = 'full',
-                    order = 14,
+                    order = 15,
                 },
                 toggleArtifactQualityFilter = {
                     name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC..'|r'),
                     desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC..'|r'),
                     type = 'toggle',
                     width = 'full',
-                    order = 16,
+                    order = 17,
                 },
                 toggleHeirloomQualityFilter = {
                     name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r'),
                     desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r'),
                     type = 'toggle',
                     width = 'full',
-                    order = 18,
-                },
-                inputMinItemLevel = {
-                    name = L['inputMinItemLevelName'],
-                    desc = L['inputMinItemLevelDesc'],
-                    type = 'input',
-                    -- pattern = '%d+',
                     order = 19,
-                    set = function(info, value)
-                        if value == '' or not tonumber(value) then
-                            Options.db.profile.inputMinItemLevel = 0;
-                            Util:Debug('inputMinItemLevel not set (defaulting to 0)');
-                        else
-                            Options.db.profile.inputMinItemLevel = value;
-                            Util:DebugOption('inputMinItemLevel', value);
-                        end
-                    end
+                },
+                groupOnlyEquipQuality = {
+                    name = 'Use Only for Equipment',
+                    type = 'group',
+                    order = 21,
+                    inline = true,
+                    args = {
+                        descOnlyEquipQuality = {
+                            name = Util:ColorText('This option will cause the Item Quality Filters to only work for equippable items.', 'info')..'\n',
+                            type = 'description',
+                            order = 1,
+                        },
+                        toggleOnlyEquipQuality = {
+                            name = L['genEnable'],
+                            desc = 'Make the Quality Filters only apply to eqippable items.',
+                            type = 'toggle',
+                            width = 'full',
+                            order = 2,
+                        },
+                        selectMinEquipQuality = {
+                            name = 'Minimum Quality',
+                            desc = 'The minimum quality for the Equippable Only option to apply.',
+                            type = 'select',
+                            values = tableItemQuality,
+                            order = 3,
+                        },
+                        inputMinItemLevel = {
+                            name = L['inputMinItemLevelName'],
+                            desc = L['inputMinItemLevelDesc'],
+                            type = 'input',
+                            -- pattern = '%d+',
+                            order = 4,
+                            set = function(info, value)
+                                if value == '' or not tonumber(value) then
+                                    Options.db.profile.inputMinItemLevel = 0;
+                                    Util:Debug('inputMinItemLevel not set (defaulting to 0)');
+                                else
+                                    Options.db.profile.inputMinItemLevel = value;
+                                    Util:DebugOption('inputMinItemLevel', value);
+                                end
+                            end
+                        },
+                    }
                 },
             },
         },

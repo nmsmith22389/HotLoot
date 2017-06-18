@@ -849,6 +849,7 @@ local function SetLoot(frame, loot)
             if self.item then
                 GameTooltip:SetOwner(self, 'ANCHOR_CURSOR')
                 GameTooltip:SetHyperlink(self.item)
+                GameTooltip:AddLine(Util:ColorText('Shift + Right Click', 'warning')..Util:ColorText(' to add this item to the exclude list.', 'info'))
                 GameTooltip:Show()
             end
         end
@@ -859,6 +860,11 @@ local function SetLoot(frame, loot)
         frame:SetScript('OnLeave', function(self)
             GameTooltip:Hide()
             ResetCursor()
+        end)
+        frame:SetScript('OnMouseUp', function(self, button)
+            if IsShiftKeyDown() and button == 'RightButton' then
+                Options:AddToExcludeList(nil, self.item)
+            end
         end)
     else
         frame.item = nil

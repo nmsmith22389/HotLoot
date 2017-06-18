@@ -681,11 +681,11 @@ local function FilterSlot(loot)
                 Options:Get('togglePoorQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_POOR and
                 CheckThreshold("z1Poor", itemSellPrice, loot.quantity) and
-                (not equipOnly or (isEquipment and meetsMinLvl and meetsMinQual))
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 -- if equipOnly then
-                --     if meetsMinLvl and meetsMinQual then
-                --         return true, 'Poor Quality Filter'
+                --     if (isEquipment and meetsMinLvl and meetsMinQual) then
+                --         return true, 'Poor Quality Equipment Filter'
                 --     else
                 --         return false, 'Does not meet equipment requirements.'
                 --     end
@@ -698,7 +698,7 @@ local function FilterSlot(loot)
                 Options:Get('toggleCommonQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_COMMON and
                 CheckThreshold("z2Common", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or (isEquipment and meetsMinLvl and meetsMinQual))
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Common Quality Filter'
             end
@@ -708,7 +708,7 @@ local function FilterSlot(loot)
                 Options:Get('toggleUncommonQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_UNCOMMON and
                 CheckThreshold("z3Uncommon", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or (isEquipment and meetsMinLvl and meetsMinQual))
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Uncommon Quality Filter'
             end
@@ -718,7 +718,7 @@ local function FilterSlot(loot)
                 Options:Get('toggleRareQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_RARE and
                 CheckThreshold("z4Rare", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or (isEquipment and meetsMinLvl and meetsMinQual))
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Rare Quality Filter'
             end
@@ -728,7 +728,7 @@ local function FilterSlot(loot)
                 Options:Get('toggleEpicQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_EPIC and
                 CheckThreshold("z5Epic", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or (isEquipment and meetsMinLvl and meetsMinQual))
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Epic Quality Filter'
             end
@@ -738,7 +738,7 @@ local function FilterSlot(loot)
                 Options:Get('toggleLegendaryQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_LEGENDARY and
                 CheckThreshold("z6Legendary", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or (isEquipment and meetsMinLvl and meetsMinQual))
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Legendary Quality Filter'
             end
@@ -748,7 +748,7 @@ local function FilterSlot(loot)
                 Options:Get('toggleArtifactQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_ARTIFACT and
                 CheckThreshold("z7Artifact", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or (isEquipment and meetsMinLvl and meetsMinQual))
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Artifact Quality Filter'
             end
@@ -758,7 +758,7 @@ local function FilterSlot(loot)
                 Options:Get('toggleHeirloomQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_HEIRLOOM and
                 CheckThreshold("z8Heirloom", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or (isEquipment and meetsMinLvl and meetsMinQual))
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Heirloom Quality Filter'
             end

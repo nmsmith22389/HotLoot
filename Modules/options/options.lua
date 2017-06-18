@@ -1617,7 +1617,7 @@ optionsTable = {
                     order = 19,
                 },
                 groupOnlyEquipQuality = {
-                    name = 'Use Only for Equipment',
+                    name = 'Filter Equipment Only',
                     type = 'group',
                     order = 21,
                     inline = true,

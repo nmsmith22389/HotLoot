@@ -116,8 +116,7 @@ function HotLoot:OnEnable()
 
     -- Register Events
     self:RegisterEvent("LOOT_OPENED")
-    self:RegisterEvent("LOOT_SLOT_CLEARED")
-    self:RegisterEvent("LOOT_CLOSED")
+    -- self:RegisterEvent("LOOT_CLOSED")
     self:RegisterEvent("BAG_UPDATE")
     self:RegisterEvent("MERCHANT_SHOW")
 
@@ -1292,39 +1291,77 @@ end
 -- ─── EVENTS ─────────────────────────────────────────────────────────────────────
 --
 
-function HotLoot:LOOT_OPENED(event, autoLooting)
-    if Options:Get('toggleSystemEnable') and autoLooting == 0 then
+function HotLoot:LOOT_OPENED()
+    if Options:Get('toggleSystemEnable') then
         -- TODO: Revaluate why mouse focus is needed
         -- mFocus = GetMouseFocus()
         -- mFocus = (mFocus) and mFocus:GetName() or 'nil'
 
         skinModeTrigger = 0
 
-        self.lootInfo = GetLootInfo()
-        self.isLooting = true
-        self.itemsLooted = {}
+        local lootInfo = GetLootInfo()
         -- For staggering the fades
-        self.staggerCount = 0
+        local staggerCount = 0
 
-        for slot, lootItem in pairs(self.lootInfo) do
-            self.lootInfo[slot].link = GetLootSlotLink(slot)
-            self.lootInfo[slot].slotType = (Util:SlotIsGold(slot)     and HL_LOOT_SLOT_TYPE.COIN) or
+        for slot, lootItem in pairs(lootInfo) do
+            lootInfo[slot].link = GetLootSlotLink(slot)
+            lootInfo[slot].slotType = (Util:SlotIsGold(slot)     and HL_LOOT_SLOT_TYPE.COIN) or
                                       (Util:SlotIsCurrency(slot) and HL_LOOT_SLOT_TYPE.CURRENCY) or
                                       HL_LOOT_SLOT_TYPE.ITEM
 
-            local filtered, reason = FilterSlot(self.lootInfo[slot])
+            local filtered, reason = FilterSlot(lootInfo[slot])
 
             if filtered then
                 Util:Debug("Item Looted in " .. Util:ColorText(reason, 'info') .. ".")
-                self.itemsLooted[slot] = true
+
+                if Options:Get('toggleEnableLootMonitor') then
+                    local frame
+                    local nextIndex = self:GetNextToastIndex()
+
+                    -- TODO: This can be simplified
+                    if not nextIndex then
+                        frame = self:CreateLootToast()
+                        self:ShiftToastPosUp()
+                        frame:SetLoot(lootInfo[slot])
+                        table.insert(self.toasts, frame)
+                    else
+                        frame = self.toasts[nextIndex]
+
+                        -- TODO: It might be possible to make 2 seperate pools (4 since sides also) and use those instead
+                        if frame.size ~= Options:Get('selectThemeSize') or frame.textSide ~= Options:Get('selectTextSide') then
+                            self.toasts[nextIndex] = self:CreateLootToast()
+                            self.toasts[nextIndex]['pos'] = frame.pos
+                            frame = self.toasts[nextIndex]
+                        end
+
+                        self:ShiftToastPosUp()
+                        frame:SetLoot(lootInfo[slot])
+                    end
+
+                    self:UpdateAnchors()
+
+                    -- frame:SetScript('OnShow', function(self)
+                        frame.timer = HotLoot:ScheduleTimer(function()
+                            if frame.animation and Options:Get('toggleShowAnimation') then
+                                frame.animation:Play()
+                            else
+                                frame:Hide()
+                            end
+                        end, Options:Get('rangeDisplayTime') + Options:Get('rangeMultipleDelay') * staggerCount)
+                    -- end)
+
+                    -- Increase Stagger Count
+                    staggerCount = staggerCount + 1
+
+                    frame:Show()
+                end
+
                 LootSlot(slot)
             else
                 Util:Debug('Item NOT looted. '..Util:ColorText('('..tostring(reason)..')', 'alert'))
                 ToSkin(slot)
             end
         end
-
-        self.isLooting = false
 
         if Options:Get('toggleLootFrameEnable') and HotLootFrame then
             if not Options:Get('toggleCloseLootWindow') or Util:IsCloseKeyDown() then
@@ -1342,52 +1379,6 @@ function HotLoot:LOOT_OPENED(event, autoLooting)
                 CloseLoot();
             end
         end
-    elseif autoLooting == 1 then
-        Util:Announce(Util:ColorText('HotLoot can not loot when autolooting is enable. Disable it to use HotLoot.', 'alert'))
-    end
-end
-
-function HotLoot:LOOT_SLOT_CLEARED(event, slot)
-    if Options:Get('toggleEnableLootMonitor') and self.isLooting and self.itemsLooted[slot] then
-        local frame
-        local nextIndex = self:GetNextToastIndex()
-
-        -- TODO: This can be simplified
-        if not nextIndex then
-            frame = self:CreateLootToast()
-            self:ShiftToastPosUp()
-            frame:SetLoot(self.lootInfo[slot])
-            table.insert(self.toasts, frame)
-        else
-            frame = self.toasts[nextIndex]
-
-            -- TODO: It might be possible to make 2 seperate pools (4 since sides also) and use those instead
-            if frame.size ~= Options:Get('selectThemeSize') or frame.textSide ~= Options:Get('selectTextSide') then
-                self.toasts[nextIndex] = self:CreateLootToast()
-                self.toasts[nextIndex]['pos'] = frame.pos
-                frame = self.toasts[nextIndex]
-            end
-
-            self:ShiftToastPosUp()
-            frame:SetLoot(self.lootInfo[slot])
-        end
-
-        self:UpdateAnchors()
-
-        -- frame:SetScript('OnShow', function(self)
-            frame.timer = HotLoot:ScheduleTimer(function()
-                if frame.animation and Options:Get('toggleShowAnimation') then
-                    frame.animation:Play()
-                else
-                    frame:Hide()
-                end
-            end, Options:Get('rangeDisplayTime') + Options:Get('rangeMultipleDelay') * self.staggerCount)
-        -- end)
-
-        -- Increase Stagger Count
-        self.staggerCount = self.staggerCount + 1
-
-        frame:Show()
     end
 end
 
@@ -1398,11 +1389,6 @@ function HotLoot:LOOT_CLOSED()
     --         incButtons[i]:Hide()
     --     end
     -- end
-
-    self.lootInfo = {}
-    self.itemsLooted = {}
-    -- For staggering the fades
-    self.staggerCount = 0
 end
 
 function HotLoot:MERCHANT_SHOW(...)

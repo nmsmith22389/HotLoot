@@ -1311,7 +1311,7 @@ function HotLoot:LOOT_OPENED()
 
             local filtered, reason = FilterSlot(lootInfo[slot])
 
-            if filtered then
+            if filtered and not lootItem.locked then
                 Util:Debug("Item Looted in " .. Util:ColorText(reason, 'info') .. ".")
 
                 if Options:Get('toggleEnableLootMonitor') then

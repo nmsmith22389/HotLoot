@@ -1,13 +1,19 @@
 # CHANGELOG
 ## v3.2.1
 ### Added
-* Added TSM options for the value line in the loot monitor.
+* Added a logo in the options!
+* Added `Shift+Right Click` on a loot toast to add it to the exclude list.
+* Added an option in the **Item Quality** filters to only consider equipment.
+* Added TSM options for the value line in the loot monitor. *(show min buyout etc.)*
 * Added a logo in options.
 * Added Legion filters.
 ### Fixed
-* Changed to a new logo.
+* Loot toasts should now not show if an item can't be looted. *(still a wip)*
+* Changed minimap icon to match new logo.
 * Changed the default options window size.
 * Fixed some options formatting.
+* Fixed an error with money formatting.
+* Locale update.
 
 ## v3.2
 #### This is such a HUGE update that I couldn't list every single change but these are some of the big ones.

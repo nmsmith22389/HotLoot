@@ -133,8 +133,8 @@ end
 -- ─── ANCHOR FRAME ───────────────────────────────────────────────────────────────
 --
 
-function HotLoot:CreateAnchorFrame()
-    local anchor = CreateFrame("Frame", 'HotLoot_Anchor', UIParent)
+function HotLoot:RefreshAnchorPosition()
+    local anchor = self.Anchor
 
     anchor:ClearAllPoints()
     if Options:Get('anchorPosition')['x'] and Options:Get('anchorPosition')['y'] then
@@ -142,6 +142,10 @@ function HotLoot:CreateAnchorFrame()
     else
         anchor:SetPoint('CENTER', UIParent, 'CENTER', 0, 0)
     end
+end
+
+function HotLoot:CreateAnchorFrame()
+    local anchor = CreateFrame("Frame", 'HotLoot_Anchor', UIParent)
 
     anchor:SetBackdrop({
         bgFile   = LSM:Fetch('background', 'HotLoot Custom'),
@@ -188,6 +192,8 @@ function HotLoot:CreateAnchorFrame()
     anchor:Show()
 
     self.Anchor = anchor
+
+    self:RefreshAnchorPosition()
 end
 
 function HotLoot:ToggleAnchor(val)
@@ -365,38 +371,39 @@ local function CanStack(iname, scount, lquant)
     --end
 end
 
--- TODO: Clean Up
+local untypedItems = {
+    ['Leather'] = {
+        [124439] = true,
+        [124438] = true,
+    },
+    ['Defiled Augment Rune'] = {
+        [140587] = true,
+    },
+    ['Artifact Research Notes'] = {
+        [139390] = true,
+    },
+    ['Sentinax Beacons'] = {
+        [146909] = true, [146908] = true, [146907] = true,
+        [146906] = true, [146905] = true, [146903] = true,
+        [146915] = true, [146914] = true, [146913] = true,
+        [146912] = true, [146911] = true, [146910] = true,
+        [146921] = true, [146920] = true, [146919] = true,
+        [146918] = true, [146917] = true, [146916] = true,
+        [147355] = true, [146923] = true, [146922] = true,
+        [147893] = true, [147889] = true, [147892] = true,
+        [147891] = true, [147894] = true,
+    },
+}
+
 local function CheckUntyped(type, itemLink)
     local itemId = Util:GetItemID(itemLink)
-    local items = {}
-    if type == 'Leather' then
-        items = {
-            [124439] = true,
-            [124438] = true,
-        }
-    elseif type == 'Defiled Augment Rune' then
-        items = {
-            [140587] = true,
-        }
-    elseif type == 'Artifact Research Notes' then
-        items = {
-            [139390] = true,
-        }
-    elseif type == 'Sentinax Beacons' then
-        items = {
-            [146909] = true, [146908] = true, [146907] = true,
-            [146906] = true, [146905] = true, [146903] = true,
-            [146915] = true, [146914] = true, [146913] = true,
-            [146912] = true, [146911] = true, [146910] = true,
-            [146921] = true, [146920] = true, [146919] = true,
-            [146918] = true, [146917] = true, [146916] = true,
-            [147355] = true, [146923] = true, [146922] = true,
-            [147893] = true, [147889] = true, [147892] = true,
-            [147891] = true, [147894] = true,
-        }
+
+    if not untypedItems[type] then
+        Util:Debug('Invalid type for CheckUntyped()')
+        return false
     end
 
-    if items[itemId] then
+    if untypedItems[type][tonumber(itemId)] then
         Util:Debug('Untyped item in filter. [class: '..type..']')
         return true
     else
@@ -654,12 +661,35 @@ local function FilterSlot(loot)
 
             -- QUALITY
 
+            -- For Equipment Only option
+            local equipOnly = Options:Get('toggleOnlyEquipQuality')
+            local isEquipment = IsEquippableItem(loot.link)
+            local meetsMinLvl = false
+            local meetsMinQual = false
+            if equipOnly and isEquipment then
+                if tonumber(loot.quality) >= tonumber(Options:Get('selectMinEquipQuality')) then
+                    meetsMinQual = true
+                end
+
+                if tonumber(itemLevel) >= tonumber(Options:Get('inputMinItemLevel')) then
+                    meetsMinLvl = true
+                end
+            end
+
             --> Poor
             if
                 Options:Get('togglePoorQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_POOR and
-                CheckThreshold("z1Poor", itemSellPrice, loot.quantity)
+                CheckThreshold("z1Poor", itemSellPrice, loot.quantity) and
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
+                -- if equipOnly then
+                --     if (isEquipment and meetsMinLvl and meetsMinQual) then
+                --         return true, 'Poor Quality Equipment Filter'
+                --     else
+                --         return false, 'Does not meet equipment requirements.'
+                --     end
+                -- end
                 return true, 'Poor Quality Filter'
             end
 
@@ -667,7 +697,8 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleCommonQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_COMMON and
-                CheckThreshold("z2Common", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+                CheckThreshold("z2Common", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Common Quality Filter'
             end
@@ -676,7 +707,8 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleUncommonQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_UNCOMMON and
-                CheckThreshold("z3Uncommon", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+                CheckThreshold("z3Uncommon", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Uncommon Quality Filter'
             end
@@ -685,7 +717,8 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleRareQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_RARE and
-                CheckThreshold("z4Rare", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+                CheckThreshold("z4Rare", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Rare Quality Filter'
             end
@@ -694,7 +727,8 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleEpicQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_EPIC and
-                CheckThreshold("z5Epic", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+                CheckThreshold("z5Epic", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Epic Quality Filter'
             end
@@ -703,7 +737,8 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleLegendaryQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_LEGENDARY and
-                CheckThreshold("z6Legendary", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+                CheckThreshold("z6Legendary", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Legendary Quality Filter'
             end
@@ -712,7 +747,8 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleArtifactQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_ARTIFACT and
-                CheckThreshold("z7Artifact", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+                CheckThreshold("z7Artifact", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Artifact Quality Filter'
             end
@@ -721,12 +757,13 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleHeirloomQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_HEIRLOOM and
-                CheckThreshold("z8Heirloom", itemSellPrice, loot.quantity) and CheckILvl(itemLevel)
+                CheckThreshold("z8Heirloom", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 return true, 'Heirloom Quality Filter'
             end
 
-            return false, 'Not Found'
+            return false, 'Not Found in Filter'
         else
             Util:Announce(L["BagsFull"])
             Util:Debug(ERR_INV_FULL);
@@ -737,7 +774,7 @@ local function FilterSlot(loot)
             return false, 'Bags Full'
         end
     else
-        return false, 'Not Found'
+        return false, 'Not Found in Filter'
     end
 end
 
@@ -778,7 +815,7 @@ local function GetItemValueText(itemLink, useTSM)
     local itemValue
     local prefixText = ''
 
-    -- FIXME: Replace dummy opts and add input for source
+    -- FIXME: Figure out why sometimes as of 7.2.5 it gets nil as the value
     if useTSM and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
         local tsmSources = TSMAPI:GetPriceSources()
         local priceSource = (tsmSources[Options:Get('inputValueTSMSource')]) and Options:Get('inputValueTSMSource') or 'DBMarket'
@@ -812,6 +849,7 @@ local function SetLoot(frame, loot)
             if self.item then
                 GameTooltip:SetOwner(self, 'ANCHOR_CURSOR')
                 GameTooltip:SetHyperlink(self.item)
+                GameTooltip:AddLine(Util:ColorText('Shift + Right Click', 'warning')..Util:ColorText(' to add this item to the exclude list.', 'info'))
                 GameTooltip:Show()
             end
         end
@@ -822,6 +860,11 @@ local function SetLoot(frame, loot)
         frame:SetScript('OnLeave', function(self)
             GameTooltip:Hide()
             ResetCursor()
+        end)
+        frame:SetScript('OnMouseUp', function(self, button)
+            if IsShiftKeyDown() and button == 'RightButton' then
+                Options:AddToExcludeList(nil, self.item)
+            end
         end)
     else
         frame.item = nil
@@ -1239,7 +1282,7 @@ function HotLoot:ChatCommand(input)
         end
     else
         OpenOptionsWindow()
-        print(input.." | trim: ".. input:trim())
+        -- print(input.." | trim: ".. input:trim())
         -- LibStub("AceConfigCmd-3.0"):HandleCommand("hl", "HotLoot", input)
     end
 end
@@ -1268,10 +1311,8 @@ function HotLoot:LOOT_OPENED()
 
             local filtered, reason = FilterSlot(lootInfo[slot])
 
-            if filtered then
-                if Options:Get('toggleDebugMode') then
-                    print("Item Looted in " .. Util:ColorText(reason, 'info') .. ".")
-                end
+            if filtered and not lootItem.locked then
+                Util:Debug("Item Looted in " .. Util:ColorText(reason, 'info') .. ".")
 
                 if Options:Get('toggleEnableLootMonitor') then
                     local frame
@@ -1352,7 +1393,7 @@ end
 
 function HotLoot:MERCHANT_SHOW(...)
     if Options:Get('toggleSystemEnable') and Options:Get('toggleSellPoorItems') then
-    Util:Debug("Merchant Window Opened")
+        Util:Debug("Merchant Window Opened")
         SellPoorItems()
     end
 end

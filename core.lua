@@ -21,6 +21,7 @@ MIT License
 HotLoot = LibStub('AceAddon-3.0'):NewAddon('HotLoot', 'AceConsole-3.0', 'AceEvent-3.0', 'AceTimer-3.0')
 local L = LibStub('AceLocale-3.0'):GetLocale('HotLoot')
 local LSM = LibStub('LibSharedMedia-3.0')
+local TooltipScan = LibStub('LibTTScan-1.0')
 HotLoot.minimapIcon = LibStub('LibDBIcon-1.0')
 local Options, Util, HotLootFrame
 local icons, closeEL = {}, 0
@@ -643,6 +644,11 @@ local function FilterSlot(loot)
             end
 
             -- LEGION
+
+            --> Artifact Power
+            if Options:Get('toggleAPFilter') and TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link), true) then
+                return true, 'Artifact Power Filter'
+            end
 
             --> Defiled Augment Rune
             if Options:Get('toggleAugmentRuneFilter') and CheckUntyped('Defiled Augment Rune', loot.link) then

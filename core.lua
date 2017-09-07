@@ -1438,6 +1438,15 @@ function HotLoot:LOOT_CLOSED()
     self.lootInfo = nil
 end
 
+function HotLoot:LOOT_SLOT_CLEARED(slot)
+    -- TODO: Finish... Replace with option... Localize
+    local modifier = IsAltKeyDown()
+    if modifier and Options:Get('toggleIncludeModifierClick') and self.lootInfo and self.lootInfo[slot] then
+        local loot = self.lootInfo[slot]
+        Options:AddToIncludeList(nil, loot.item)
+    end
+end
+
 function HotLoot:MERCHANT_SHOW(...)
     if Options:Get('toggleSystemEnable') and Options:Get('toggleSellPoorItems') then
         Util:Debug("Merchant Window Opened")

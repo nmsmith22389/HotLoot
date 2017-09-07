@@ -128,31 +128,31 @@ local defaults = {
         -- ─── GENERAL ─────────────────────────────────────────────────────
         --
 
-        toggleSystemEnable = true,
-        toggleDisableInRaid = true,
-        toggleDebugMode = false,
-        toggleAnnounceEvents = true,
-        selectAnnounceWindow = GetDefaultChatWindow(),
-        toggleAnnounceBagsFullRaid = true,
-        toggleCloseLootWindow = false,
+        toggleSystemEnable            = true,
+        toggleDisableInRaid           = true,
+        toggleDebugMode               = false,
+        toggleAnnounceEvents          = true,
+        selectAnnounceWindow          = GetDefaultChatWindow(),
+        toggleAnnounceBagsFullRaid    = true,
+        toggleCloseLootWindow         = false,
         selectCloseLootWindowModifier = '0',
-        toggleSkinningMode = false,
-        selectSkinningModeModifier = '0',
+        toggleSkinningMode            = false,
+        selectSkinningModeModifier    = '0',
         --
         -- ─── LOOT MONITOR ────────────────────────────────────────────────
         --
 
-        toggleEnableLootMonitor = true,
+        toggleEnableLootMonitor     = true,
         toggleShowLootMonitorAnchor = true,
 
         --== Appearance ==--
         --> General
         selectGrowthDirection = -1,
-        selectThemeSize = 1,
-        rangeTransparency = 1,
-        rangeToastPadding = 8,
-        inputMinWidth = '145',
-        rangeToastScale = 0,
+        selectThemeSize       = 1,
+        rangeTransparency     = 1,
+        rangeToastPadding     = 8,
+        inputMinWidth         = '145',
+        rangeToastScale       = 0,
 
         --> Texture
         selectThemeBackground = 'HotLoot Custom',
@@ -169,27 +169,27 @@ local defaults = {
             b = 1,
             a = 1
         },
-        toggleColorByQuality = true,
-        toggleThemeBackgroundTile = true,
+        toggleColorByQuality         = true,
+        toggleThemeBackgroundTile    = true,
         rangeThemeBackgroundTileSize = 16,
-        rangeThemeBorderEdgeSize = 16,
-        rangeThemeBorderInset = 2,
+        rangeThemeBorderEdgeSize     = 16,
+        rangeThemeBorderInset        = 2,
 
         --> Icon
         rangeIconSize = 16,
 
         --> Animation
         toggleShowAnimation = true,
-        rangeDisplayTime = 4,
-        rangeMultipleDelay = 0.5,
-        rangeFadeSpeed = 5,
+        rangeDisplayTime    = 4,
+        rangeMultipleDelay  = 0.5,
+        rangeFadeSpeed      = 5,
 
         --
         -- ─── TEXT ────────────────────────────────────────────────────────
         --
         --** UNUSED **--
         selectTextFont = 'Roboto Condensed Bold',
-        rangeFontSize = 9,
+        rangeFontSize  = 9,
         colorFontColor = {
             ['r'] = 1.0,
             ['g'] = 1.0,
@@ -209,11 +209,11 @@ local defaults = {
         rangeNameTextYOffset = 0,
 
         --> Quantity
-        toggleShowItemQuant = true,
+        toggleShowItemQuant  = true,
         toggleShowTotalQuant = true,
-        selectQuantTextFont   = 'Roboto Condensed Bold',
-        rangeQuantTextSize    = 8,
-        colorQuantTextFont = {
+        selectQuantTextFont  = 'Roboto Condensed Bold',
+        rangeQuantTextSize   = 8,
+        colorQuantTextFont   = {
             r = 1.0,
             g = 1.0,
             b = 1.0,
@@ -223,7 +223,7 @@ local defaults = {
         rangeQuantTextYOffset = 0,
 
         --> Line 1
-        toggleShowItemType = false,
+        toggleShowItemType  = false,
         selectLine1TextFont = 'Roboto Condensed Bold',
         rangeLine1TextSize  = 10,
         colorLine1TextFont = {
@@ -245,9 +245,9 @@ local defaults = {
             b = 1.0,
             a = 1.0
         },
-        toggleShowTSMValue = false,
+        toggleShowTSMValue    = false,
         toggleShowValuePrefix = false,
-        inputValueTSMSource = 'DBMinBuyout',
+        inputValueTSMSource   = 'DBMinBuyout',
         rangeLine2TextXOffset = 0,
         rangeLine2TextYOffset = 0,
 
@@ -255,28 +255,32 @@ local defaults = {
         -- ─── FILTERS ─────────────────────────────────────────────────────
         --
 
-        toggleGoldFilter             = true,
-        toggleQuestFilter            = true,
-        toggleCurrencyFilter         = true,
-        toggleJunkFilter             = false,
-        togglePickpocketFilter       = true,
-        toggleClothFilter            = false,
-        toggleMiningFilter           = false,
-        toggleGemFilter              = false,
-        toggleHerbFilter             = false,
-        toggleLeatherFilter          = false,
-        toggleFishingFilter          = false,
-        toggleEnchantingFilter       = false,
-        togglePigmentsFilter         = false,
-        toggleCookingFilter          = false,
-        toggleRecipeFilter           = false,
-        togglePotionFilter           = false,
-        selectPotionType             = 'both',
-        toggleFlaskFilter            = false,
-        toggleElixirFilter           = false,
-        toggleElementalFilter        = false,
+        toggleGoldFilter       = true,
+        toggleQuestFilter      = true,
+        toggleCurrencyFilter   = true,
+        toggleJunkFilter       = false,
+        togglePickpocketFilter = true,
+        toggleClothFilter      = false,
+        toggleMiningFilter     = false,
+        toggleGemFilter        = false,
+        toggleHerbFilter       = false,
+        toggleLeatherFilter    = false,
+        toggleFishingFilter    = false,
+        toggleEnchantingFilter = false,
+        togglePigmentsFilter   = false,
+        toggleCookingFilter    = false,
+        toggleRecipeFilter     = false,
+        togglePotionFilter     = false,
+        selectPotionType       = 'both',
+        toggleFlaskFilter      = false,
+        toggleElixirFilter     = false,
+        toggleElementalFilter  = false,
+
         --> Legion Filters
         toggleAPFilter              = true,
+        toggleAugmentRuneFilter     = true,
+        toggleKnowledgeScrollFilter = true,
+        toggleSentinaxBeaconFilter  = true,
 
         --
         -- ─── QUALITY FILTERS ─────────────────────────────────────────────
@@ -293,7 +297,9 @@ local defaults = {
         toggleLegendaryQualityFilter = true,
         toggleArtifactQualityFilter  = true,
         toggleHeirloomQualityFilter  = true,
-        inputMinItemLevel = 0,
+        inputMinItemLevel            = 0,
+
+        -- FIXME: Add defaults for equip only options!
 
         -- Include List
         tableIncludeList = {},
@@ -309,7 +315,7 @@ local defaults = {
         inputThresholdValue2 = 0,
         selectThresholdType3 = '0None',
         inputThresholdValue3 = 0,
-        toggleUseQuantValue = false,
+        toggleUseQuantValue  = false,
     }
 }
 

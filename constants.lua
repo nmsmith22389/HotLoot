@@ -18,6 +18,46 @@ _G.HL_TEXT_SIDE = {
     LEFT  = 1
 }
 
+_G.HL_LOOT_REASON = {
+    NOT_FOUND          = 'Not Found in Filter',
+    BAGS_FULL          = 'Bags Full',
+    GOLD               = 'Gold Filter',
+    CURRENCY           = 'Currency Filter',
+    INCLUDE            = 'Include List',
+    EXCLUDE            = 'Exclude List',
+    QUEST              = 'Quest Item Filter',
+    PICKPOCKET         = 'Pickpocket Filter',
+    CLOTH              = 'Cloth Filter',
+    MINING             = 'Mining Filter',
+    GEM                = 'Gem Filter',
+    HERB               = 'Herb Filter',
+    LEATHER            = 'Leather Filter',
+    FISHING            = 'Fishing Filter',
+    ENCHANTING         = 'Enchanting Filter',
+    INSCRIPTION        = 'Inscription Filter',
+    COOKING            = 'Cooking Filter',
+    RECIPE             = 'Recipe Filter',
+    POTION             = 'Potion Filter',
+    POTION_HEALTH      = 'Health Potion Filter',
+    POTION_MANA        = 'Mana Potion Filter',
+    POTION_UNSUPPORTED = 'Unsupported Potion',
+    FLASK              = 'Flask Filter',
+    ELIXIR             = 'Elixir Filter',
+    ELEMENTAL          = 'Elemental Filter',
+    ARTIFACT_POWER     = 'Artifact Power Filter',
+    AUGMENT_RUNE       = 'Defiled Augment Rune Filter',
+    ARTIFACT_RESEARCH  = 'Artifact Research Notes Filter',
+    SENTINAX_BEACON    = 'Sentinax Beacons Filter',
+    QUALITY_POOR       = 'Poor Quality Filter',
+    QUALITY_COMMON     = 'Common Quality Filter',
+    QUALITY_UNCOMMON   = 'Uncommon Quality Filter',
+    QUALITY_RARE       = 'Rare Quality Filter',
+    QUALITY_EPIC       = 'Epic Quality Filter',
+    QUALITY_LEGENDARY  = 'Legendary Quality Filter',
+    QUALITY_ARTIFACT   = 'Artifact Quality Filter',
+    QUALITY_HEIRLOOM   = 'Heirloom Quality Filter',
+}
+
 -- @usage
 -- *to return the localized name*
 -- GetItemClassInfo(itemClassEnum)

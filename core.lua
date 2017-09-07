@@ -463,18 +463,18 @@ local function FilterSlot(loot)
         -- TODO: Consider moving this inside the item section
         -- Don't Loot
         Util:Announce(L["AnnounceItemExcluded"]:format(loot.link))
-        return false, 'Exclude List'
+        return false, HL_LOOT_REASON.EXCLUDE
     end
 
     if loot.slotType == HL_LOOT_SLOT_TYPE.COIN then
         -- Check Gold (Coin)
         if Options:Get('toggleGoldFilter') then
-            return true, 'Gold Filter'
+            return true, HL_LOOT_REASON.GOLD
         end
     elseif loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
         -- Check Currency
         if Options:Get('toggleCurrencyFilter') then
-            return true, 'Currency Filter'
+            return true, HL_LOOT_REASON.CURRENCY
         end
     elseif loot.slotType == HL_LOOT_SLOT_TYPE.ITEM and (not Options:Get('toggleDisableInRaid') or GetLootMethod() ~= 'master') then
         local _, _, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice, itemClass, itemSubClass = GetItemInfo(loot.link)
@@ -483,6 +483,7 @@ local function FilterSlot(loot)
 
             -- TODO: Normalize these so that the check order is (pref, type, subtype, other) (there may be special cases)
             -- TODO: Make options for quality to loot only equipable items
+            -- FIXME: ======== REPLACE LOOT REASON WITH CONSTANTS (need to finish) ========
 
             --> Debug
             if Options:Get('toggleDebugMode') then
@@ -494,7 +495,7 @@ local function FilterSlot(loot)
 
             --> Include List
             if Options:Get('tableIncludeList')[loot.item] then
-                return true, 'Include List'
+                return true, HL_LOOT_REASON.INCLUDE
             end
 
             --> Quest
@@ -503,12 +504,12 @@ local function FilterSlot(loot)
                 itemClass == HL_ITEM_CLASS.QUEST and
                 CheckThreshold("Quest", itemSellPrice, loot.quantity)
             then
-                return true, 'Quest Item Filter'
+                return true, HL_LOOT_REASON.QUEST
             end
 
             --> Pickpocket
             if IsStealthed() and Options:Get('togglePickpocketFilter') and loot.quality ~= 0 then
-                return true, 'Pickpocket Filter'
+                return true, HL_LOOT_REASON.PICKPOCKET
             end
 
             --> Cloth
@@ -517,7 +518,7 @@ local function FilterSlot(loot)
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.CLOTH) and
                 CheckThreshold("Cloth", itemSellPrice, loot.quantity)
             then
-                return true, 'Cloth Filter'
+                return true, HL_LOOT_REASON.CLOTH
             end
 
             --> Mining
@@ -526,7 +527,7 @@ local function FilterSlot(loot)
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.METAL_STONE) and
                 CheckThreshold("Metal & Stone", itemSellPrice, loot.quantity)
             then
-                return true, 'Mining Filter'
+                return true, HL_LOOT_REASON.MINING
             end
 
             --> Jewelcrafting
@@ -535,7 +536,7 @@ local function FilterSlot(loot)
                 --[[(itemClass == HL_ITEM_CLASS.GEM or ]](itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.JEWELCRAFTING) and
                 CheckThreshold("Gem", itemSellPrice, loot.quantity)
             then
-                return true, 'Gem Filter'
+                return true, HL_LOOT_REASON.GEM
             end
 
             --> Herbs
@@ -544,7 +545,7 @@ local function FilterSlot(loot)
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.HERB) and
                 CheckThreshold("Herb", itemSellPrice, loot.quantity)
             then
-                return true, 'Herb Filter'
+                return true, HL_LOOT_REASON.HERB
             end
 
             --> Leather
@@ -554,7 +555,7 @@ local function FilterSlot(loot)
                 CheckUntyped('Leather', loot.link)) and
                 CheckThreshold("Leather", itemSellPrice, loot.quantity)
             then
-                return true, 'Leather Filter'
+                return true, HL_LOOT_REASON.LEATHER
             end
 
             --> Fishing (-junk)
@@ -563,7 +564,7 @@ local function FilterSlot(loot)
                 Options:Get('toggleFishingFilter') and
                 not (itemClass == HL_ITEM_CLASS.MISCELLANEOUS and itemSubClass == HL_ITEM_SUB_CLASS.MISCELLANEOUS.JUNK)
             then
-                return true, 'Fishing Filter'
+                return true, HL_LOOT_REASON.FISHING
             end
 
             --> Enchanting
@@ -572,7 +573,7 @@ local function FilterSlot(loot)
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.ENCHANTING) and
                 CheckThreshold("Enchanting", itemSellPrice, loot.quantity)
             then
-                return true, 'Enchanting Filter'
+                return true, HL_LOOT_REASON.ENCHANTING
             end
 
             --> Inscription
@@ -769,7 +770,7 @@ local function FilterSlot(loot)
                 return true, 'Heirloom Quality Filter'
             end
 
-            return false, 'Not Found in Filter'
+            return false, HL_LOOT_REASON.NOT_FOUND
         else
             Util:Announce(L["BagsFull"])
             Util:Debug(ERR_INV_FULL);
@@ -777,10 +778,10 @@ local function FilterSlot(loot)
                 -- TODO: RECOLOR?
                 RaidNotice_AddMessage(RaidWarningFrame, L['BagsFull'], ChatTypeInfo["RAID_WARNING"])
             end
-            return false, 'Bags Full'
+            return false, HL_LOOT_REASON.BAGS_FULL
         end
     else
-        return false, 'Not Found in Filter'
+        return false, HL_LOOT_REASON.NOT_FOUND
     end
 end
 

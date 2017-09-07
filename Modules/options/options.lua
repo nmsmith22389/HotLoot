@@ -275,6 +275,8 @@ local defaults = {
         toggleFlaskFilter            = false,
         toggleElixirFilter           = false,
         toggleElementalFilter        = false,
+        --> Legion Filters
+        toggleAPFilter              = true,
 
         --
         -- ─── QUALITY FILTERS ─────────────────────────────────────────────
@@ -1545,6 +1547,7 @@ optionsTable = {
                             type = 'execute',
                             order = 1,
                             func = function()
+                                Options:Set('toggleAPFilter', true)
                                 Options:Set('toggleAugmentRuneFilter', true)
                                 Options:Set('toggleKnowledgeScrollFilter', true)
                                 Options:Set('toggleSentinaxBeaconFilter', true)
@@ -1555,31 +1558,39 @@ optionsTable = {
                             type = 'execute',
                             order = 2,
                             func = function()
+                                Options:Set('toggleAPFilter', false)
                                 Options:Set('toggleAugmentRuneFilter', false)
                                 Options:Set('toggleKnowledgeScrollFilter', false)
                                 Options:Set('toggleSentinaxBeaconFilter', false)
                             end
+                        },
+                        toggleAPFilter = {
+                            name = L['FilterNameTemplate']:format(ARTIFACT_POWER),
+                            desc = L['FilterDescTemplate']:format(ARTIFACT_POWER),
+                            type = 'toggle',
+                            width = 'double',
+                            order = 3
                         },
                         toggleAugmentRuneFilter = {
                             name = L['toggleAugmentRuneFilterName'],
                             desc = L['toggleAugmentRuneFilterDesc'],
                             type = 'toggle',
                             width = 'double',
-                            order = 3
+                            order = 4
                         },
                         toggleKnowledgeScrollFilter = {
                             name = L['toggleKnowledgeScrollFilterName'],
                             desc = L['toggleKnowledgeScrollFilterDesc'],
                             type = 'toggle',
                             width = 'double',
-                            order = 4
+                            order = 5
                         },
                         toggleSentinaxBeaconFilter = {
                             name = L['toggleSentinaxBeaconFilterName'],
                             desc = L['toggleSentinaxBeaconFilterDesc'],
                             type = 'toggle',
                             width = 'double',
-                            order = 5
+                            order = 6
                         },
                     }
                 },

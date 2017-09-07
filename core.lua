@@ -1307,19 +1307,23 @@ function HotLoot:LOOT_OPENED()
         skinModeTrigger = 0
 
         local lootInfo = GetLootInfo()
+        self.lootInfo = lootInfo
         -- For staggering the fades
         local staggerCount = 0
 
         for slot, lootItem in pairs(lootInfo) do
-            lootInfo[slot].link = GetLootSlotLink(slot)
-            lootInfo[slot].slotType = (Util:SlotIsGold(slot)     and HL_LOOT_SLOT_TYPE.COIN) or
+            lootItem.link = GetLootSlotLink(slot)
+            lootItem.slotType = (Util:SlotIsGold(slot)     and HL_LOOT_SLOT_TYPE.COIN) or
                                       (Util:SlotIsCurrency(slot) and HL_LOOT_SLOT_TYPE.CURRENCY) or
                                       HL_LOOT_SLOT_TYPE.ITEM
 
-            local filtered, reason = FilterSlot(lootInfo[slot])
+            local filtered, reason = FilterSlot(lootItem)
 
             if filtered and not lootItem.locked then
                 Util:Debug("Item Looted in " .. Util:ColorText(reason, 'info') .. ".")
+
+                -- NOTE: Setting the reason into the loot var so it can be read by SetLoot()
+                lootItem.reason = reason
 
                 if Options:Get('toggleEnableLootMonitor') then
                     local frame
@@ -1329,7 +1333,7 @@ function HotLoot:LOOT_OPENED()
                     if not nextIndex then
                         frame = self:CreateLootToast()
                         self:ShiftToastPosUp()
-                        frame:SetLoot(lootInfo[slot])
+                        frame:SetLoot(lootItem)
                         table.insert(self.toasts, frame)
                     else
                         frame = self.toasts[nextIndex]
@@ -1342,7 +1346,7 @@ function HotLoot:LOOT_OPENED()
                         end
 
                         self:ShiftToastPosUp()
-                        frame:SetLoot(lootInfo[slot])
+                        frame:SetLoot(lootItem)
                     end
 
                     self:UpdateAnchors()
@@ -1390,12 +1394,8 @@ function HotLoot:LOOT_OPENED()
 end
 
 function HotLoot:LOOT_CLOSED()
-    -- TODO: Change to support only HL LootFrame
-    -- if incButtons then
-    --     for i = 1, #incButtons do
-    --         incButtons[i]:Hide()
-    --     end
-    -- end
+    -- Clear stored loot info
+    self.lootInfo = nil
 end
 
 function HotLoot:MERCHANT_SHOW(...)

@@ -393,7 +393,7 @@ function lib:AboutOptionsTable(AddOn)
 				order = 50,
 				name = function()
 					local author = GetAddOnMetadata(AddOn, "Author") or UNKNOWN
-					author = string.gsub(author, "(%a)([%w_']*)", TitleCase)
+					--author = string.gsub(author, "(%a)([%w_']*)", TitleCase)
 					local authorservername = GetAddOnMetadata(AddOn, "X-Author-Server") or UNKNOWN
 					authorservername = string.gsub(authorservername, "(%a)([%w_']*)", TitleCase)
 					local authorfaction = GetAddOnMetadata(AddOn, "X-Author-Faction") or UNKNOWN

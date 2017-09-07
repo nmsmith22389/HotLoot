@@ -148,6 +148,29 @@ function Util:SlotIsCurrency(slot)
     end
 end
 
+function Util:ShortNumber(num, places)
+    local ret
+    local placeValue = ("%%.%df"):format(places or 0)
+    if not num then
+        return 0
+    elseif num >= 1000000000000 then
+        placeValue = placeValue..'T'
+        ret = placeValue:format(num / 1000000000000) -- trillion
+    elseif num >= 1000000000 then
+        placeValue = placeValue..'B'
+        ret = placeValue:format(num / 1000000000) -- billion
+    elseif num >= 1000000 then
+        placeValue = placeValue..'M'
+        ret = placeValue:format(num / 1000000) -- million
+    elseif num >= 1000 then
+        placeValue = placeValue..'K'
+        ret = placeValue:format(num / 1000) -- thousand
+    else
+        ret = num -- hundreds
+    end
+    return ret
+end
+
 --Money text formatting, code taken from Scrooge by thelibrarian ( http://www.wowace.com/addons/scrooge/ )
 local COLOR_COPPER = "|cffeda55f"
 local COLOR_SILVER = "|cffc7c7cf"

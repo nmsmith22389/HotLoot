@@ -3,6 +3,9 @@ local module = Options -- Alias
 local L = LibStub('AceLocale-3.0'):GetLocale('HotLoot')
 local Util = HotLoot:GetModule('Util')
 
+-- TODO: Consider moving smart info and TSM options to Loot Monitor Appearance > General or even some place better
+--       (The text options section should prob just be for actual text appearance.)
+
 --
 -- ─── LOCALS ─────────────────────────────────────────────────────────────────────
 --
@@ -659,6 +662,75 @@ optionsTable = {
                             order = 2,
                             set = 'SetShowLootMonitorAnchor'
                         },
+                        spacer = {
+                            name = '',
+                            type = 'description',
+                            width = 'full',
+                            order = 4
+                        },
+                        -- TODO:FIXME: LOCALIZE!
+                        groupSmartInfo = {
+                            name = 'Smart Info',
+                            type = 'group',
+                            inline = true,
+                            order = 6,
+                            args = {
+                                --TODO: Make sure that when this is turned on it also turns 'Show Type Text' on as well.
+                                toggleSmartInfo = {
+                                    -- name = L['toggleSmartInfoName'],
+                                    -- desc = L['toggleSmartInfoDesc'],
+                                    name = L['genEnable'],
+                                    -- desc = L['toggleSmartInfoDesc'],
+                                    type = 'toggle',
+                                    width = 'full',
+                                    order = 2
+                                },
+                                groupFarmingMode = {
+                                    name = 'Farming Mode',
+                                    type = 'group',
+                                    inline = true,
+                                    order = 4,
+                                    args = {
+                                        --[[
+                                            --hhitems =  {}
+                                            --hhitems.Foxflower = {}
+                                            --table.insert(hhitems.Foxflower, {
+                                            --      quant = 5,
+                                            --      time = time()
+                                            --})
+                                            --print(#hhitems.Foxflower)
+                                            local ti = 0
+                                            local td = 0
+                                            local mint = 0
+                                            local maxt = 0
+                                            for i, v in ipairs(hhitems.Foxflower) do
+                                               ti = ti + v.quant
+                                               if mint == 0 or v.time < mint then
+                                                  mint = v.time
+                                               end
+                                               if maxt == 0 or v.time > maxt then
+                                                  maxt = v.time
+                                               end
+
+                                            end
+                                            td = maxt - mint
+                                            print(format('Tot Quant: %d', ti))
+                                            print(format('Duration : %d', td))
+                                            local iPerSec = ti/td
+                                            local iph = iPerSec*60*60
+                                            print('Items/Hour #2: '..iph)
+                                        ]]
+                                        toggleFarmingMode = {
+                                            name = L['genEnable'],
+                                            -- desc = L['toggleFarmingMode'],
+                                            type = 'toggle',
+                                            width = 'full',
+                                            order = 2
+                                        },
+                                    }
+                                },
+                            }
+                        },
                     }
                 },
                 groupLootMonitorAppearance = {
@@ -1063,7 +1135,7 @@ optionsTable = {
                             name = L['genEnable'], -- Used to be toggleShowItemTypeName
                             desc = L['toggleShowItemTypeDesc'],
                             type = 'toggle',
-                            width = 'double',
+                            -- width = 'double',
                             order = 18
                         },
                         selectLine1TextFont = {
@@ -1073,7 +1145,7 @@ optionsTable = {
                             dialogControl = 'LSM30_Font',
                             values = AceGUIWidgetLSMlists.font,
                             width = 'double',
-                            order = 19
+                            order = 21
                         },
                         rangeLine1TextSize = {
                             name = L['rangeFontSizeName'],
@@ -1084,7 +1156,7 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 20
+                            order = 22
                         },
                         colorLine1TextFont = {
                             name = L['colorFontColorName'],
@@ -1092,7 +1164,7 @@ optionsTable = {
                             type = 'color',
                             -- hidden = 'Advanced',
                             hasAlpha = true,
-                            order = 21,
+                            order = 23,
                             set = 'SetColor',
                             get = 'GetColor'
                         },
@@ -1124,14 +1196,14 @@ optionsTable = {
                         headerLine2Text = {
                             name = L['headerLine2Text'],
                             type = 'header',
-                            order = 24,
+                            order = 26,
                         },
                         toggleShowSellPrice = {
                             name = L['genEnable'], -- Used to be toggleShowSellPriceName
                             desc = L['toggleShowSellPriceDesc'],
                             type = 'toggle',
                             width = 'double',
-                            order = 25
+                            order = 27
                         },
                         selectLine2TextFont = {
                             name = L['genFont'],
@@ -1140,7 +1212,7 @@ optionsTable = {
                             dialogControl = 'LSM30_Font',
                             values = AceGUIWidgetLSMlists.font,
                             width = 'double',
-                            order = 26
+                            order = 28
                         },
                         rangeLine2TextSize = {
                             name = L['rangeFontSizeName'],
@@ -1151,7 +1223,7 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 27
+                            order = 29
                         },
                         colorLine2TextFont = {
                             name = L['colorFontColorName'],
@@ -1159,14 +1231,14 @@ optionsTable = {
                             type = 'color',
                             -- hidden = 'Advanced',
                             hasAlpha = true,
-                            order = 28,
+                            order = 30,
                             set = 'SetColor',
                             get = 'GetColor'
                         },
                         groupTSMValue = {
                             name = L['groupTSMValue'],
                             type = 'group',
-                            order = 29,
+                            order = 31,
                             inline = true,
                             args = {
                                 toggleShowTSMValue = {

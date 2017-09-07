@@ -846,6 +846,40 @@ local function GetItemValueText(itemLink, useTSM)
     return prefixText..Util:FormatMoney(itemValue, 'SMART', true)
 end
 
+local function GetSmartInfoText(loot)
+-- ────────────────────────────────────────────────────────────────────────────────
+-- TODO: Localize ALL these
+-- ────────────────────────────────────────────────────────────────────────────────
+    if loot.slotType == HL_LOOT_SLOT_TYPE.COIN then
+        --> If loot is gold
+        -- ... show total player gold.
+        -- TODO: LOCALIZE
+        local template = 'Player Gold: %s'
+        local goldValue = GetMoney()
+        return template:format(Util:FormatMoney(goldValue, 'SMART', true))
+    elseif loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
+        --> If loot is currency
+        -- ... Weekly max? Total max?
+        return CURRENCY
+    else
+        --> If loot is an item
+        local reason = loot.reason
+
+        --> If the item is...
+        if reason == HL_LOOT_REASON.ARTIFACT_POWER then
+            -- Artifact Power
+            -- TODO: LOCALIZE
+            return string.format('Gives %s AP', Util:ShortNumber(TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link))), 1)
+        else
+            local typeText        = select(6, GetItemInfo(loot.link)) or 'N/A'
+            local subtypeText     = select(7, GetItemInfo(loot.link)) or 'N/A'
+            local typeTextDivider = ': '
+
+            return typeText..typeTextDivider..subtypeText
+        end
+    end
+end
+
 -- TODO: Add option to change text outline (ie outline, thickoutline, mono, none)
 local function SetLoot(frame, loot)
     --> Set ToolTip
@@ -1005,7 +1039,7 @@ local function SetLoot(frame, loot)
         frame.type:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha)
 
         if Options:Get('toggleShowItemType') then
-            local typeText, subtypeText, typeTextDivider = '', '', ''
+            local typeText, subtypeText, typeTextDivider, typeOutput = '', '', '', ''
 
             if loot.slotType == HL_LOOT_SLOT_TYPE.ITEM then
                 typeText        = select(6, GetItemInfo(loot.link)) or 'N/A'
@@ -1015,7 +1049,13 @@ local function SetLoot(frame, loot)
                 typeText = CURRENCY
             end
 
-            frame.type:SetText(typeText..typeTextDivider..subtypeText)
+            if Options:Get('toggleSmartInfo') then
+                typeOutput = GetSmartInfoText(loot)
+            else
+                typeOutput = typeText..typeTextDivider..subtypeText
+            end
+
+            frame.type:SetText(typeOutput)
             -- frame.type:ClearAllPoints()
             -- frame.type:SetPoint('TOPLEFT', frame, 'TOPLEFT', theme.text.type.left, theme.text.type.top)
 

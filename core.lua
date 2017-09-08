@@ -996,7 +996,7 @@ local function SetLoot(frame, loot)
             if Options:Get('toggleShowTotalQuant') and loot.slotType ~= nil then
                 if loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
                     local _, currencyCurrentAmount, _, _, _, currencyMax, _ = GetCurrencyInfo(loot.link)
-                    local currencyTotalText = (currencyCurrentAmount + loot.quantity < currencyMax) and (currencyCurrentAmount + loot.quantity) or currencyMax
+                    local currencyTotalText = (currencyCurrentAmount + loot.quantity < currencyMax or currencyMax == 0) and (currencyCurrentAmount + loot.quantity) or currencyMax
                     countText = loot.quantity..' ['..tostring(currencyTotalText)..']'
                 else
                     countText = loot.quantity..' ['..tostring(GetItemCount(loot.item) + loot.quantity)..']'

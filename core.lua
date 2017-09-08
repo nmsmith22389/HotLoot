@@ -869,7 +869,7 @@ local function GetSmartInfoText(loot)
         if reason == HL_LOOT_REASON.ARTIFACT_POWER then
             -- Artifact Power
             -- TODO: LOCALIZE
-            return string.format('Gives %s AP', Util:ShortNumber(TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link))), 1)
+            return string.format('Gives %s AP', Util:ShortNumber(TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link)), 1))
         else
             local typeText        = select(6, GetItemInfo(loot.link)) or 'N/A'
             local subtypeText     = select(7, GetItemInfo(loot.link)) or 'N/A'

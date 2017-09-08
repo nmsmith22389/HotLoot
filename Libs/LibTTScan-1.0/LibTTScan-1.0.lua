@@ -15,6 +15,7 @@ local WorldFrame = WorldFrame
 local dump = DevTools_Dump
 local gsub = string.gsub
 local sfind = string.find
+local smatch = string.match
 -- [AUTOLOCAL END]
 
 -- Custom tooltip for fast tooltip parsing
@@ -102,15 +103,32 @@ function lib.GetItemArtifactPower(item_id, only_type)
       if max_lines > 10 then max_lines = 10 end
    end
 
-   for line = start_scan_line, max_lines do
-      local text = fs_GetText(tt_l[line])
-      if sfind(text, ITEM_SPELL_TRIGGER_ONUSE) and sfind(text, ARTIFACT_POWER) then
-         local _, _, amount = sfind(text, "(%d[%d,.%s]+)")
-         if amount then
-            return gsub(amount, '[^%d]', '') + 0
-         end
-      end
-   end
+    for line = start_scan_line, max_lines do
+        local text = fs_GetText(tt_l[line])
+        if sfind(text, ITEM_SPELL_TRIGGER_ONUSE) and sfind(text, ARTIFACT_POWER) then
+            local whole, dec = smatch(text, '(%d+)[,.]?(%d*)')
+            local amount = tonumber(whole..'.'..dec)
+
+            if sfind(text, FIRST_NUMBER) then
+                -- Thousand
+                amount = amount * 1000
+            elseif sfind(text, SECOND_NUMBER) then
+                -- Million
+                amount = amount * 1000000
+            elseif sfind(text, THIRD_NUMBER) then
+                -- Billion
+                amount = amount * 1000000000
+            elseif sfind(text, FOURTH_NUMBER) then
+                -- Trillion
+                amount = amount * 1000000000000
+            else
+                -- < 1000
+                 amount = tonumber(whole..dec)
+            end
+
+            return amount or 0
+        end
+    end
 end
 
 -- /run LibStub("LibTTScan-1.0").IsMerchantItemAlreadyKnown(i)

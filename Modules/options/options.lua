@@ -309,6 +309,9 @@ local defaults = {
         tableExcludeList = {},
         toggleShowExcludeButton = false,
 
+        -- Farming List
+        tableFarmingList = {},
+
         selectThresholdType1 = '0None',
         inputThresholdValue1 = 0,
         selectThresholdType2 = '0None',
@@ -316,6 +319,10 @@ local defaults = {
         selectThresholdType3 = '0None',
         inputThresholdValue3 = 0,
         toggleUseQuantValue  = false,
+
+
+        -- Smart Info
+        toggleSmartInfo = false,
     }
 }
 
@@ -463,6 +470,30 @@ end
 
 function Options:GetExcludeList()
     return self.db.profile.tableExcludeList
+end
+
+--
+-- ─── FARMING LIST ───────────────────────────────────────────────────────────────
+--
+
+function Options:AddToFarmingList(info, value)
+    if type(value) == 'string' and value ~= nil then
+        local itemName, itemLink = GetItemInfo(value)
+        if itemName then
+            self.db.profile.tableFarmingList[Util:GetItemID(itemLink)] = itemName
+            Util:Announce(string.format(L['AnnounceListAdd'], Util:ColorText(itemName, 'info'), 'Farming List'))
+        else
+            Util:Print(string.format(L['ErrorListItemNotFound'], Util:ColorText(value, 'info'), 'Farming List'))
+        end
+    end
+end
+
+function Options:RemoveFromFarmingList()
+    self.db.profile.tableFarmingList[self.db.profile.selectFarmingList] = nil
+end
+
+function Options:GetFarmingList()
+    return self.db.profile.tableFarmingList
 end
 
 --
@@ -681,6 +712,7 @@ optionsTable = {
                             name = 'Smart Info',
                             type = 'group',
                             inline = true,
+                            hidden = true, -- TODO: Take out when ready
                             order = 6,
                             args = {
                                 --TODO: Make sure that when this is turned on it also turns 'Show Type Text' on as well.
@@ -697,6 +729,9 @@ optionsTable = {
                                     name = 'Farming Mode',
                                     type = 'group',
                                     inline = true,
+                                    disabled = function()
+                                        return not Options:Get('toggleSmartInfo')
+                                    end,
                                     order = 4,
                                     args = {
                                         --[[
@@ -734,6 +769,28 @@ optionsTable = {
                                             type = 'toggle',
                                             width = 'full',
                                             order = 2
+                                        },
+                                        selectFarmingList = {
+                                            name = 'Items to Watch',
+                                            type = 'select',
+                                            values = 'GetFarmingList',
+                                            order = 4,
+                                        },
+                                        inputFarmingListAdd = {
+                                            name = 'Add to List',
+                                            -- desc = L['inputFarmingListAddDesc'],
+                                            type = 'input',
+                                            order = 6,
+                                            set = 'AddToFarmingList',
+                                            get = function(info)
+                                                return ''
+                                            end
+                                        },
+                                        buttonRemoveFromFarmingList = {
+                                            name = 'Remove',
+                                            type = 'execute',
+                                            order = 8,
+                                            func = 'RemoveFromFarmingList'
                                         },
                                     }
                                 },
@@ -1782,9 +1839,10 @@ optionsTable = {
                     order = 4,
                     func = 'RemoveFromIncludeList'
                 },
-                toggleShowIncludeButton = {
-                    name = L['toggleShowIncludeButtonName'],
-                    desc = L['toggleShowIncludeButtonDesc'],
+                toggleIncludeModifierClick = {
+                    -- name = 'Add to List on Loot Click',
+                    name = L['toggleIncludeModifierClickName'],
+                    desc = L['toggleIncludeModifierClickDesc'],
                     type = 'toggle',
                     hidden = true,
                     order = 5,

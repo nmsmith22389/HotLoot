@@ -1841,8 +1841,11 @@ optionsTable = {
                 },
                 toggleIncludeModifierClick = {
                     -- name = 'Add to List on Loot Click',
-                    name = L['toggleIncludeModifierClickName'],
-                    desc = L['toggleIncludeModifierClickDesc'],
+                    -- TODO: Localize
+                    -- name = L['toggleIncludeModifierClickName'],
+                    -- desc = L['toggleIncludeModifierClickDesc'],
+                    name = 'Add to List on Loot Modifier',
+                    desc = 'Will add the item to the Include List when manually looting an item while holding down Alt.',
                     type = 'toggle',
                     hidden = true,
                     order = 5,

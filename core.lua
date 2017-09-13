@@ -494,7 +494,7 @@ local function FilterSlot(loot)
             end
 
             --> Include List
-            if Options:Get('tableIncludeList')[loot.item] then
+            if Options:Get('tableIncludeList')[loot.item] and CheckThreshold('z9Include', itemSellPrice, loot.quantity) then
                 return true, HL_LOOT_REASON.INCLUDE
             end
 

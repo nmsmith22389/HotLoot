@@ -1063,12 +1063,14 @@ local function SetLoot(frame, loot)
     local iconWidth   = frame.icon:GetWidth()
     local nameWidth   = frame.name:GetStringWidth()
     local typeWidth   = (frame.type and Options:Get('toggleShowItemType')) and frame.type:GetStringWidth() or 0
-    local valueWidth  = (frame.count and Options:Get('toggleShowSellPrice')) and frame.value:GetStringWidth() or 0
+    local valueWidth  = (frame.value and Options:Get('toggleShowSellPrice')) and frame.value:GetStringWidth() or 0
+    local countWidth  = (frame.count and Options:Get('toggleShowItemQuant')) and frame.count:GetStringWidth() or 0
     local spacerWidth = 16
-    local minWidth    = tonumber(Options:Get('inputMinWidth'))
+    local minWidth    = tonumber(Options:Get('inputMinWidth')) or 0
 
     local frameWidth = max(
         iconWidth + nameWidth  + spacerWidth,
+        iconWidth + nameWidth  + spacerWidth + countWidth,
         iconWidth + typeWidth  + spacerWidth,
         iconWidth + valueWidth + spacerWidth,
         minWidth

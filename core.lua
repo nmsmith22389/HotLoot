@@ -864,18 +864,27 @@ local function GetSmartInfoText(loot)
     else
         --> If loot is an item
         local reason = loot.reason
+        local itemID = Util:GetItemID(loot.link)
 
         --> If the item is...
         if reason == HL_LOOT_REASON.ARTIFACT_POWER then
             -- Artifact Power
             -- TODO: LOCALIZE
             return string.format('Gives %s AP', Util:ShortNumber(TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link)), 1))
+        elseif HotLoot.farmingStats[itemID] then
+            local stat = HotLoot:GetFarmingStats(itemID)
+            local statFormatted = stat < 1000 and string.format('%.1f', stat) or Util:ShortNumber(stat)
+            local perOption = Options:Get('selectFarmingModeRate')
+            -- TODO: Localize these below (ie 'Second', 'Minute', 'Hour')
+            local perFormatted = (perOption == 'second' and 'Second') or (perOption == 'minute' and 'Minute') or (perOption == 'hour' and 'Hour')
+
+            return string.format('Farmed: %s/%s', statFormatted, perFormatted)
         else
             local typeText        = select(6, GetItemInfo(loot.link)) or 'N/A'
             local subtypeText     = select(7, GetItemInfo(loot.link)) or 'N/A'
             local typeTextDivider = ': '
 
-            return typeText..typeTextDivider..subtypeText
+            return Options:Get('toggleShowItemTypeNoInfo') and typeText..typeTextDivider..subtypeText or ''
         end
     end
 end
@@ -1039,23 +1048,7 @@ local function SetLoot(frame, loot)
         frame.type:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha)
 
         if Options:Get('toggleShowItemType') then
-            local typeText, subtypeText, typeTextDivider, typeOutput = '', '', '', ''
-
-            if loot.slotType == HL_LOOT_SLOT_TYPE.ITEM then
-                typeText        = select(6, GetItemInfo(loot.link)) or 'N/A'
-                subtypeText     = select(7, GetItemInfo(loot.link)) or 'N/A'
-                typeTextDivider = ': '
-            elseif loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
-                typeText = CURRENCY
-            end
-
-            if Options:Get('toggleSmartInfo') then
-                typeOutput = GetSmartInfoText(loot)
-            else
-                typeOutput = typeText..typeTextDivider..subtypeText
-            end
-
-            frame.type:SetText(typeOutput)
+            frame.type:SetText(GetSmartInfoText(loot))
             -- frame.type:ClearAllPoints()
             -- frame.type:SetPoint('TOPLEFT', frame, 'TOPLEFT', theme.text.type.left, theme.text.type.top)
 
@@ -1182,6 +1175,63 @@ function HotLoot:ShiftToastPosUp()
     for i, frame in ipairs(self.toasts) do
         frame.pos = frame.pos + 1
     end
+end
+
+--
+-- ─── FARMING MODE ───────────────────────────────────────────────────────────────
+--
+
+function UpdateFarmingList(itemID, quant)
+    local list = Options:Get('tableFarmingList')
+    itemID = tostring(itemID)
+    HotLoot.farmingStats = HotLoot.farmingStats or {}
+
+    if list[itemID] then
+        HotLoot.farmingStats[itemID] = HotLoot.farmingStats[itemID] or {}
+
+        local stat = {
+            quant = quant,
+            time  = time()
+        }
+
+        table.insert(HotLoot.farmingStats[itemID], stat)
+
+        if #HotLoot.farmingStats[itemID] > 10 then
+            table.remove(HotLoot.farmingStats[itemID], 1)
+        end
+    end
+end
+
+function HotLoot:GetFarmingStats(itemID)
+    itemID = tostring(itemID)
+
+    if not HotLoot.farmingStats[itemID] then
+        return false
+    end
+
+    local totalQuant = 0
+    local duration   = 0
+    local minTime    = 0
+    local maxTime    = 0
+
+    for _, v in ipairs(HotLoot.farmingStats[itemID]) do
+        totalQuant = totalQuant + v.quant
+        if minTime == 0 or v.time < minTime then
+            minTime = v.time
+        end
+        if maxTime == 0 or v.time > maxTime then
+            maxTime = v.time
+        end
+    end
+
+    duration = (maxTime - minTime < 1 and 1) or (maxTime - minTime)
+
+    local perSec  = totalQuant/duration
+    local perMin  = perSec * 60
+    local perHour = perMin * 60
+    local option  = Options:Get('selectFarmingModeRate')
+
+    return (option == 'second' and perSec) or (option == 'minute' and perMin) or (option == 'hour' and perHour)
 end
 
 --
@@ -1368,6 +1418,11 @@ function HotLoot:LOOT_OPENED()
                 if Options:Get('toggleEnableLootMonitor') then
                     local frame
                     local nextIndex = self:GetNextToastIndex()
+
+                    -- Farming Mode
+                    if Options:Get('toggleFarmingMode') then
+                        UpdateFarmingList(Util:GetItemID(lootItem.link))
+                    end
 
                     -- TODO: This can be simplified
                     if not nextIndex then

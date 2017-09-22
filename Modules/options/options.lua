@@ -79,6 +79,13 @@ local tableItemQuality = {
     ['7'] = ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r',
 }
 
+-- TODO: Localize
+local tableFarmingModeRate = {
+    ['second'] = 'Per Second',
+    ['hour']   = 'Per Hour',
+    ['minute'] = 'Per Minute',
+}
+
 -- TODO: fix so that it gets all window names
 local tableChatWindows
 local function GetChatWindows()
@@ -145,6 +152,9 @@ local defaults = {
 
         toggleEnableLootMonitor     = true,
         toggleShowLootMonitorAnchor = true,
+        
+        toggleFarmingMode = false,
+        selectFarmingModeRate = 'hour',
 
         --== Appearance ==--
         --> General
@@ -224,7 +234,8 @@ local defaults = {
         rangeQuantTextYOffset = 0,
 
         --> Line 1
-        toggleShowItemType  = false,
+        toggleShowItemType  = true,
+        toggleShowItemTypeNoInfo = false,
         selectLine1TextFont = 'Roboto Condensed Bold',
         rangeLine1TextSize  = 10,
         colorLine1TextFont = {
@@ -320,10 +331,6 @@ local defaults = {
         selectThresholdType3 = '0None',
         inputThresholdValue3 = 0,
         toggleUseQuantValue  = false,
-
-
-        -- Smart Info
-        toggleSmartInfo = false,
     }
 }
 
@@ -477,15 +484,68 @@ end
 -- ─── FARMING LIST ───────────────────────────────────────────────────────────────
 --
 
+function FormatFarmingType(text)
+    text = text:gsub('(%a)', string.upper, 1)
+    --[[
+        ['z1Poor'] = ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC..'|r',
+        ['z2Common'] = ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC..'|r',
+        ['z3Uncommon'] = ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC..'|r',
+        ['z4Rare'] = ITEM_QUALITY_COLORS[3].hex..ITEM_QUALITY3_DESC..'|r',
+        ['z5Epic'] = ITEM_QUALITY_COLORS[4].hex..ITEM_QUALITY4_DESC..'|r',
+        ['z6Legendary'] = ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC..'|r',
+        ['z7Artifact'] = ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC..'|r',
+        ['z8Heirloom'] = ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r',
+        ['z9Include'] = L['headerIncludeList'],
+    ]]
+    if text == "Poor" then
+        text = 'z1'..text
+    elseif text == "Common" then
+        text = 'z2'..text
+    elseif text == "Uncommon" then
+        text = 'z3'..text
+    elseif text == "Rare" then
+        text = 'z4'..text
+    elseif text == "Epic" then
+        text = 'z5'..text
+    elseif text == "Legendary" then
+        text = 'z6'..text
+    elseif text == "Artifact" then
+        text = 'z7'..text
+    elseif text == "Heirloom" then
+        text = 'z8'..text
+    elseif text == "Include" then
+        text = 'z9'..text
+    end
+
+    return text
+end
+
 function Options:AddToFarmingList(info, value)
-    if type(value) == 'string' and value ~= nil then
-        local itemName, itemLink = GetItemInfo(value)
-        if itemName then
-            self.db.profile.tableFarmingList[Util:GetItemID(itemLink)] = itemName
-            Util:Announce(string.format(L['AnnounceListAdd'], Util:ColorText(itemName, 'info'), 'Farming List'))
-        else
-            Util:Print(string.format(L['ErrorListItemNotFound'], Util:ColorText(value, 'info'), 'Farming List'))
-        end
+    if type(value) == 'string' and value ~= '' then
+        --[[ local reg = '%[(%w+)%:(%w+)%]'
+        local cmd, cat = value:match(reg)
+        if cmd and cat then
+            cmd = cmd:lower()
+            cat  = cat:lower()
+
+            if cmd == 'type' then
+                local formatted = FormatFarmingType(cat)
+                if tableFilterTypes[formatted] and not self.db.profile.tableFarmingList[('type:%s'):format(cat)] then
+                    self.db.profile.tableFarmingList[('type:%s'):format(cat)] = Util:ColorText('Type: ', 'success')..cat:gsub('(%a)', string.upper, 1)
+                    Util:Announce(string.format(L['AnnounceListAdd'], Util:ColorText(Util:ColorText('Type: ', 'success')..cat:gsub('(%a)', string.upper, 1), 'info'), 'Farming List'))
+                else
+                    Util:Print(string.format(L['ErrorListItemNotFound'], Util:ColorText(value, 'info'), 'Farming List'))
+                end
+            end
+        else ]]
+            local itemName, itemLink = GetItemInfo(value)
+            if itemName then
+                self.db.profile.tableFarmingList[tostring(Util:GetItemID(itemLink))] = itemName
+                Util:Announce(string.format(L['AnnounceListAdd'], Util:ColorText(itemName, 'info'), 'Farming List'))
+            else
+                Util:Print(string.format(L['ErrorListItemNotFound'], Util:ColorText(value, 'info'), 'Farming List'))
+            end
+        -- end
     end
 end
 
@@ -708,93 +768,60 @@ optionsTable = {
                             width = 'full',
                             order = 4
                         },
-                        -- TODO:FIXME: LOCALIZE!
-                        groupSmartInfo = {
-                            name = 'Smart Info',
+                        groupFarmingMode = {
+                            name = L['groupFarmingMode'],
                             type = 'group',
                             inline = true,
-                            hidden = true, -- TODO: Take out when ready
-                            order = 6,
+                            order = 12,
                             args = {
-                                --TODO: Make sure that when this is turned on it also turns 'Show Type Text' on as well.
-                                toggleSmartInfo = {
-                                    -- name = L['toggleSmartInfoName'],
-                                    -- desc = L['toggleSmartInfoDesc'],
-                                    name = L['genEnable'],
-                                    -- desc = L['toggleSmartInfoDesc'],
-                                    type = 'toggle',
+                                descFarmingMode = {
+                                    name = Util:ColorText(L['descFarmingMode'], 'info'),
+                                    type = 'description',
                                     width = 'full',
                                     order = 2
                                 },
-                                groupFarmingMode = {
-                                    name = 'Farming Mode',
-                                    type = 'group',
-                                    inline = true,
-                                    disabled = function()
-                                        return not Options:Get('toggleSmartInfo')
-                                    end,
-                                    order = 4,
-                                    args = {
-                                        --[[
-                                            --hhitems =  {}
-                                            --hhitems.Foxflower = {}
-                                            --table.insert(hhitems.Foxflower, {
-                                            --      quant = 5,
-                                            --      time = time()
-                                            --})
-                                            --print(#hhitems.Foxflower)
-                                            local ti = 0
-                                            local td = 0
-                                            local mint = 0
-                                            local maxt = 0
-                                            for i, v in ipairs(hhitems.Foxflower) do
-                                               ti = ti + v.quant
-                                               if mint == 0 or v.time < mint then
-                                                  mint = v.time
-                                               end
-                                               if maxt == 0 or v.time > maxt then
-                                                  maxt = v.time
-                                               end
-
-                                            end
-                                            td = maxt - mint
-                                            print(format('Tot Quant: %d', ti))
-                                            print(format('Duration : %d', td))
-                                            local iPerSec = ti/td
-                                            local iph = iPerSec*60*60
-                                            print('Items/Hour #2: '..iph)
-                                        ]]
-                                        toggleFarmingMode = {
-                                            name = L['genEnable'],
-                                            -- desc = L['toggleFarmingMode'],
-                                            type = 'toggle',
-                                            width = 'full',
-                                            order = 2
-                                        },
-                                        selectFarmingList = {
-                                            name = 'Items to Watch',
-                                            type = 'select',
-                                            values = 'GetFarmingList',
-                                            order = 4,
-                                        },
-                                        inputFarmingListAdd = {
-                                            name = 'Add to List',
-                                            -- desc = L['inputFarmingListAddDesc'],
-                                            type = 'input',
-                                            order = 6,
-                                            set = 'AddToFarmingList',
-                                            get = function(info)
-                                                return ''
-                                            end
-                                        },
-                                        buttonRemoveFromFarmingList = {
-                                            name = 'Remove',
-                                            type = 'execute',
-                                            order = 8,
-                                            func = 'RemoveFromFarmingList'
-                                        },
-                                    }
+                                toggleFarmingMode = {
+                                    name = L['genEnable'],
+                                    -- desc = L['toggleFarmingMode'],
+                                    type = 'toggle',
+                                    width = 'full',
+                                    order = 6
                                 },
+                                descListAddWarning = {
+                                    name = Util:ColorText(L['descListAddWarning'], 'warning'),
+                                    type = 'description',
+                                    width = 'full',
+                                    order = 7
+                                },
+                                selectFarmingList = {
+                                    name = L['selectListName'],
+                                    type = 'select',
+                                    values = 'GetFarmingList',
+                                    order = 8,
+                                },
+                                inputFarmingListAdd = {
+                                    name = L['inputListAddName'],
+                                    desc = L['inputListAddDesc'],
+                                    type = 'input',
+                                    order = 10,
+                                    set = 'AddToFarmingList',
+                                    get = function(info)
+                                        return ''
+                                    end
+                                },
+                                buttonRemoveFromFarmingList = {
+                                    name = L['buttonRemoveFromListName'],
+                                    type = 'execute',
+                                    order = 12,
+                                    func = 'RemoveFromFarmingList'
+                                },
+                                selectFarmingModeRate = {
+                                    name = L['selectFarmingModeRateName'],
+                                    desc = L['selectFarmingModeRateDesc'],
+                                    type = 'select',
+                                    values = tableFarmingModeRate,
+                                    order = 14
+                                }
                             }
                         },
                     }
@@ -1197,12 +1224,26 @@ optionsTable = {
                             type = 'header',
                             order = 17,
                         },
+                        descLine1Text = {
+                            name = L['descSmartInfo'],
+                            type = 'description',
+                            order = 18,
+                        },
+                        -- TODO: Add toggle to show type when no smart info. (off by default)
+                        -- TODO: Change to match Line 1
                         toggleShowItemType = {
                             name = L['genEnable'], -- Used to be toggleShowItemTypeName
-                            desc = L['toggleShowItemTypeDesc'],
+                            -- desc = L['toggleShowItemTypeDesc'],
+                            type = 'toggle',
+                            width = 'double',
+                            order = 19
+                        },
+                        toggleShowItemTypeNoInfo = {
+                            name = L['toggleShowItemTypeNoInfoName'],
+                            desc = L['toggleShowItemTypeNoInfoDesc'],
                             type = 'toggle',
                             -- width = 'double',
-                            order = 18
+                            order = 20
                         },
                         selectLine1TextFont = {
                             name = L['genFont'],

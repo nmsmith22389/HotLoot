@@ -1,4 +1,24 @@
 # CHANGELOG
+## v3.3
+### Added
+* Added an Artifact Power filter. *(using LibTTScan)*
+* Replaced Type with Smart Info
+    * **Smart Info**
+        * Shows special info about various items in the loot toasts.
+        * *Examples: Currency maxes, farming info, AP info, more to come.*
+* Added Farming Mode.
+    * **Farming Mode**
+        * Allows you to track how many of an item you are gathering per second/minute/hour.
+        * See the options in the `General` tab of the `Loot Monitor` options.
+        * Smart info must be enabled for it to work.
+### Fixed
+* Updated the credits.
+* Cleaned up code.
+* Fixed an error that prevented currency totals from being shown.
+* Fixed an error with the small toast size.
+* Include List should now work in the Value Threshold.
+* Locale update.
+
 ## v3.2.1
 ### Added
 * Added a logo in the options!

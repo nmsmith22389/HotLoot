@@ -17,7 +17,8 @@ L["colorFontColorDesc"] = "Select the font color for the text in the Loot Monito
 L["colorFontColorName"] = "Font Color"
 L["colorThemeBGName"] = "Background Color"
 L["colorThemeBorderName"] = "Border Color"
-L["descFarmingMode"] = "Show's the amount of items looted per minute/hour in the loot toast. Useful for farming items."
+L["descFarmingMode"] = [=[Farming Mode show's the amount of items looted per second/minute/hour in the loot toast. Useful for farming items.
+(Smart info must be enabled for it to show.)]=]
 L["descHotLoot"] = [=[HotLoot is an autoloot filter designed to streamline the looting process. This AddOn allow you to automatically loot various items related to professions and quests.
 ]=]
 L["descHotLootNote"] = [=[NOTE: In order for HotLoot to work effectively please ensure that all other autoloot AddOns and options are turned off.
@@ -25,7 +26,8 @@ L["descHotLootNote"] = [=[NOTE: In order for HotLoot to work effectively please 
 L["descItemQualityFilters"] = "NOTE: These options will loot ALL types of items of that quality."
 L["descListAddWarning"] = "NOTE: Items can be added using an Item ID, Item Link, or Item Name. But, Item Name can only be used if it is in your inventory."
 L["descOnlyEquipQuality"] = "This option will cause the Item Quality Filters to only work for equippable items."
-L["descSmartInfo"] = "Smart Info will display pertinent information relating to the looted item. (ie. AP value, currency info, item type)"
+L["descSmartInfo"] = [=[Smart Info will display pertinent information relating to the looted item.
+(ie. AP value, currency info, item type)]=]
 L["descValueThresholds"] = "After Item Type is set, use the Threshold input to set the value of the threshold. If an item of that type is currently being looted, it will not be picked up unless its value is greater than or equal to the specified threshold. The corresponding loot filter must also be on. The thresholds don't actually loot anything by themselves."
 L["dialogConfirmSkinningMode"] = "Are you sure you want to enable Skinning Mode?"
 L["dialogConfirmSkinningModeWarn"] = "WARNING: Skinning mode WILL DELETE anything not caught by the loot filters. HotLoot is not responsible for lost items."

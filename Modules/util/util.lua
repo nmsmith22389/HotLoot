@@ -7,6 +7,8 @@ local module = Util -- Alias
 -- ─── GLOBAL ─────────────────────────────────────────────────────────────────────
 --
 
+-- TODO: Idea for general util >>> maxValue(table, [key]) = finds max value in table (could also do min/avg/total)
+
 function Util:ColorText(text, hex)
     -- TODO: add hex error checking
     if hex == 'addon' then
@@ -146,6 +148,29 @@ function Util:SlotIsCurrency(slot)
     if GetLootSlotType(slot) == HL_LOOT_SLOT_TYPE.CURRENCY then 
         return true
     end
+end
+
+function Util:ShortNumber(num, places)
+    local ret
+    local placeValue = ("%%.%df"):format(places or 0)
+    if not num then
+        return 0
+    elseif num >= 1000000000000 then
+        placeValue = placeValue..'T'
+        ret = placeValue:format(num / 1000000000000) -- trillion
+    elseif num >= 1000000000 then
+        placeValue = placeValue..'B'
+        ret = placeValue:format(num / 1000000000) -- billion
+    elseif num >= 1000000 then
+        placeValue = placeValue..'M'
+        ret = placeValue:format(num / 1000000) -- million
+    elseif num >= 1000 then
+        placeValue = placeValue..'K'
+        ret = placeValue:format(num / 1000) -- thousand
+    else
+        ret = num -- hundreds
+    end
+    return ret
 end
 
 --Money text formatting, code taken from Scrooge by thelibrarian ( http://www.wowace.com/addons/scrooge/ )

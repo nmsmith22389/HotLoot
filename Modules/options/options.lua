@@ -3,6 +3,9 @@ local module = Options -- Alias
 local L = LibStub('AceLocale-3.0'):GetLocale('HotLoot')
 local Util = HotLoot:GetModule('Util')
 
+-- TODO: Consider moving smart info and TSM options to Loot Monitor Appearance > General or even some place better
+--       (The text options section should prob just be for actual text appearance.)
+
 --
 -- ─── LOCALS ─────────────────────────────────────────────────────────────────────
 --
@@ -42,17 +45,18 @@ local tableFilterTypes = {
     ['0None'] = L['None'],
     ['Quest'] = GetItemClassInfo(HL_ITEM_CLASS.QUEST),
     --['Junk'] = L['Junk'],
-    ['Gem'] = GetItemClassInfo(HL_ITEM_CLASS.GEM),
+    ['Cloth'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.CLOTH),
     ['Metal & Stone'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.METAL_STONE),
-    ['Cooking Ingredient'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.COOKING),
+    ['Gem'] = GetItemClassInfo(HL_ITEM_CLASS.GEM),
     ['Herb'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.HERB),
     ['Leather'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER),
-    ['Cloth'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.CLOTH),
-    ['Elemental'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.ELEMENTAL),
     ['Enchanting'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.ENCHANTING),
+    ['Inscription'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.INSCRIPTION),
+    ['Cooking Ingredient'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.COOKING),
     ['Potion'] = GetItemSubClassInfo(HL_ITEM_CLASS.CONSUMABLE, HL_ITEM_SUB_CLASS.CONSUMABLE.POTION),
     ['Flask'] = GetItemSubClassInfo(HL_ITEM_CLASS.CONSUMABLE, HL_ITEM_SUB_CLASS.CONSUMABLE.FLASK),
     ['Elixir'] = GetItemSubClassInfo(HL_ITEM_CLASS.CONSUMABLE, HL_ITEM_SUB_CLASS.CONSUMABLE.ELIXIR),
+    ['Elemental'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.ELEMENTAL),
     ['z1Poor'] = ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC..'|r',
     ['z2Common'] = ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC..'|r',
     ['z3Uncommon'] = ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC..'|r',
@@ -61,7 +65,7 @@ local tableFilterTypes = {
     ['z6Legendary'] = ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC..'|r',
     ['z7Artifact'] = ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC..'|r',
     ['z8Heirloom'] = ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r',
-    ['Include'] = L['headerIncludeList'],
+    ['z9Include'] = L['headerIncludeList'],
 }
 
 local tableItemQuality = {
@@ -73,6 +77,13 @@ local tableItemQuality = {
     ['5'] = ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC..'|r',
     ['6'] = ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC..'|r',
     ['7'] = ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r',
+}
+
+-- TODO: Localize
+local tableFarmingModeRate = {
+    ['second'] = 'Per Second',
+    ['hour']   = 'Per Hour',
+    ['minute'] = 'Per Minute',
 }
 
 -- TODO: fix so that it gets all window names
@@ -125,31 +136,34 @@ local defaults = {
         -- ─── GENERAL ─────────────────────────────────────────────────────
         --
 
-        toggleSystemEnable = true,
-        toggleDisableInRaid = true,
-        toggleDebugMode = false,
-        toggleAnnounceEvents = true,
-        selectAnnounceWindow = GetDefaultChatWindow(),
-        toggleAnnounceBagsFullRaid = true,
-        toggleCloseLootWindow = false,
+        toggleSystemEnable            = true,
+        toggleDisableInRaid           = true,
+        toggleDebugMode               = false,
+        toggleAnnounceEvents          = true,
+        selectAnnounceWindow          = GetDefaultChatWindow(),
+        toggleAnnounceBagsFullRaid    = true,
+        toggleCloseLootWindow         = false,
         selectCloseLootWindowModifier = '0',
-        toggleSkinningMode = false,
-        selectSkinningModeModifier = '0',
+        toggleSkinningMode            = false,
+        selectSkinningModeModifier    = '0',
         --
         -- ─── LOOT MONITOR ────────────────────────────────────────────────
         --
 
-        toggleEnableLootMonitor = true,
+        toggleEnableLootMonitor     = true,
         toggleShowLootMonitorAnchor = true,
+        
+        toggleFarmingMode = false,
+        selectFarmingModeRate = 'hour',
 
         --== Appearance ==--
         --> General
         selectGrowthDirection = -1,
-        selectThemeSize = 1,
-        rangeTransparency = 1,
-        rangeToastPadding = 8,
-        inputMinWidth = '145',
-        rangeToastScale = 0,
+        selectThemeSize       = 1,
+        rangeTransparency     = 1,
+        rangeToastPadding     = 8,
+        inputMinWidth         = '145',
+        rangeToastScale       = 0,
 
         --> Texture
         selectThemeBackground = 'HotLoot Custom',
@@ -166,27 +180,27 @@ local defaults = {
             b = 1,
             a = 1
         },
-        toggleColorByQuality = true,
-        toggleThemeBackgroundTile = true,
+        toggleColorByQuality         = true,
+        toggleThemeBackgroundTile    = true,
         rangeThemeBackgroundTileSize = 16,
-        rangeThemeBorderEdgeSize = 16,
-        rangeThemeBorderInset = 2,
+        rangeThemeBorderEdgeSize     = 16,
+        rangeThemeBorderInset        = 2,
 
         --> Icon
         rangeIconSize = 16,
 
         --> Animation
         toggleShowAnimation = true,
-        rangeDisplayTime = 4,
-        rangeMultipleDelay = 0.5,
-        rangeFadeSpeed = 5,
+        rangeDisplayTime    = 4,
+        rangeMultipleDelay  = 0.5,
+        rangeFadeSpeed      = 5,
 
         --
         -- ─── TEXT ────────────────────────────────────────────────────────
         --
         --** UNUSED **--
         selectTextFont = 'Roboto Condensed Bold',
-        rangeFontSize = 9,
+        rangeFontSize  = 9,
         colorFontColor = {
             ['r'] = 1.0,
             ['g'] = 1.0,
@@ -206,11 +220,11 @@ local defaults = {
         rangeNameTextYOffset = 0,
 
         --> Quantity
-        toggleShowItemQuant = true,
+        toggleShowItemQuant  = true,
         toggleShowTotalQuant = true,
-        selectQuantTextFont   = 'Roboto Condensed Bold',
-        rangeQuantTextSize    = 8,
-        colorQuantTextFont = {
+        selectQuantTextFont  = 'Roboto Condensed Bold',
+        rangeQuantTextSize   = 8,
+        colorQuantTextFont   = {
             r = 1.0,
             g = 1.0,
             b = 1.0,
@@ -220,7 +234,8 @@ local defaults = {
         rangeQuantTextYOffset = 0,
 
         --> Line 1
-        toggleShowItemType = false,
+        toggleShowItemType  = true,
+        toggleShowItemTypeNoInfo = false,
         selectLine1TextFont = 'Roboto Condensed Bold',
         rangeLine1TextSize  = 10,
         colorLine1TextFont = {
@@ -242,9 +257,9 @@ local defaults = {
             b = 1.0,
             a = 1.0
         },
-        toggleShowTSMValue = false,
+        toggleShowTSMValue    = false,
         toggleShowValuePrefix = false,
-        inputValueTSMSource = 'DBMinBuyout',
+        inputValueTSMSource   = 'DBMinBuyout',
         rangeLine2TextXOffset = 0,
         rangeLine2TextYOffset = 0,
 
@@ -252,26 +267,32 @@ local defaults = {
         -- ─── FILTERS ─────────────────────────────────────────────────────
         --
 
-        toggleGoldFilter             = true,
-        toggleQuestFilter            = true,
-        toggleCurrencyFilter         = true,
-        toggleJunkFilter             = false,
-        togglePickpocketFilter       = true,
-        toggleClothFilter            = false,
-        toggleMiningFilter           = false,
-        toggleGemFilter              = false,
-        toggleHerbFilter             = false,
-        toggleLeatherFilter          = false,
-        toggleFishingFilter          = false,
-        toggleEnchantingFilter       = false,
-        togglePigmentsFilter         = false,
-        toggleCookingFilter          = false,
-        toggleRecipeFilter           = false,
-        togglePotionFilter           = false,
-        selectPotionType             = 'both',
-        toggleFlaskFilter            = false,
-        toggleElixirFilter           = false,
-        toggleElementalFilter        = false,
+        toggleGoldFilter       = true,
+        toggleQuestFilter      = true,
+        toggleCurrencyFilter   = true,
+        toggleJunkFilter       = false,
+        togglePickpocketFilter = true,
+        toggleClothFilter      = false,
+        toggleMiningFilter     = false,
+        toggleGemFilter        = false,
+        toggleHerbFilter       = false,
+        toggleLeatherFilter    = false,
+        toggleFishingFilter    = false,
+        toggleEnchantingFilter = false,
+        togglePigmentsFilter   = false,
+        toggleCookingFilter    = false,
+        toggleRecipeFilter     = false,
+        togglePotionFilter     = false,
+        selectPotionType       = 'both',
+        toggleFlaskFilter      = false,
+        toggleElixirFilter     = false,
+        toggleElementalFilter  = false,
+
+        --> Legion Filters
+        toggleAPFilter              = true,
+        toggleAugmentRuneFilter     = true,
+        toggleKnowledgeScrollFilter = true,
+        toggleSentinaxBeaconFilter  = true,
 
         --
         -- ─── QUALITY FILTERS ─────────────────────────────────────────────
@@ -288,7 +309,9 @@ local defaults = {
         toggleLegendaryQualityFilter = true,
         toggleArtifactQualityFilter  = true,
         toggleHeirloomQualityFilter  = true,
-        inputMinItemLevel = 0,
+        inputMinItemLevel            = 0,
+
+        -- FIXME: Add defaults for equip only options!
 
         -- Include List
         tableIncludeList = {},
@@ -298,13 +321,16 @@ local defaults = {
         tableExcludeList = {},
         toggleShowExcludeButton = false,
 
+        -- Farming List
+        tableFarmingList = {},
+
         selectThresholdType1 = '0None',
         inputThresholdValue1 = 0,
         selectThresholdType2 = '0None',
         inputThresholdValue2 = 0,
         selectThresholdType3 = '0None',
         inputThresholdValue3 = 0,
-        toggleUseQuantValue = false,
+        toggleUseQuantValue  = false,
     }
 }
 
@@ -452,6 +478,83 @@ end
 
 function Options:GetExcludeList()
     return self.db.profile.tableExcludeList
+end
+
+--
+-- ─── FARMING LIST ───────────────────────────────────────────────────────────────
+--
+
+function FormatFarmingType(text)
+    text = text:gsub('(%a)', string.upper, 1)
+    --[[
+        ['z1Poor'] = ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC..'|r',
+        ['z2Common'] = ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC..'|r',
+        ['z3Uncommon'] = ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC..'|r',
+        ['z4Rare'] = ITEM_QUALITY_COLORS[3].hex..ITEM_QUALITY3_DESC..'|r',
+        ['z5Epic'] = ITEM_QUALITY_COLORS[4].hex..ITEM_QUALITY4_DESC..'|r',
+        ['z6Legendary'] = ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC..'|r',
+        ['z7Artifact'] = ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC..'|r',
+        ['z8Heirloom'] = ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r',
+        ['z9Include'] = L['headerIncludeList'],
+    ]]
+    if text == "Poor" then
+        text = 'z1'..text
+    elseif text == "Common" then
+        text = 'z2'..text
+    elseif text == "Uncommon" then
+        text = 'z3'..text
+    elseif text == "Rare" then
+        text = 'z4'..text
+    elseif text == "Epic" then
+        text = 'z5'..text
+    elseif text == "Legendary" then
+        text = 'z6'..text
+    elseif text == "Artifact" then
+        text = 'z7'..text
+    elseif text == "Heirloom" then
+        text = 'z8'..text
+    elseif text == "Include" then
+        text = 'z9'..text
+    end
+
+    return text
+end
+
+function Options:AddToFarmingList(info, value)
+    if type(value) == 'string' and value ~= '' then
+        --[[ local reg = '%[(%w+)%:(%w+)%]'
+        local cmd, cat = value:match(reg)
+        if cmd and cat then
+            cmd = cmd:lower()
+            cat  = cat:lower()
+
+            if cmd == 'type' then
+                local formatted = FormatFarmingType(cat)
+                if tableFilterTypes[formatted] and not self.db.profile.tableFarmingList[('type:%s'):format(cat)] then
+                    self.db.profile.tableFarmingList[('type:%s'):format(cat)] = Util:ColorText('Type: ', 'success')..cat:gsub('(%a)', string.upper, 1)
+                    Util:Announce(string.format(L['AnnounceListAdd'], Util:ColorText(Util:ColorText('Type: ', 'success')..cat:gsub('(%a)', string.upper, 1), 'info'), 'Farming List'))
+                else
+                    Util:Print(string.format(L['ErrorListItemNotFound'], Util:ColorText(value, 'info'), 'Farming List'))
+                end
+            end
+        else ]]
+            local itemName, itemLink = GetItemInfo(value)
+            if itemName then
+                self.db.profile.tableFarmingList[tostring(Util:GetItemID(itemLink))] = itemName
+                Util:Announce(string.format(L['AnnounceListAdd'], Util:ColorText(itemName, 'info'), 'Farming List'))
+            else
+                Util:Print(string.format(L['ErrorListItemNotFound'], Util:ColorText(value, 'info'), 'Farming List'))
+            end
+        -- end
+    end
+end
+
+function Options:RemoveFromFarmingList()
+    self.db.profile.tableFarmingList[self.db.profile.selectFarmingList] = nil
+end
+
+function Options:GetFarmingList()
+    return self.db.profile.tableFarmingList
 end
 
 --
@@ -658,6 +761,68 @@ optionsTable = {
                             width = 'double',
                             order = 2,
                             set = 'SetShowLootMonitorAnchor'
+                        },
+                        spacer = {
+                            name = '',
+                            type = 'description',
+                            width = 'full',
+                            order = 4
+                        },
+                        groupFarmingMode = {
+                            name = L['groupFarmingMode'],
+                            type = 'group',
+                            inline = true,
+                            order = 12,
+                            args = {
+                                descFarmingMode = {
+                                    name = Util:ColorText(L['descFarmingMode'], 'info'),
+                                    type = 'description',
+                                    width = 'full',
+                                    order = 2
+                                },
+                                descListAddWarning = {
+                                    name = Util:ColorText(L['descListAddWarning'], 'warning'),
+                                    type = 'description',
+                                    width = 'full',
+                                    order = 6
+                                },
+                                toggleFarmingMode = {
+                                    name = L['genEnable'],
+                                    -- desc = L['toggleFarmingMode'],
+                                    type = 'toggle',
+                                    width = 'full',
+                                    order = 7
+                                },
+                                selectFarmingList = {
+                                    name = L['selectListName'],
+                                    type = 'select',
+                                    values = 'GetFarmingList',
+                                    order = 8,
+                                },
+                                inputFarmingListAdd = {
+                                    name = L['inputListAddName'],
+                                    desc = L['inputListAddDesc'],
+                                    type = 'input',
+                                    order = 10,
+                                    set = 'AddToFarmingList',
+                                    get = function(info)
+                                        return ''
+                                    end
+                                },
+                                buttonRemoveFromFarmingList = {
+                                    name = L['buttonRemoveFromListName'],
+                                    type = 'execute',
+                                    order = 12,
+                                    func = 'RemoveFromFarmingList'
+                                },
+                                selectFarmingModeRate = {
+                                    name = L['selectFarmingModeRateName'],
+                                    desc = L['selectFarmingModeRateDesc'],
+                                    type = 'select',
+                                    values = tableFarmingModeRate,
+                                    order = 14
+                                }
+                            }
                         },
                     }
                 },
@@ -1059,12 +1224,26 @@ optionsTable = {
                             type = 'header',
                             order = 17,
                         },
+                        descLine1Text = {
+                            name = L['descSmartInfo'],
+                            type = 'description',
+                            order = 18,
+                        },
+                        -- TODO: Add toggle to show type when no smart info. (off by default)
+                        -- TODO: Change to match Line 1
                         toggleShowItemType = {
                             name = L['genEnable'], -- Used to be toggleShowItemTypeName
-                            desc = L['toggleShowItemTypeDesc'],
+                            -- desc = L['toggleShowItemTypeDesc'],
                             type = 'toggle',
                             width = 'double',
-                            order = 18
+                            order = 19
+                        },
+                        toggleShowItemTypeNoInfo = {
+                            name = L['toggleShowItemTypeNoInfoName'],
+                            desc = L['toggleShowItemTypeNoInfoDesc'],
+                            type = 'toggle',
+                            -- width = 'double',
+                            order = 20
                         },
                         selectLine1TextFont = {
                             name = L['genFont'],
@@ -1073,7 +1252,7 @@ optionsTable = {
                             dialogControl = 'LSM30_Font',
                             values = AceGUIWidgetLSMlists.font,
                             width = 'double',
-                            order = 19
+                            order = 21
                         },
                         rangeLine1TextSize = {
                             name = L['rangeFontSizeName'],
@@ -1084,7 +1263,7 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 20
+                            order = 22
                         },
                         colorLine1TextFont = {
                             name = L['colorFontColorName'],
@@ -1092,7 +1271,7 @@ optionsTable = {
                             type = 'color',
                             -- hidden = 'Advanced',
                             hasAlpha = true,
-                            order = 21,
+                            order = 23,
                             set = 'SetColor',
                             get = 'GetColor'
                         },
@@ -1124,14 +1303,14 @@ optionsTable = {
                         headerLine2Text = {
                             name = L['headerLine2Text'],
                             type = 'header',
-                            order = 24,
+                            order = 26,
                         },
                         toggleShowSellPrice = {
                             name = L['genEnable'], -- Used to be toggleShowSellPriceName
                             desc = L['toggleShowSellPriceDesc'],
                             type = 'toggle',
                             width = 'double',
-                            order = 25
+                            order = 27
                         },
                         selectLine2TextFont = {
                             name = L['genFont'],
@@ -1140,7 +1319,7 @@ optionsTable = {
                             dialogControl = 'LSM30_Font',
                             values = AceGUIWidgetLSMlists.font,
                             width = 'double',
-                            order = 26
+                            order = 28
                         },
                         rangeLine2TextSize = {
                             name = L['rangeFontSizeName'],
@@ -1151,7 +1330,7 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 27
+                            order = 29
                         },
                         colorLine2TextFont = {
                             name = L['colorFontColorName'],
@@ -1159,14 +1338,14 @@ optionsTable = {
                             type = 'color',
                             -- hidden = 'Advanced',
                             hasAlpha = true,
-                            order = 28,
+                            order = 30,
                             set = 'SetColor',
                             get = 'GetColor'
                         },
                         groupTSMValue = {
                             name = L['groupTSMValue'],
                             type = 'group',
-                            order = 29,
+                            order = 31,
                             inline = true,
                             args = {
                                 toggleShowTSMValue = {
@@ -1461,9 +1640,8 @@ optionsTable = {
                         }
                     }
                 },
-                -- TODO: Localize these!
                 groupLegion = {
-                    name = 'Legion',
+                    name = L['genLegion'],
                     type = 'group',
                     order = 4,
                     inline = true,
@@ -1473,6 +1651,7 @@ optionsTable = {
                             type = 'execute',
                             order = 1,
                             func = function()
+                                Options:Set('toggleAPFilter', true)
                                 Options:Set('toggleAugmentRuneFilter', true)
                                 Options:Set('toggleKnowledgeScrollFilter', true)
                                 Options:Set('toggleSentinaxBeaconFilter', true)
@@ -1483,31 +1662,39 @@ optionsTable = {
                             type = 'execute',
                             order = 2,
                             func = function()
+                                Options:Set('toggleAPFilter', false)
                                 Options:Set('toggleAugmentRuneFilter', false)
                                 Options:Set('toggleKnowledgeScrollFilter', false)
                                 Options:Set('toggleSentinaxBeaconFilter', false)
                             end
+                        },
+                        toggleAPFilter = {
+                            name = L['FilterNameTemplate']:format(ARTIFACT_POWER),
+                            desc = L['FilterDescTemplate']:format(ARTIFACT_POWER),
+                            type = 'toggle',
+                            width = 'double',
+                            order = 3
                         },
                         toggleAugmentRuneFilter = {
                             name = L['toggleAugmentRuneFilterName'],
                             desc = L['toggleAugmentRuneFilterDesc'],
                             type = 'toggle',
                             width = 'double',
-                            order = 3
+                            order = 4
                         },
                         toggleKnowledgeScrollFilter = {
                             name = L['toggleKnowledgeScrollFilterName'],
                             desc = L['toggleKnowledgeScrollFilterDesc'],
                             type = 'toggle',
                             width = 'double',
-                            order = 4
+                            order = 5
                         },
                         toggleSentinaxBeaconFilter = {
                             name = L['toggleSentinaxBeaconFilterName'],
                             desc = L['toggleSentinaxBeaconFilterDesc'],
                             type = 'toggle',
                             width = 'double',
-                            order = 5
+                            order = 6
                         },
                     }
                 },
@@ -1617,26 +1804,26 @@ optionsTable = {
                     order = 19,
                 },
                 groupOnlyEquipQuality = {
-                    name = 'Filter Equipment Only',
+                    name = L['groupOnlyEquipQuality'],
                     type = 'group',
                     order = 21,
                     inline = true,
                     args = {
                         descOnlyEquipQuality = {
-                            name = Util:ColorText('This option will cause the Item Quality Filters to only work for equippable items.', 'info')..'\n',
+                            name = Util:ColorText(L['descOnlyEquipQuality'], 'info')..'\n',
                             type = 'description',
                             order = 1,
                         },
                         toggleOnlyEquipQuality = {
                             name = L['genEnable'],
-                            desc = 'Make the Quality Filters only apply to eqippable items.',
+                            desc = L['toggleOnlyEquipQualityDesc'],
                             type = 'toggle',
                             width = 'full',
                             order = 2,
                         },
                         selectMinEquipQuality = {
-                            name = 'Minimum Quality',
-                            desc = 'The minimum quality for the Equippable Only option to apply.',
+                            name = L['selectMinEquipQualityName'],
+                            desc = L['selectMinEquipQualityDesc'],
                             type = 'select',
                             values = tableItemQuality,
                             order = 3,
@@ -1671,62 +1858,74 @@ optionsTable = {
                     type = 'header',
                     order = 1,
                 },
+                descListAddWarning = {
+                    name = Util:ColorText(L['descListAddWarning'], 'warning'),
+                    type = 'description',
+                    width = 'full',
+                    order = 2
+                },
                 selectIncludeList = {
-                    name = L['selectIncludeListName'],
+                    name = L['selectListName'],
                     type = 'select',
                     values = 'GetIncludeList',
-                    order = 2,
+                    order = 3,
                 },
                 inputIncludeListAdd = {
-                    name = L['inputIncludeListAddName'],
-                    desc = L['inputIncludeListAddDesc'],
+                    name = L['inputListAddName'],
+                    desc = L['inputListAddDesc'],
                     type = 'input',
-                    order = 3,
+                    order = 4,
                     set = 'AddToIncludeList',
                     get = function(info)
                         return ''
                     end
                 },
                 buttonRemoveFromIncludeList = {
-                    name = L['buttonRemoveFromIncludeListName'],
+                    name = L['buttonRemoveFromListName'],
                     type = 'execute',
-                    order = 4,
+                    order = 5,
                     func = 'RemoveFromIncludeList'
                 },
-                toggleShowIncludeButton = {
-                    name = L['toggleShowIncludeButtonName'],
-                    desc = L['toggleShowIncludeButtonDesc'],
+                toggleIncludeModifierClick = {
+                    name = L['toggleIncludeModifierClickName'],
+                    desc = L['toggleIncludeModifierClickDesc'],
                     type = 'toggle',
                     hidden = true,
-                    order = 5,
+                    order = 6,
                 },
                 headerExcludeList = {
                     name = L['headerExcludeList'],
                     type = 'header',
-                    order = 6,
-                },
-                selectExcludeList = {
-                    name = L['selectExcludeListName'],
-                    type = 'select',
-                    values = 'GetExcludeList',
                     order = 7,
                 },
+                descListAddWarning = {
+                    name = Util:ColorText(L['descListAddWarning'], 'warning'),
+                    type = 'description',
+                    width = 'full',
+                    order = 8
+                },
+                selectExcludeList = {
+                    name = L['selectListName'],
+                    type = 'select',
+                    values = 'GetExcludeList',
+                    order = 9,
+                },
                 inputExcludeListAdd = {
-                    name = L['inputExcludeListAddName'],
-                    desc = L['inputExcludeListAddDesc'],
+                    name = L['inputListAddName'],
+                    desc = L['inputListAddDesc'],
                     --multiline = 10,
                     type = 'input',
                     --width = 'full',
-                    order = 8,
+                    order = 10,
                     set = 'AddToExcludeList',
                     get = function(info)
                         return ''
                     end
                 },
                 buttonRemoveFromExcludeList = {
-                    name = L['buttonRemoveFromExcludeListName'],
+                    name = L['buttonRemoveFromListName'],
                     type = 'execute',
-                    order = 9,
+                    order = 11,
                     func = 'RemoveFromExcludeList'
                 },
                 toggleShowExcludeButton = {
@@ -1734,7 +1933,7 @@ optionsTable = {
                     desc = L['toggleShowExcludeButtonDesc'],
                     type = 'toggle',
                     hidden = true,
-                    order = 10,
+                    order = 12,
                 },
             },
         },

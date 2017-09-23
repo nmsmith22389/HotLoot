@@ -21,6 +21,7 @@ MIT License
 HotLoot = LibStub('AceAddon-3.0'):NewAddon('HotLoot', 'AceConsole-3.0', 'AceEvent-3.0', 'AceTimer-3.0')
 local L = LibStub('AceLocale-3.0'):GetLocale('HotLoot')
 local LSM = LibStub('LibSharedMedia-3.0')
+local TooltipScan = LibStub('LibTTScan-1.0')
 HotLoot.minimapIcon = LibStub('LibDBIcon-1.0')
 local Options, Util, HotLootFrame
 local icons, closeEL = {}, 0
@@ -462,18 +463,18 @@ local function FilterSlot(loot)
         -- TODO: Consider moving this inside the item section
         -- Don't Loot
         Util:Announce(L["AnnounceItemExcluded"]:format(loot.link))
-        return false, 'Exclude List'
+        return false, HL_LOOT_REASON.EXCLUDE
     end
 
     if loot.slotType == HL_LOOT_SLOT_TYPE.COIN then
         -- Check Gold (Coin)
         if Options:Get('toggleGoldFilter') then
-            return true, 'Gold Filter'
+            return true, HL_LOOT_REASON.GOLD
         end
     elseif loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
         -- Check Currency
         if Options:Get('toggleCurrencyFilter') then
-            return true, 'Currency Filter'
+            return true, HL_LOOT_REASON.CURRENCY
         end
     elseif loot.slotType == HL_LOOT_SLOT_TYPE.ITEM and (not Options:Get('toggleDisableInRaid') or GetLootMethod() ~= 'master') then
         local _, _, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice, itemClass, itemSubClass = GetItemInfo(loot.link)
@@ -482,6 +483,7 @@ local function FilterSlot(loot)
 
             -- TODO: Normalize these so that the check order is (pref, type, subtype, other) (there may be special cases)
             -- TODO: Make options for quality to loot only equipable items
+            -- FIXME: ======== REPLACE LOOT REASON WITH CONSTANTS (need to finish) ========
 
             --> Debug
             if Options:Get('toggleDebugMode') then
@@ -492,8 +494,8 @@ local function FilterSlot(loot)
             end
 
             --> Include List
-            if Options:Get('tableIncludeList')[loot.item] then
-                return true, 'Include List'
+            if Options:Get('tableIncludeList')[loot.item] and CheckThreshold('z9Include', itemSellPrice, loot.quantity) then
+                return true, HL_LOOT_REASON.INCLUDE
             end
 
             --> Quest
@@ -502,12 +504,12 @@ local function FilterSlot(loot)
                 itemClass == HL_ITEM_CLASS.QUEST and
                 CheckThreshold("Quest", itemSellPrice, loot.quantity)
             then
-                return true, 'Quest Item Filter'
+                return true, HL_LOOT_REASON.QUEST
             end
 
             --> Pickpocket
             if IsStealthed() and Options:Get('togglePickpocketFilter') and loot.quality ~= 0 then
-                return true, 'Pickpocket Filter'
+                return true, HL_LOOT_REASON.PICKPOCKET
             end
 
             --> Cloth
@@ -516,7 +518,7 @@ local function FilterSlot(loot)
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.CLOTH) and
                 CheckThreshold("Cloth", itemSellPrice, loot.quantity)
             then
-                return true, 'Cloth Filter'
+                return true, HL_LOOT_REASON.CLOTH
             end
 
             --> Mining
@@ -525,7 +527,7 @@ local function FilterSlot(loot)
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.METAL_STONE) and
                 CheckThreshold("Metal & Stone", itemSellPrice, loot.quantity)
             then
-                return true, 'Mining Filter'
+                return true, HL_LOOT_REASON.MINING
             end
 
             --> Jewelcrafting
@@ -534,7 +536,7 @@ local function FilterSlot(loot)
                 --[[(itemClass == HL_ITEM_CLASS.GEM or ]](itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.JEWELCRAFTING) and
                 CheckThreshold("Gem", itemSellPrice, loot.quantity)
             then
-                return true, 'Gem Filter'
+                return true, HL_LOOT_REASON.GEM
             end
 
             --> Herbs
@@ -543,7 +545,7 @@ local function FilterSlot(loot)
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.HERB) and
                 CheckThreshold("Herb", itemSellPrice, loot.quantity)
             then
-                return true, 'Herb Filter'
+                return true, HL_LOOT_REASON.HERB
             end
 
             --> Leather
@@ -553,7 +555,7 @@ local function FilterSlot(loot)
                 CheckUntyped('Leather', loot.link)) and
                 CheckThreshold("Leather", itemSellPrice, loot.quantity)
             then
-                return true, 'Leather Filter'
+                return true, HL_LOOT_REASON.LEATHER
             end
 
             --> Fishing (-junk)
@@ -562,7 +564,7 @@ local function FilterSlot(loot)
                 Options:Get('toggleFishingFilter') and
                 not (itemClass == HL_ITEM_CLASS.MISCELLANEOUS and itemSubClass == HL_ITEM_SUB_CLASS.MISCELLANEOUS.JUNK)
             then
-                return true, 'Fishing Filter'
+                return true, HL_LOOT_REASON.FISHING
             end
 
             --> Enchanting
@@ -571,7 +573,7 @@ local function FilterSlot(loot)
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.ENCHANTING) and
                 CheckThreshold("Enchanting", itemSellPrice, loot.quantity)
             then
-                return true, 'Enchanting Filter'
+                return true, HL_LOOT_REASON.ENCHANTING
             end
 
             --> Inscription
@@ -643,6 +645,11 @@ local function FilterSlot(loot)
             end
 
             -- LEGION
+
+            --> Artifact Power
+            if Options:Get('toggleAPFilter') and TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link), true) then
+                return true, 'Artifact Power Filter'
+            end
 
             --> Defiled Augment Rune
             if Options:Get('toggleAugmentRuneFilter') and CheckUntyped('Defiled Augment Rune', loot.link) then
@@ -763,7 +770,7 @@ local function FilterSlot(loot)
                 return true, 'Heirloom Quality Filter'
             end
 
-            return false, 'Not Found in Filter'
+            return false, HL_LOOT_REASON.NOT_FOUND
         else
             Util:Announce(L["BagsFull"])
             Util:Debug(ERR_INV_FULL);
@@ -771,10 +778,10 @@ local function FilterSlot(loot)
                 -- TODO: RECOLOR?
                 RaidNotice_AddMessage(RaidWarningFrame, L['BagsFull'], ChatTypeInfo["RAID_WARNING"])
             end
-            return false, 'Bags Full'
+            return false, HL_LOOT_REASON.BAGS_FULL
         end
     else
-        return false, 'Not Found in Filter'
+        return false, HL_LOOT_REASON.NOT_FOUND
     end
 end
 
@@ -837,6 +844,59 @@ local function GetItemValueText(itemLink, useTSM)
 
     prefixText = (prefixText ~= '' and Options:Get('toggleShowValuePrefix')) and prefixText..': ' or ''
     return prefixText..Util:FormatMoney(itemValue, 'SMART', true)
+end
+
+local function GetSmartInfoText(loot)
+-- ────────────────────────────────────────────────────────────────────────────────
+-- TODO: Localize ALL these
+-- ────────────────────────────────────────────────────────────────────────────────
+    if loot.slotType == HL_LOOT_SLOT_TYPE.COIN then
+        --> If loot is gold
+        -- ... show total player gold.
+        -- TODO: LOCALIZE
+        local template = 'Player Gold: %s'
+        local goldValue = GetMoney()
+        return template:format(Util:FormatMoney(goldValue, 'SMART', true))
+    elseif loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
+        --> If loot is currency
+        -- ... Weekly max? Total max?
+        return CURRENCY
+    else
+        --> If loot is an item
+        local reason = loot.reason
+        local itemID = Util:GetItemID(loot.link)
+
+        --> If the item is...
+        if reason == HL_LOOT_REASON.ARTIFACT_POWER then
+            -- Artifact Power
+            -- TODO: LOCALIZE
+            return string.format('Gives %s AP', Util:ShortNumber(TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link)), 1))
+        elseif Options:Get('toggleFarmingMode') and HotLoot.farmingStats and HotLoot.farmingStats[tostring(itemID)] then
+            local stat = HotLoot:GetFarmingStats(itemID)
+            local statFormatted = function()
+                if stat < 1 then
+                    return string.format('%.2f', stat)
+                elseif stat < 100 then
+                    return string.format('%.1f', stat)
+                elseif stat < 1000 then
+                    return string.format('%.0f', stat)
+                else
+                    return Util:ShortNumber(stat, 1)
+                end
+            end
+            local perOption = Options:Get('selectFarmingModeRate')
+            -- TODO: Localize these below (ie 'Second', 'Minute', 'Hour')
+            local perFormatted = (perOption == 'second' and 'Second') or (perOption == 'minute' and 'Minute') or (perOption == 'hour' and 'Hour')
+
+            return string.format('Farmed: %s/%s', statFormatted(), perFormatted)
+        else
+            local typeText        = select(6, GetItemInfo(loot.link)) or 'N/A'
+            local subtypeText     = select(7, GetItemInfo(loot.link)) or 'N/A'
+            local typeTextDivider = ': '
+
+            return Options:Get('toggleShowItemTypeNoInfo') and typeText..typeTextDivider..subtypeText or ''
+        end
+    end
 end
 
 -- TODO: Add option to change text outline (ie outline, thickoutline, mono, none)
@@ -955,7 +1015,7 @@ local function SetLoot(frame, loot)
             if Options:Get('toggleShowTotalQuant') and loot.slotType ~= nil then
                 if loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
                     local _, currencyCurrentAmount, _, _, _, currencyMax, _ = GetCurrencyInfo(loot.link)
-                    local currencyTotalText = (currencyCurrentAmount + loot.quantity < currencyMax) and (currencyCurrentAmount + loot.quantity) or currencyMax
+                    local currencyTotalText = (currencyCurrentAmount + loot.quantity < currencyMax or currencyMax == 0) and (currencyCurrentAmount + loot.quantity) or currencyMax
                     countText = loot.quantity..' ['..tostring(currencyTotalText)..']'
                 else
                     countText = loot.quantity..' ['..tostring(GetItemCount(loot.item) + loot.quantity)..']'
@@ -998,17 +1058,7 @@ local function SetLoot(frame, loot)
         frame.type:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha)
 
         if Options:Get('toggleShowItemType') then
-            local typeText, subtypeText, typeTextDivider = '', '', ''
-
-            if loot.slotType == HL_LOOT_SLOT_TYPE.ITEM then
-                typeText        = select(6, GetItemInfo(loot.link)) or 'N/A'
-                subtypeText     = select(7, GetItemInfo(loot.link)) or 'N/A'
-                typeTextDivider = ': '
-            elseif loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
-                typeText = CURRENCY
-            end
-
-            frame.type:SetText(typeText..typeTextDivider..subtypeText)
+            frame.type:SetText(GetSmartInfoText(loot))
             -- frame.type:ClearAllPoints()
             -- frame.type:SetPoint('TOPLEFT', frame, 'TOPLEFT', theme.text.type.left, theme.text.type.top)
 
@@ -1023,12 +1073,14 @@ local function SetLoot(frame, loot)
     local iconWidth   = frame.icon:GetWidth()
     local nameWidth   = frame.name:GetStringWidth()
     local typeWidth   = (frame.type and Options:Get('toggleShowItemType')) and frame.type:GetStringWidth() or 0
-    local valueWidth  = (frame.count and Options:Get('toggleShowSellPrice')) and frame.value:GetStringWidth() or 0
+    local valueWidth  = (frame.value and Options:Get('toggleShowSellPrice')) and frame.value:GetStringWidth() or 0
+    local countWidth  = (frame.count and Options:Get('toggleShowItemQuant')) and frame.count:GetStringWidth() or 0
     local spacerWidth = 16
-    local minWidth    = tonumber(Options:Get('inputMinWidth'))
+    local minWidth    = tonumber(Options:Get('inputMinWidth')) or 0
 
     local frameWidth = max(
         iconWidth + nameWidth  + spacerWidth,
+        iconWidth + nameWidth  + spacerWidth + countWidth,
         iconWidth + typeWidth  + spacerWidth,
         iconWidth + valueWidth + spacerWidth,
         minWidth
@@ -1135,6 +1187,63 @@ function HotLoot:ShiftToastPosUp()
     for i, frame in ipairs(self.toasts) do
         frame.pos = frame.pos + 1
     end
+end
+
+--
+-- ─── FARMING MODE ───────────────────────────────────────────────────────────────
+--
+
+function UpdateFarmingList(itemID, quant)
+    local list = Options:Get('tableFarmingList')
+    itemID = tostring(itemID)
+    HotLoot.farmingStats = HotLoot.farmingStats or {}
+
+    if list[itemID] then
+        HotLoot.farmingStats[itemID] = HotLoot.farmingStats[itemID] or {}
+
+        local stat = {
+            ['quant'] = quant,
+            ['time']  = time()
+        }
+
+        table.insert(HotLoot.farmingStats[itemID], stat)
+
+        if #HotLoot.farmingStats[itemID] > 10 then
+            table.remove(HotLoot.farmingStats[itemID], 1)
+        end
+    end
+end
+
+function HotLoot:GetFarmingStats(itemID)
+    itemID = tostring(itemID)
+
+    if not HotLoot.farmingStats[itemID] then
+        return false
+    end
+
+    local totalQuant = 0
+    local duration   = 0
+    local minTime    = 0
+    local maxTime    = 0
+
+    for _, v in ipairs(HotLoot.farmingStats[itemID]) do
+        totalQuant = totalQuant + v.quant
+        if minTime == 0 or v.time < minTime then
+            minTime = v.time
+        end
+        if maxTime == 0 or v.time > maxTime then
+            maxTime = v.time
+        end
+    end
+
+    duration = (maxTime - minTime < 1 and 1) or (maxTime - minTime)
+
+    local perSec  = totalQuant/duration
+    local perMin  = perSec * 60
+    local perHour = perMin * 60
+    local option  = Options:Get('selectFarmingModeRate')
+
+    return (option == 'second' and perSec) or (option == 'minute' and perMin) or (option == 'hour' and perHour)
 end
 
 --
@@ -1300,29 +1409,38 @@ function HotLoot:LOOT_OPENED()
         skinModeTrigger = 0
 
         local lootInfo = GetLootInfo()
+        self.lootInfo = lootInfo
         -- For staggering the fades
         local staggerCount = 0
 
         for slot, lootItem in pairs(lootInfo) do
-            lootInfo[slot].link = GetLootSlotLink(slot)
-            lootInfo[slot].slotType = (Util:SlotIsGold(slot)     and HL_LOOT_SLOT_TYPE.COIN) or
+            lootItem.link = GetLootSlotLink(slot)
+            lootItem.slotType = (Util:SlotIsGold(slot)     and HL_LOOT_SLOT_TYPE.COIN) or
                                       (Util:SlotIsCurrency(slot) and HL_LOOT_SLOT_TYPE.CURRENCY) or
                                       HL_LOOT_SLOT_TYPE.ITEM
 
-            local filtered, reason = FilterSlot(lootInfo[slot])
+            local filtered, reason = FilterSlot(lootItem)
 
             if filtered and not lootItem.locked then
                 Util:Debug("Item Looted in " .. Util:ColorText(reason, 'info') .. ".")
+
+                -- NOTE: Setting the reason into the loot var so it can be read by SetLoot()
+                lootItem.reason = reason
 
                 if Options:Get('toggleEnableLootMonitor') then
                     local frame
                     local nextIndex = self:GetNextToastIndex()
 
+                    -- Farming Mode
+                    if Options:Get('toggleFarmingMode') then
+                        UpdateFarmingList(Util:GetItemID(lootItem.link), lootItem.quantity)
+                    end
+
                     -- TODO: This can be simplified
                     if not nextIndex then
                         frame = self:CreateLootToast()
                         self:ShiftToastPosUp()
-                        frame:SetLoot(lootInfo[slot])
+                        frame:SetLoot(lootItem)
                         table.insert(self.toasts, frame)
                     else
                         frame = self.toasts[nextIndex]
@@ -1335,7 +1453,7 @@ function HotLoot:LOOT_OPENED()
                         end
 
                         self:ShiftToastPosUp()
-                        frame:SetLoot(lootInfo[slot])
+                        frame:SetLoot(lootItem)
                     end
 
                     self:UpdateAnchors()
@@ -1383,12 +1501,17 @@ function HotLoot:LOOT_OPENED()
 end
 
 function HotLoot:LOOT_CLOSED()
-    -- TODO: Change to support only HL LootFrame
-    -- if incButtons then
-    --     for i = 1, #incButtons do
-    --         incButtons[i]:Hide()
-    --     end
-    -- end
+    -- Clear stored loot info
+    self.lootInfo = nil
+end
+
+function HotLoot:LOOT_SLOT_CLEARED(slot)
+    -- TODO: Finish... Replace with option... Localize
+    local modifier = IsAltKeyDown()
+    if modifier and Options:Get('toggleIncludeModifierClick') and self.lootInfo and self.lootInfo[slot] then
+        local loot = self.lootInfo[slot]
+        Options:AddToIncludeList(nil, loot.item)
+    end
 end
 
 function HotLoot:MERCHANT_SHOW(...)

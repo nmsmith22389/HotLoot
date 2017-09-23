@@ -1,11 +1,11 @@
-## Interface: 70200
+## Interface: 70300
 ## Title: HotLoot
 ## Notes: Auto looting AddOn.
-## Version: 3.2.1
+## Version: 3.3.0
 ## SavedVariables: HotLootDB
-## Author: Neilo & Feindsong
+## Author: Neìl & Fiënd
 
-## X-Author-Server: The Forgotten Coast
+## X-Author-Server: Mal'ganis
 ## X-Author-Faction: Horde
 ## X-Email: nmsmith22389 AT gmail DOT com
 ## X-License: MIT

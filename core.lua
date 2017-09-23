@@ -871,14 +871,24 @@ local function GetSmartInfoText(loot)
             -- Artifact Power
             -- TODO: LOCALIZE
             return string.format('Gives %s AP', Util:ShortNumber(TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link)), 1))
-        elseif Options:Get('toggleFarmingMode') and HotLoot.farmingStats and HotLoot.farmingStats[itemID] then
+        elseif Options:Get('toggleFarmingMode') and HotLoot.farmingStats and HotLoot.farmingStats[tostring(itemID)] then
             local stat = HotLoot:GetFarmingStats(itemID)
-            local statFormatted = stat < 1000 and string.format('%.1f', stat) or Util:ShortNumber(stat)
+            local statFormatted = function()
+                if stat < 1 then
+                    return string.format('%.2f', stat)
+                elseif stat < 100 then
+                    return string.format('%.1f', stat)
+                elseif stat < 1000 then
+                    return string.format('%.0f', stat)
+                else
+                    return Util:ShortNumber(stat, 1)
+                end
+            end
             local perOption = Options:Get('selectFarmingModeRate')
             -- TODO: Localize these below (ie 'Second', 'Minute', 'Hour')
             local perFormatted = (perOption == 'second' and 'Second') or (perOption == 'minute' and 'Minute') or (perOption == 'hour' and 'Hour')
 
-            return string.format('Farmed: %s/%s', statFormatted, perFormatted)
+            return string.format('Farmed: %s/%s', statFormatted(), perFormatted)
         else
             local typeText        = select(6, GetItemInfo(loot.link)) or 'N/A'
             local subtypeText     = select(7, GetItemInfo(loot.link)) or 'N/A'
@@ -1192,8 +1202,8 @@ function UpdateFarmingList(itemID, quant)
         HotLoot.farmingStats[itemID] = HotLoot.farmingStats[itemID] or {}
 
         local stat = {
-            quant = quant,
-            time  = time()
+            ['quant'] = quant,
+            ['time']  = time()
         }
 
         table.insert(HotLoot.farmingStats[itemID], stat)
@@ -1423,7 +1433,7 @@ function HotLoot:LOOT_OPENED()
 
                     -- Farming Mode
                     if Options:Get('toggleFarmingMode') then
-                        UpdateFarmingList(Util:GetItemID(lootItem.link))
+                        UpdateFarmingList(Util:GetItemID(lootItem.link), lootItem.quantity)
                     end
 
                     -- TODO: This can be simplified

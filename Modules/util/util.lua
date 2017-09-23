@@ -7,6 +7,8 @@ local module = Util -- Alias
 -- ─── GLOBAL ─────────────────────────────────────────────────────────────────────
 --
 
+-- TODO: Idea for general util >>> maxValue(table, [key]) = finds max value in table (could also do min/avg/total)
+
 function Util:ColorText(text, hex)
     -- TODO: add hex error checking
     if hex == 'addon' then

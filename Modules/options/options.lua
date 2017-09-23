@@ -780,16 +780,16 @@ optionsTable = {
                                     width = 'full',
                                     order = 2
                                 },
+                                descListAddWarning = {
+                                    name = Util:ColorText(L['descListAddWarning'], 'warning'),
+                                    type = 'description',
+                                    width = 'full',
+                                    order = 6
+                                },
                                 toggleFarmingMode = {
                                     name = L['genEnable'],
                                     -- desc = L['toggleFarmingMode'],
                                     type = 'toggle',
-                                    width = 'full',
-                                    order = 6
-                                },
-                                descListAddWarning = {
-                                    name = Util:ColorText(L['descListAddWarning'], 'warning'),
-                                    type = 'description',
                                     width = 'full',
                                     order = 7
                                 },
@@ -1640,9 +1640,8 @@ optionsTable = {
                         }
                     }
                 },
-                -- TODO: Localize these!
                 groupLegion = {
-                    name = 'Legion',
+                    name = L['genLegion'],
                     type = 'group',
                     order = 4,
                     inline = true,
@@ -1805,26 +1804,26 @@ optionsTable = {
                     order = 19,
                 },
                 groupOnlyEquipQuality = {
-                    name = 'Filter Equipment Only',
+                    name = L['groupOnlyEquipQuality'],
                     type = 'group',
                     order = 21,
                     inline = true,
                     args = {
                         descOnlyEquipQuality = {
-                            name = Util:ColorText('This option will cause the Item Quality Filters to only work for equippable items.', 'info')..'\n',
+                            name = Util:ColorText(L['descOnlyEquipQuality'], 'info')..'\n',
                             type = 'description',
                             order = 1,
                         },
                         toggleOnlyEquipQuality = {
                             name = L['genEnable'],
-                            desc = 'Make the Quality Filters only apply to eqippable items.',
+                            desc = L['toggleOnlyEquipQualityDesc'],
                             type = 'toggle',
                             width = 'full',
                             order = 2,
                         },
                         selectMinEquipQuality = {
-                            name = 'Minimum Quality',
-                            desc = 'The minimum quality for the Equippable Only option to apply.',
+                            name = L['selectMinEquipQualityName'],
+                            desc = L['selectMinEquipQualityDesc'],
                             type = 'select',
                             values = tableItemQuality,
                             order = 3,
@@ -1859,66 +1858,74 @@ optionsTable = {
                     type = 'header',
                     order = 1,
                 },
+                descListAddWarning = {
+                    name = Util:ColorText(L['descListAddWarning'], 'warning'),
+                    type = 'description',
+                    width = 'full',
+                    order = 2
+                },
                 selectIncludeList = {
-                    name = L['selectIncludeListName'],
+                    name = L['selectListName'],
                     type = 'select',
                     values = 'GetIncludeList',
-                    order = 2,
+                    order = 3,
                 },
                 inputIncludeListAdd = {
-                    name = L['inputIncludeListAddName'],
-                    desc = L['inputIncludeListAddDesc'],
+                    name = L['inputListAddName'],
+                    desc = L['inputListAddDesc'],
                     type = 'input',
-                    order = 3,
+                    order = 4,
                     set = 'AddToIncludeList',
                     get = function(info)
                         return ''
                     end
                 },
                 buttonRemoveFromIncludeList = {
-                    name = L['buttonRemoveFromIncludeListName'],
+                    name = L['buttonRemoveFromListName'],
                     type = 'execute',
-                    order = 4,
+                    order = 5,
                     func = 'RemoveFromIncludeList'
                 },
                 toggleIncludeModifierClick = {
-                    -- name = 'Add to List on Loot Click',
-                    -- TODO: Localize
-                    -- name = L['toggleIncludeModifierClickName'],
-                    -- desc = L['toggleIncludeModifierClickDesc'],
-                    name = 'Add to List on Loot Modifier',
-                    desc = 'Will add the item to the Include List when manually looting an item while holding down Alt.',
+                    name = L['toggleIncludeModifierClickName'],
+                    desc = L['toggleIncludeModifierClickDesc'],
                     type = 'toggle',
                     hidden = true,
-                    order = 5,
+                    order = 6,
                 },
                 headerExcludeList = {
                     name = L['headerExcludeList'],
                     type = 'header',
-                    order = 6,
-                },
-                selectExcludeList = {
-                    name = L['selectExcludeListName'],
-                    type = 'select',
-                    values = 'GetExcludeList',
                     order = 7,
                 },
+                descListAddWarning = {
+                    name = Util:ColorText(L['descListAddWarning'], 'warning'),
+                    type = 'description',
+                    width = 'full',
+                    order = 8
+                },
+                selectExcludeList = {
+                    name = L['selectListName'],
+                    type = 'select',
+                    values = 'GetExcludeList',
+                    order = 9,
+                },
                 inputExcludeListAdd = {
-                    name = L['inputExcludeListAddName'],
-                    desc = L['inputExcludeListAddDesc'],
+                    name = L['inputListAddName'],
+                    desc = L['inputListAddDesc'],
                     --multiline = 10,
                     type = 'input',
                     --width = 'full',
-                    order = 8,
+                    order = 10,
                     set = 'AddToExcludeList',
                     get = function(info)
                         return ''
                     end
                 },
                 buttonRemoveFromExcludeList = {
-                    name = L['buttonRemoveFromExcludeListName'],
+                    name = L['buttonRemoveFromListName'],
                     type = 'execute',
-                    order = 9,
+                    order = 11,
                     func = 'RemoveFromExcludeList'
                 },
                 toggleShowExcludeButton = {
@@ -1926,7 +1933,7 @@ optionsTable = {
                     desc = L['toggleShowExcludeButtonDesc'],
                     type = 'toggle',
                     hidden = true,
-                    order = 10,
+                    order = 12,
                 },
             },
         },

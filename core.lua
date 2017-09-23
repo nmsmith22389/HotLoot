@@ -871,7 +871,7 @@ local function GetSmartInfoText(loot)
             -- Artifact Power
             -- TODO: LOCALIZE
             return string.format('Gives %s AP', Util:ShortNumber(TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link)), 1))
-        elseif HotLoot.farmingStats[itemID] then
+        elseif Options:Get('toggleFarmingMode') and HotLoot.farmingStats and HotLoot.farmingStats[itemID] then
             local stat = HotLoot:GetFarmingStats(itemID)
             local statFormatted = stat < 1000 and string.format('%.1f', stat) or Util:ShortNumber(stat)
             local perOption = Options:Get('selectFarmingModeRate')

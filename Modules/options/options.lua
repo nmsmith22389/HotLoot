@@ -2024,8 +2024,36 @@ optionsTable = {
                     name = L['toggleUseQuantValueName'],
                     desc = L['toggleUseQuantValueDesc'],
                     type = 'toggle',
-                    -- hidden = 'Advanced',
                     order = 4
+                },
+                -- TODO: Localize
+                groupTSMSource = {
+                    name = 'Tradeskill Master',
+                    type = 'group',
+                    order = 6,
+                    inline = true,
+                    args = {
+                        descTSMSource = {
+                            -- FIXME: make sure this slash code is right
+                            name = Util:ColorText(L['inputValueTSMSourceDescNote']:format(Util:ColorText('/tsm source', 'success')), 'info'),
+                            type = 'description',
+                            order = 2,
+                        },
+                        toggleUseTSMValue = {
+                            name = 'Use TSM Value',
+                            desc = 'When looking at an items value use TSM as the source.',
+                            type = 'toggle',
+                            order = 4
+                        },
+                        -- FIXME: This is too much like the other tsm option name so make it something diff... prob the ones above too!
+                        -- Dont forget to change it in core.lua too!
+                        inputUseTSMValueSource = {
+                            name = L['inputValueTSMSourceName'],
+                            desc = L['inputValueTSMSourceDesc'],
+                            type = 'input',
+                            order = 6
+                        }
+                    }
                 },
             },
         },

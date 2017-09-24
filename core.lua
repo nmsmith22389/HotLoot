@@ -412,7 +412,18 @@ local function CheckUntyped(type, itemLink)
     end
 end
 
-local function CheckThreshold(itemType, sellAmount, itemQuantity)
+local function CheckThreshold(itemType, itemLink, sellAmount, itemQuantity)
+    if Options:Get('toggleUseTSMValue') and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
+        local tsmSources = TSMAPI:GetPriceSources()
+        local priceSource = (tsmSources[Options:Get('inputUseTSMValueSource')]) and Options:Get('inputUseTSMValueSource') or 'DBMarket'
+        local sellAmountOld = sellAmount
+
+        sellAmount = TSMAPI:GetItemValue(_G.TSMAPI.Item:ToItemString(itemLink), priceSource)
+        if not sellAmount then
+            sellAmount = sellAmountOld
+        end
+    end
+
     local value
     if Options:Get('toggleUseQuantValue') and itemQuantity ~= nil then
         value = itemQuantity * sellAmount
@@ -494,7 +505,7 @@ local function FilterSlot(loot)
             end
 
             --> Include List
-            if Options:Get('tableIncludeList')[loot.item] and CheckThreshold('z9Include', itemSellPrice, loot.quantity) then
+            if Options:Get('tableIncludeList')[loot.item] and CheckThreshold('z9Include', loot.link, itemSellPrice, loot.quantity) then
                 return true, HL_LOOT_REASON.INCLUDE
             end
 
@@ -502,7 +513,7 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleQuestFilter') and
                 itemClass == HL_ITEM_CLASS.QUEST and
-                CheckThreshold("Quest", itemSellPrice, loot.quantity)
+                CheckThreshold("Quest", loot.link, itemSellPrice, loot.quantity)
             then
                 return true, HL_LOOT_REASON.QUEST
             end
@@ -516,7 +527,7 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleClothFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.CLOTH) and
-                CheckThreshold("Cloth", itemSellPrice, loot.quantity)
+                CheckThreshold("Cloth", loot.link, itemSellPrice, loot.quantity)
             then
                 return true, HL_LOOT_REASON.CLOTH
             end
@@ -525,7 +536,7 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleMiningFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.METAL_STONE) and
-                CheckThreshold("Metal & Stone", itemSellPrice, loot.quantity)
+                CheckThreshold("Metal & Stone", loot.link, itemSellPrice, loot.quantity)
             then
                 return true, HL_LOOT_REASON.MINING
             end
@@ -534,7 +545,7 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleGemFilter') and
                 --[[(itemClass == HL_ITEM_CLASS.GEM or ]](itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.JEWELCRAFTING) and
-                CheckThreshold("Gem", itemSellPrice, loot.quantity)
+                CheckThreshold("Gem", loot.link, itemSellPrice, loot.quantity)
             then
                 return true, HL_LOOT_REASON.GEM
             end
@@ -543,7 +554,7 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleHerbFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.HERB) and
-                CheckThreshold("Herb", itemSellPrice, loot.quantity)
+                CheckThreshold("Herb", loot.link, itemSellPrice, loot.quantity)
             then
                 return true, HL_LOOT_REASON.HERB
             end
@@ -553,7 +564,7 @@ local function FilterSlot(loot)
                 Options:Get('toggleLeatherFilter') and
                 ((itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER) or
                 CheckUntyped('Leather', loot.link)) and
-                CheckThreshold("Leather", itemSellPrice, loot.quantity)
+                CheckThreshold("Leather", loot.link, itemSellPrice, loot.quantity)
             then
                 return true, HL_LOOT_REASON.LEATHER
             end
@@ -571,7 +582,7 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleEnchantingFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.ENCHANTING) and
-                CheckThreshold("Enchanting", itemSellPrice, loot.quantity)
+                CheckThreshold("Enchanting", loot.link, itemSellPrice, loot.quantity)
             then
                 return true, HL_LOOT_REASON.ENCHANTING
             end
@@ -580,40 +591,40 @@ local function FilterSlot(loot)
             if
                 Options:Get('togglePigmentsFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.INSCRIPTION) and
-                CheckThreshold("Inscription", itemSellPrice, loot.quantity)
+                CheckThreshold("Inscription", loot.link, itemSellPrice, loot.quantity)
             then
-                return true, 'Pigment Filter'
+                return true, HL_LOOT_REASON.INSCRIPTION
             end
 
             --> Cooking
             if
                 Options:Get('toggleCookingFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.COOKING) and
-                CheckThreshold("Cooking Ingredient", itemSellPrice, loot.quantity)
+                CheckThreshold("Cooking Ingredient", loot.link, itemSellPrice, loot.quantity)
             then
-                return true, 'Cooking Filter'
+                return true, HL_LOOT_REASON.COOKING
             end
 
             --> Recipe
             if Options:Get('toggleRecipeFilter') and itemClass == HL_ITEM_CLASS.RECIPE then
-                return true, 'Recipe Filter'
+                return true, HL_LOOT_REASON.RECIPE
             end
 
             --> Pots
             if
                 Options:Get('togglePotionFilter') and
                 (itemClass == HL_ITEM_CLASS.CONSUMABLE and itemSubClass == HL_ITEM_SUB_CLASS.CONSUMABLE.POTION) and
-                CheckThreshold("Potion", itemSellPrice, loot.quantity)
+                CheckThreshold("Potion", loot.link, itemSellPrice, loot.quantity)
             then
                 if Options:Get('selectPotionType') == "both" then
-                    return true, 'Potion Filter'
+                    return true, HL_LOOT_REASON.POTION
                 -- FIXME: Either make these experiemental or fix these so they work in any language
                 elseif Options:Get('selectPotionType') == "healing" and string.find(loot.item, L["Healing"])  then
-                    return true, 'Health Potion Filter'
+                    return true, HL_LOOT_REASON.POTION_HEALTH
                 elseif Options:Get('selectPotionType') == "mana" and string.find(loot.item, L["Mana"])  then
-                    return true, 'Mana Potion Filter'
+                    return true, HL_LOOT_REASON.POTION_MANA
                 else
-                    return false, 'Unsupported Potion'
+                    return false, HL_LOOT_REASON.POTION_UNSUPPORTED
                 end
             end
 
@@ -621,49 +632,49 @@ local function FilterSlot(loot)
             if
                 Options:Get('toggleFlaskFilter') and
                 (itemClass == HL_ITEM_CLASS.CONSUMABLE and itemSubClass == HL_ITEM_SUB_CLASS.CONSUMABLE.FLASK) and
-                CheckThreshold("Flask", itemSellPrice, loot.quantity)
+                CheckThreshold("Flask", loot.link, itemSellPrice, loot.quantity)
             then
-                return true, 'Flask Filter'
+                return true, HL_LOOT_REASON.FLASK
             end
 
             --> Elixirs
             if
                 Options:Get('toggleElixirFilter') and
                 (itemClass == HL_ITEM_CLASS.CONSUMABLE and itemSubClass == HL_ITEM_SUB_CLASS.CONSUMABLE.ELIXIR) and
-                CheckThreshold("Elixir", itemSellPrice, loot.quantity)
+                CheckThreshold("Elixir", loot.link, itemSellPrice, loot.quantity)
             then
-                return true, 'Elixir Filter'
+                return true, HL_LOOT_REASON.ELIXIR
             end
 
             --> Motes
             if
                 Options:Get('toggleElementalFilter') and
                 (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.ELEMENTAL) and
-                CheckThreshold("Elemental", itemSellPrice, loot.quantity)
+                CheckThreshold("Elemental", loot.link, itemSellPrice, loot.quantity)
             then
-                return true, 'Elemental Filter'
+                return true, HL_LOOT_REASON.ELEMENTAL
             end
 
             -- LEGION
 
             --> Artifact Power
             if Options:Get('toggleAPFilter') and TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link), true) then
-                return true, 'Artifact Power Filter'
+                return true, HL_LOOT_REASON.ARTIFACT_POWER
             end
 
             --> Defiled Augment Rune
             if Options:Get('toggleAugmentRuneFilter') and CheckUntyped('Defiled Augment Rune', loot.link) then
-                return true, 'Defiled Augment Rune Filter'
+                return true, HL_LOOT_REASON.AUGMENT_RUNE
             end
 
             --> Artifact Research Notes
             if Options:Get('toggleKnowledgeScrollFilter') and CheckUntyped('Artifact Research Notes', loot.link) then
-                return true, 'Artifact Research Notes Filter'
+                return true, HL_LOOT_REASON.ARTIFACT_RESEARCH
             end
 
             --> Sentinax Beacons
             if Options:Get('toggleSentinaxBeaconFilter') and CheckUntyped('Sentinax Beacons', loot.link) then
-                return true, 'Sentinax Beacons Filter'
+                return true, HL_LOOT_REASON.SENTINAX_BEACON
             end
 
             -- QUALITY
@@ -687,7 +698,7 @@ local function FilterSlot(loot)
             if
                 Options:Get('togglePoorQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_POOR and
-                CheckThreshold("z1Poor", itemSellPrice, loot.quantity) and
+                CheckThreshold("z1Poor", loot.link, itemSellPrice, loot.quantity) and
                 (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
                 -- if equipOnly then
@@ -697,77 +708,77 @@ local function FilterSlot(loot)
                 --         return false, 'Does not meet equipment requirements.'
                 --     end
                 -- end
-                return true, 'Poor Quality Filter'
+                return true, HL_LOOT_REASON.QUALITY_POOR
             end
 
             --> Common
             if
                 Options:Get('toggleCommonQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_COMMON and
-                CheckThreshold("z2Common", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                CheckThreshold("z2Common", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
                 (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
-                return true, 'Common Quality Filter'
+                return true, HL_LOOT_REASON.QUALITY_COMMON
             end
 
             --> Uncommon
             if
                 Options:Get('toggleUncommonQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_UNCOMMON and
-                CheckThreshold("z3Uncommon", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                CheckThreshold("z3Uncommon", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
                 (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
-                return true, 'Uncommon Quality Filter'
+                return true, HL_LOOT_REASON.QUALITY_UNCOMMON
             end
 
             --> Rare
             if
                 Options:Get('toggleRareQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_RARE and
-                CheckThreshold("z4Rare", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                CheckThreshold("z4Rare", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
                 (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
-                return true, 'Rare Quality Filter'
+                return true, HL_LOOT_REASON.QUALITY_RARE
             end
 
             --> Epic
             if
                 Options:Get('toggleEpicQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_EPIC and
-                CheckThreshold("z5Epic", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                CheckThreshold("z5Epic", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
                 (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
-                return true, 'Epic Quality Filter'
+                return true, HL_LOOT_REASON.QUALITY_EPIC
             end
 
             --> Legendary
             if
                 Options:Get('toggleLegendaryQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_LEGENDARY and
-                CheckThreshold("z6Legendary", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                CheckThreshold("z6Legendary", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
                 (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
-                return true, 'Legendary Quality Filter'
+                return true, HL_LOOT_REASON.QUALITY_LEGENDARY
             end
 
             --> Artifact
             if
                 Options:Get('toggleArtifactQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_ARTIFACT and
-                CheckThreshold("z7Artifact", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                CheckThreshold("z7Artifact", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
                 (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
-                return true, 'Artifact Quality Filter'
+                return true, HL_LOOT_REASON.QUALITY_ARTIFACT
             end
 
             --> Heirloom
             if
                 Options:Get('toggleHeirloomQualityFilter') and
                 loot.quality == LE_ITEM_QUALITY_HEIRLOOM and
-                CheckThreshold("z8Heirloom", itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
+                CheckThreshold("z8Heirloom", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
                 (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
             then
-                return true, 'Heirloom Quality Filter'
+                return true, HL_LOOT_REASON.QUALITY_HEIRLOOM
             end
 
             return false, HL_LOOT_REASON.NOT_FOUND

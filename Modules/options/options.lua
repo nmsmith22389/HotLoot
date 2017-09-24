@@ -540,7 +540,7 @@ function Options:AddToFarmingList(info, value)
         else ]]
             local itemName, itemLink = GetItemInfo(value)
             if itemName then
-                self.db.profile.tableFarmingList[tostring(Util:GetItemID(itemLink))] = itemName
+                self.db.profile.tableFarmingList[Util:GetItemID(itemLink)] = itemName
                 Util:Announce(string.format(L['AnnounceListAdd'], Util:ColorText(itemName, 'info'), 'Farming List'))
             else
                 Util:Print(string.format(L['ErrorListItemNotFound'], Util:ColorText(value, 'info'), 'Farming List'))
@@ -2123,4 +2123,13 @@ function Options:OnInitialize()
     -- end
 
     tableChatWindows = GetChatWindows()
+
+    setmetatable(self.db.profile.tableFarmingList, {
+        __index = function(t, k)
+            return rawget(t, tostring(k))
+        end,
+        __newindex = function(t, k, v)
+            rawset(t, tostring(k), v)
+        end
+    })
 end

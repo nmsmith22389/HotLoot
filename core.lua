@@ -882,7 +882,7 @@ local function GetSmartInfoText(loot)
             -- Artifact Power
             -- TODO: LOCALIZE
             return string.format('Gives %s AP', Util:ShortNumber(TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link)), 1))
-        elseif Options:Get('toggleFarmingMode') and HotLoot.farmingStats and HotLoot.farmingStats[tostring(itemID)] then
+        elseif Options:Get('toggleFarmingMode') and HotLoot.farmingStats and HotLoot.farmingStats[itemID] then
             local stat = HotLoot:GetFarmingStats(itemID)
             local statFormatted = function()
                 if stat < 1 then
@@ -1206,8 +1206,18 @@ end
 
 function UpdateFarmingList(itemID, quant)
     local list = Options:Get('tableFarmingList')
-    itemID = tostring(itemID)
-    HotLoot.farmingStats = HotLoot.farmingStats or {}
+    if not HotLoot.farmingStats then
+        HotLoot.farmingStats = {}
+        local mt = {
+            __index = function(t, k)
+                return rawget(t, tostring(k))
+            end,
+            __newindex = function(t, k, v)
+                rawset(t, tostring(k), v)
+            end
+        }
+        setmetatable(HotLoot.farmingStats, mt)
+    end
 
     if list[itemID] then
         HotLoot.farmingStats[itemID] = HotLoot.farmingStats[itemID] or {}
@@ -1226,8 +1236,6 @@ function UpdateFarmingList(itemID, quant)
 end
 
 function HotLoot:GetFarmingStats(itemID)
-    itemID = tostring(itemID)
-
     if not HotLoot.farmingStats[itemID] then
         return false
     end

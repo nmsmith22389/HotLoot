@@ -1,4 +1,8 @@
 # CHANGELOG
+## v3.3.1
+### Fixed
+* Fixed an error in Farming Mode.
+
 ## v3.3
 ### Added
 * Added an Artifact Power filter. *(using LibTTScan)*

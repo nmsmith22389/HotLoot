@@ -470,8 +470,8 @@ end
 --      1: result [boolean]
 --      2: filter caught in / reason not caught [string]
 local function FilterSlot(loot)
+    -- FIXME: is this check for in raid part really needed?
     if Options:Get('tableExcludeList')[loot.item] and loot.link and (not Options:Get('toggleDisableInRaid') or GetLootMethod() ~= 'master') then
-        -- TODO: Consider moving this inside the item section
         -- Don't Loot
         Util:Announce(L["AnnounceItemExcluded"]:format(loot.link))
         return false, HL_LOOT_REASON.EXCLUDE
@@ -493,8 +493,6 @@ local function FilterSlot(loot)
         if (HasRoom(1) or CanStack(loot.item, itemStackCount, loot.quantity)) then
 
             -- TODO: Normalize these so that the check order is (pref, type, subtype, other) (there may be special cases)
-            -- TODO: Make options for quality to loot only equipable items
-            -- FIXME: ======== REPLACE LOOT REASON WITH CONSTANTS (need to finish) ========
 
             --> Debug
             if Options:Get('toggleDebugMode') then
@@ -1007,7 +1005,6 @@ local function SetLoot(frame, loot)
         colorFont.alpha = 1.0
     end
 
-    -- TODO: ADD OPTIONS FOR OUTLINE ETC
     --> Set Name
     local nameText = loot.link or loot.item
     frame.name:SetFont(AceGUIWidgetLSMlists.font[Options:Get('selectNameTextFont')], Options:Get('rangeNameTextSize'), "OUTLINE")
@@ -1372,6 +1369,7 @@ function HotLoot:ChatCommand(input)
     elseif string.find(input, '^exclude%s') then
         local item = string.gsub(input, '^exclude%s', '', 1)
         Options:AddToExcludeList(nil, item)
+    -- TODO: Add farming filter
     elseif string.find(input, '^filter%s') then
         local itemInput = string.gsub(input, '^filter%s', '', 1)
 

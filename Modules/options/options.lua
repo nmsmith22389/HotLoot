@@ -1348,24 +1348,30 @@ optionsTable = {
                             order = 31,
                             inline = true,
                             args = {
+                                descTSMSource = {
+                                    -- FIXME: make sure this slash code is right
+                                    name = Util:ColorText(L['inputValueTSMSourceDescNote']:format(Util:ColorText('/tsm source', 'success')), 'info'),
+                                    type = 'description',
+                                    order = 2,
+                                },
                                 toggleShowTSMValue = {
                                     name = L['toggleShowTSMValueName'],
                                     desc = L['toggleShowTSMValueDesc'],
                                     type = 'toggle',
                                     width = 'full',
-                                    order = 1
+                                    order = 4
                                 },
                                 toggleShowValuePrefix = {
                                     name = L['toggleShowValuePrefixName'],
                                     desc = L['toggleShowValuePrefixDesc'],
                                     type = 'toggle',
-                                    order = 2
+                                    order = 6
                                 },
                                 inputValueTSMSource = {
                                     name = L['inputValueTSMSourceName'],
                                     desc = L['inputValueTSMSourceDesc'],
                                     type = 'input',
-                                    order = 3
+                                    order = 8
                                 },
                             }
                         },

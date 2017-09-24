@@ -1432,7 +1432,7 @@ function HotLoot:LOOT_OPENED()
                     local nextIndex = self:GetNextToastIndex()
 
                     -- Farming Mode
-                    if Options:Get('toggleFarmingMode') then
+                    if Options:Get('toggleFarmingMode') and lootItem.link then
                         UpdateFarmingList(Util:GetItemID(lootItem.link), lootItem.quantity)
                     end
 

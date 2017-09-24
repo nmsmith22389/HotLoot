@@ -1,7 +1,7 @@
 ## Interface: 70300
 ## Title: HotLoot
 ## Notes: Auto looting AddOn.
-## Version: 3.3.0
+## Version: 3.3.1
 ## SavedVariables: HotLootDB
 ## Author: Neìl & Fiënd
 

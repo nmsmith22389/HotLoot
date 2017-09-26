@@ -111,9 +111,9 @@ end
 -- RealUI Support
 function Util:IsRealUILootOn()
     if IsAddOnLoaded('nibRealUI') then
-        return RealUI:GetModuleEnabled('Loot');
+        return RealUI:GetModuleEnabled('Loot')
     else
-        return false;
+        return false
     end
 end
 
@@ -199,7 +199,7 @@ function Util:FormatMoney(amount, style, textonly)
 	local copper = floor(mod(value, 100))
 
 	if not style or style == "SMART" then
-		local str = "";
+		local str = ""
 		if gold > 0 then
 			str = format("%d%s%s", gold, goldname, (silver > 0 or copper > 0) and " " or "")
 		end

@@ -1877,11 +1877,11 @@ optionsTable = {
                             order = 4,
                             set = function(info, value)
                                 if value == '' or not tonumber(value) then
-                                    Options.db.profile.inputMinItemLevel = 0;
-                                    Util:Debug('inputMinItemLevel not set (defaulting to 0)');
+                                    Options.db.profile.inputMinItemLevel = 0
+                                    Util:Debug('inputMinItemLevel not set (defaulting to 0)')
                                 else
-                                    Options.db.profile.inputMinItemLevel = value;
-                                    Util:DebugOption('inputMinItemLevel', value);
+                                    Options.db.profile.inputMinItemLevel = value
+                                    Util:DebugOption('inputMinItemLevel', value)
                                 end
                             end
                         },
@@ -2123,16 +2123,16 @@ optionsTable = {
 
 -- local function TransferOldSetting(oldKey, newKey)
 --     if Options.db.profile[oldKey] ~= nil then
---         Options.db.profile[newKey] = Options.db.profile[oldKey];
---         Options.db.profile[oldKey] = nil;
+--         Options.db.profile[newKey] = Options.db.profile[oldKey]
+--         Options.db.profile[oldKey] = nil
 --     end
 -- end
 
 -- local function TransferAllSettings()
---     Util:Announce('Settings have changed and need to be transferred.\n This should only happen once.');
---     Util:Announce('Transfering old settings now...');
+--     Util:Announce('Settings have changed and need to be transferred.\n This should only happen once.')
+--     Util:Announce('Transfering old settings now...')
 
---     Util:Announce('Settings transfer complete!');
+--     Util:Announce('Settings transfer complete!')
 -- end
 
 function Options:OnInitialize()

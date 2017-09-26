@@ -304,33 +304,33 @@ end
 --
 
 -- TODO: Find out what happens if gold isnt set to pick up and you use skinning mode on it.
-local tItemsToDelete = {};
+local tItemsToDelete = {}
 local function ToSkin(slot)
-    local _, lootName, lootQuantity, _, _ = GetLootSlotInfo(slot);
-    -- local itemLink = GetLootSlotLink(slot);
+    local _, lootName, lootQuantity, _, _ = GetLootSlotInfo(slot)
+    -- local itemLink = GetLootSlotLink(slot)
     if (Options:Get('toggleSkinningMode') or Util:IsSkinKeyDown()) and lootQuantity > 0 then
-        tItemsToDelete[lootName] = true;
-        LootSlot(slot);
-        Util:Debug(Util:ColorText(lootName..' is set to be deleted!', 'alert'));
+        tItemsToDelete[lootName] = true
+        LootSlot(slot)
+        Util:Debug(Util:ColorText(lootName..' is set to be deleted!', 'alert'))
     end
 end
 
 local function DeleteLeftovers()
     if not Util:IsEmpty(tItemsToDelete) then
         -- TODO: Rename
-        Util:Announce(L["SkinAnnounce1"]);
+        Util:Announce(L["SkinAnnounce1"])
         for bag = 0, NUM_BAG_SLOTS do
             for slot = 1, GetContainerNumSlots(bag) do
-                local itemLink = GetContainerItemLink(bag, slot);
+                local itemLink = GetContainerItemLink(bag, slot)
                 local itemName
                 if itemLink then
-                    itemName = select(1, GetItemInfo(itemLink));
+                    itemName = select(1, GetItemInfo(itemLink))
                     if itemName and tItemsToDelete[itemName] then
-                        PickupContainerItem(bag, slot);
+                        PickupContainerItem(bag, slot)
                         if CursorHasItem() then
-                            DeleteCursorItem();
+                            DeleteCursorItem()
                             -- TODO: Rename
-                            Util:Announce(itemLink .. L["SkinAnnounce2"]);
+                            Util:Announce(itemLink .. L["SkinAnnounce2"])
                         end
                     end
                 end
@@ -507,7 +507,7 @@ local function FilterSlot(loot)
                 local strFilterDebug = "-------------\n"..
                     tostring(loot.link)..' x'..tostring(loot.quantity)..'\n'..
                     '    - '..tostring(itemType)..' > '..tostring(itemSubType)
-                Util:Debug(strFilterDebug);
+                Util:Debug(strFilterDebug)
             end
 
             --> Include List
@@ -790,7 +790,7 @@ local function FilterSlot(loot)
             return false, HL_LOOT_REASON.NOT_FOUND
         else
             Util:Announce(L["BagsFull"])
-            Util:Debug(ERR_INV_FULL);
+            Util:Debug(ERR_INV_FULL)
             if Options:Get('toggleAnnounceBagsFullRaid') then
                 -- TODO: RECOLOR?
                 RaidNotice_AddMessage(RaidWarningFrame, L['BagsFull'], ChatTypeInfo["RAID_WARNING"])
@@ -1305,7 +1305,7 @@ local function IBOnLeave()
 end
 
 function HotLoot:CreateILootButton(slot)
-    local attachFrame = Util:IsRealUILootOn() and _G['RealUI_Loot'] or _G['LootFrame'];
+    local attachFrame = Util:IsRealUILootOn() and _G['RealUI_Loot'] or _G['LootFrame']
     local i = CreateFrame("button", "IncButton"..slot, attachFrame)
     i:SetWidth(8)
     i:SetHeight(30)
@@ -1524,8 +1524,8 @@ function HotLoot:LOOT_OPENED()
             -- TODO: Add back RealUI and ElvUI support
             if Options:Get('toggleCloseLootWindow') and not Util:IsCloseKeyDown()--[[ and (string.find(mFocus, "WorldFrame") or Util:IsRealUILootOn())]] then
                 -- TODO: Figure out if this is needed
-                closeEL = 1;
-                CloseLoot();
+                closeEL = 1
+                CloseLoot()
             end
         end
     end
@@ -1553,5 +1553,5 @@ function HotLoot:MERCHANT_SHOW(...)
 end
 
 function HotLoot:BAG_UPDATE(...)
-    DeleteLeftovers();
+    DeleteLeftovers()
 end

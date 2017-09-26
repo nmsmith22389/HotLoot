@@ -1939,7 +1939,7 @@ optionsTable = {
                     type = 'header',
                     order = 7,
                 },
-                descListAddWarning = {
+                descListAddWarning2 = {
                     name = Util:ColorText(L['descListAddWarning'], 'warning'),
                     type = 'description',
                     width = 'full',
@@ -2076,7 +2076,7 @@ optionsTable = {
                     args = {
                         descTSMSource = {
                             -- FIXME: make sure this slash code is right
-                            name = Util:ColorText(L['inputValueTSMSourceDescNote']:format(Util:ColorText('/tsm source', 'success')), 'info'),
+                            name = Util:ColorText(L['inputValueTSMSourceDescNote']:format(Util:ColorText('/tsm source', 'success')..Util:GetColorString('info')), 'info'),
                             type = 'description',
                             order = 2,
                         },

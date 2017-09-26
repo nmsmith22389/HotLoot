@@ -10,7 +10,10 @@ local module = Util -- Alias
 -- TODO: Idea for general util >>> maxValue(table, [key]) = finds max value in table (could also do min/avg/total)
 
 function Util:ColorText(text, hex)
-    -- TODO: add hex error checking
+    return self:GetColorString(hex)..tostring(text)..'|r'
+end
+
+function Util:GetColorString(hex)
     if hex == 'addon' then
         hex = 'FF3D00'
     elseif hex == 'info' then
@@ -27,7 +30,7 @@ function Util:ColorText(text, hex)
         hex = 'ff'..hex
     end
 
-    return '|c'..tostring(hex):upper()..tostring(text)..'|r'
+    return '|c'..tostring(hex):lower()
 end
 
 function Util:Print(text, frame)

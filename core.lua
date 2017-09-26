@@ -39,6 +39,14 @@ HotLoot.toasts = {}
 
 -- NOTE: Put vars (hoisted) here (i suppose if everything is done right then this should be empty)
 
+local function GetFont(key)
+    if not LSM:IsValid('font', Options:Get(key)) then
+        Options:Set(key, Options.db.defaults.profile[key])
+    end
+
+    return LSM:Fetch('font', Options:Get(key))
+end
+
 --
 -- ─── DIALOGS ────────────────────────────────────────────────────────────────────
 --
@@ -1007,14 +1015,18 @@ local function SetLoot(frame, loot)
 
     --> Set Name
     local nameText = loot.link or loot.item
-    frame.name:SetFont(AceGUIWidgetLSMlists.font[Options:Get('selectNameTextFont')], Options:Get('rangeNameTextSize'), "OUTLINE")
+    local nameFont = GetFont('selectNameTextFont')
+
+    frame.name:SetFont(nameFont, Options:Get('rangeNameTextSize'), Options:Get('selectNameTextOutline'))
     frame.name:SetText(nameText)
     -- frame.name:ClearAllPoints()
     -- frame.name:SetPoint('TOPLEFT', frame, 'TOPLEFT', theme.text.name.left, theme.text.name.top)
 
     --> Set Count
     if frame.count then
-        frame.count:SetFont(AceGUIWidgetLSMlists.font[Options:Get('selectQuantTextFont')], Options:Get('rangeQuantTextSize'), "OUTLINE")
+        local countFont = GetFont('selectQuantTextFont')
+
+        frame.count:SetFont(countFont, Options:Get('rangeQuantTextSize'), Options:Get('selectQuantTextOutline'))
         frame.count:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha)
 
         if Options:Get('toggleShowItemQuant') and loot.quantity > 0 then
@@ -1040,7 +1052,9 @@ local function SetLoot(frame, loot)
 
     --> Set Value
     if frame.value then
-        frame.value:SetFont(AceGUIWidgetLSMlists.font[Options:Get('selectLine2TextFont')], Options:Get('rangeLine2TextSize'), "OUTLINE")
+        local valueFont = GetFont('selectLine2TextFont')
+
+        frame.value:SetFont(valueFont, Options:Get('rangeLine2TextSize'), Options:Get('selectLine2TextOutline'))
         frame.value:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha)
 
         if Options:Get('toggleShowSellPrice') and loot.quantity > 0 and loot.slotType == HL_LOOT_SLOT_TYPE.ITEM then
@@ -1062,7 +1076,7 @@ local function SetLoot(frame, loot)
 
     --> Set Type
     if frame.type then
-        frame.type:SetFont(AceGUIWidgetLSMlists.font[Options:Get('selectLine1TextFont')], Options:Get('rangeLine1TextSize'), "OUTLINE")
+        frame.type:SetFont(GetFont('selectLine1TextFont'), Options:Get('rangeLine1TextSize'), Options:Get('selectLine1TextOutline'))
         frame.type:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha)
 
         if Options:Get('toggleShowItemType') then

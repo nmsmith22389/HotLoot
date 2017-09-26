@@ -79,6 +79,13 @@ local tableItemQuality = {
     ['7'] = ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r',
 }
 
+local tableFontOutline = {
+    ["NONE"] = NONE,
+    ["OUTLINE"] = "OUTLINE",
+    ["MONOCHROMEOUTLINE"] = "MONOCROMEOUTLINE",
+    ["THICKOUTLINE"] = "THICKOUTLINE"
+}
+
 -- TODO: Localize
 local tableFarmingModeRate = {
     ['second'] = 'Per Second',
@@ -216,6 +223,7 @@ local defaults = {
         --> Name Text
         selectNameTextFont   = 'Roboto Condensed Bold',
         rangeNameTextSize    = 12,
+        selectNameTextOutline = 'OUTLINE',
         rangeNameTextXOffset = 0,
         rangeNameTextYOffset = 0,
 
@@ -224,6 +232,7 @@ local defaults = {
         toggleShowTotalQuant = true,
         selectQuantTextFont  = 'Roboto Condensed Bold',
         rangeQuantTextSize   = 8,
+        selectQuantTextOutline = 'OUTLINE',
         colorQuantTextFont   = {
             r = 1.0,
             g = 1.0,
@@ -238,6 +247,7 @@ local defaults = {
         toggleShowItemTypeNoInfo = false,
         selectLine1TextFont = 'Roboto Condensed Bold',
         rangeLine1TextSize  = 10,
+        selectLine1TextOutline = 'OUTLINE',
         colorLine1TextFont = {
             r = 1.0,
             g = 1.0,
@@ -251,6 +261,7 @@ local defaults = {
         toggleShowSellPrice = true,
         selectLine2TextFont = 'Roboto Condensed Bold',
         rangeLine2TextSize  = 10,
+        selectLine2TextOutline = 'OUTLINE',
         colorLine2TextFont = {
             r = 1.0,
             g = 1.0,
@@ -1107,7 +1118,13 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 5
+                            order = 6
+                        },
+                        selectNameTextOutline = {
+                            name = L['genOutline'],
+                            type = 'select',
+                            values = tableFontOutline,
+                            order = 8
                         },
                         --[[colorNameTextFont = {
                             name = L['colorFontColorName'],
@@ -1147,7 +1164,7 @@ optionsTable = {
                         headerQuantText = {
                             name = L['headerQuantText'],
                             type = 'header',
-                            order = 9,
+                            order = 10,
                         },
                         -- TODO: Consider changing the name for this and the other lines from 'Enable' to 'Show' (or 'Hide'?)
                         toggleShowItemQuant = {
@@ -1155,14 +1172,14 @@ optionsTable = {
                             desc = L['toggleShowItemQuantDesc'],
                             type = 'toggle',
                             -- width = 'double',
-                            order = 10
+                            order = 12
                         },
                         toggleShowTotalQuant = {
                             name = L['toggleShowTotalQuantName'],
                             desc = L['toggleShowTotalQuantDesc'],
                             type = 'toggle',
                             -- width = 'double',
-                            order = 11
+                            order = 14
                         },
                         selectQuantTextFont = {
                             name = L['genFont'],
@@ -1171,7 +1188,7 @@ optionsTable = {
                             dialogControl = 'LSM30_Font',
                             values = AceGUIWidgetLSMlists.font,
                             width = 'double',
-                            order = 12
+                            order = 16
                         },
                         rangeQuantTextSize = {
                             name = L['rangeFontSizeName'],
@@ -1182,7 +1199,13 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 13
+                            order = 18
+                        },
+                        selectQuantTextOutline = {
+                            name = L['genOutline'],
+                            type = 'select',
+                            values = tableFontOutline,
+                            order = 20
                         },
                         colorQuantTextFont = {
                             name = L['colorFontColorName'],
@@ -1190,7 +1213,7 @@ optionsTable = {
                             type = 'color',
                             -- hidden = 'Advanced',
                             hasAlpha = true,
-                            order = 14,
+                            order = 22,
                             set = 'SetColor',
                             get = 'GetColor'
                         },
@@ -1222,12 +1245,12 @@ optionsTable = {
                         headerLine1Text = {
                             name = L['headerLine1Text'],
                             type = 'header',
-                            order = 17,
+                            order = 24,
                         },
                         descLine1Text = {
                             name = L['descSmartInfo'],
                             type = 'description',
-                            order = 18,
+                            order = 26,
                         },
                         -- TODO: Add toggle to show type when no smart info. (off by default)
                         -- TODO: Change to match Line 1
@@ -1236,14 +1259,14 @@ optionsTable = {
                             -- desc = L['toggleShowItemTypeDesc'],
                             type = 'toggle',
                             width = 'double',
-                            order = 19
+                            order = 28
                         },
                         toggleShowItemTypeNoInfo = {
                             name = L['toggleShowItemTypeNoInfoName'],
                             desc = L['toggleShowItemTypeNoInfoDesc'],
                             type = 'toggle',
                             -- width = 'double',
-                            order = 20
+                            order = 30
                         },
                         selectLine1TextFont = {
                             name = L['genFont'],
@@ -1252,7 +1275,13 @@ optionsTable = {
                             dialogControl = 'LSM30_Font',
                             values = AceGUIWidgetLSMlists.font,
                             width = 'double',
-                            order = 21
+                            order = 32
+                        },
+                        selectLine1TextOutline = {
+                            name = L['genOutline'],
+                            type = 'select',
+                            values = tableFontOutline,
+                            order = 34
                         },
                         rangeLine1TextSize = {
                             name = L['rangeFontSizeName'],
@@ -1263,7 +1292,7 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 22
+                            order = 36
                         },
                         colorLine1TextFont = {
                             name = L['colorFontColorName'],
@@ -1271,7 +1300,7 @@ optionsTable = {
                             type = 'color',
                             -- hidden = 'Advanced',
                             hasAlpha = true,
-                            order = 23,
+                            order = 38,
                             set = 'SetColor',
                             get = 'GetColor'
                         },
@@ -1303,14 +1332,14 @@ optionsTable = {
                         headerLine2Text = {
                             name = L['headerLine2Text'],
                             type = 'header',
-                            order = 26,
+                            order = 40,
                         },
                         toggleShowSellPrice = {
                             name = L['genEnable'], -- Used to be toggleShowSellPriceName
                             desc = L['toggleShowSellPriceDesc'],
                             type = 'toggle',
                             width = 'double',
-                            order = 27
+                            order = 42
                         },
                         selectLine2TextFont = {
                             name = L['genFont'],
@@ -1319,7 +1348,7 @@ optionsTable = {
                             dialogControl = 'LSM30_Font',
                             values = AceGUIWidgetLSMlists.font,
                             width = 'double',
-                            order = 28
+                            order = 44
                         },
                         rangeLine2TextSize = {
                             name = L['rangeFontSizeName'],
@@ -1330,7 +1359,13 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 29
+                            order = 46
+                        },
+                        selectLine2TextOutline = {
+                            name = L['genOutline'],
+                            type = 'select',
+                            values = tableFontOutline,
+                            order = 48
                         },
                         colorLine2TextFont = {
                             name = L['colorFontColorName'],
@@ -1338,14 +1373,14 @@ optionsTable = {
                             type = 'color',
                             -- hidden = 'Advanced',
                             hasAlpha = true,
-                            order = 30,
+                            order = 50,
                             set = 'SetColor',
                             get = 'GetColor'
                         },
                         groupTSMValue = {
                             name = L['groupTSMValue'],
                             type = 'group',
-                            order = 31,
+                            order = 52,
                             inline = true,
                             args = {
                                 descTSMSource = {

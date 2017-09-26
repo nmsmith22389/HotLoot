@@ -1506,7 +1506,7 @@ function HotLoot:LOOT_OPENED()
                 end
 
                 LootSlot(slot)
-            else
+            elseif not filtered then
                 Util:Debug('Item NOT looted. '..Util:ColorText('('..tostring(reason)..')', 'alert'))
                 ToSkin(slot)
             end

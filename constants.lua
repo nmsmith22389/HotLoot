@@ -58,6 +58,12 @@ _G.HL_LOOT_REASON = {
     QUALITY_HEIRLOOM   = 'Heirloom Quality Filter',
 }
 
+_G.HL_FILTER_TYPE = {
+    TYPE = 0,
+    VALUE = 1,
+    QUALITY = 2,
+}
+
 -- @usage
 -- *to return the localized name*
 -- GetItemClassInfo(itemClassEnum)
@@ -89,9 +95,9 @@ _G.HL_ITEM_SUB_CLASS.CONSUMABLE = {
     POTION                 = 1, -- 'Potion'
     ELIXIR                 = 2, -- 'Elixir'
     FLASK                  = 3, -- 'Flask'
-    SCROLL                 = 4, -- 'Scroll (OBSOLETE)'
+    -- SCROLL                 = 4, -- 'Scroll (OBSOLETE)'
     FOOD_DRINK             = 5, -- 'Food & Drink'
-    ITEM_ENHANCEMENT       = 6, -- 'Item Enhancement (OBSOLETE)'
+    -- ITEM_ENHANCEMENT       = 6, -- 'Item Enhancement (OBSOLETE)'
     BANDAGE                = 7, -- 'Bandage'
     OTHER                  = 8, -- 'Other'
     VANTUS_RUNES           = 9  -- 'Vantus Runes'
@@ -171,18 +177,18 @@ _G.HL_ITEM_SUB_CLASS.REAGENT = {
 }
 
 _G.HL_ITEM_SUB_CLASS.PROJECTILE = {
-    WAND   = 0, -- 'Wand(OBSOLETE)'
-    BOLT   = 1, -- 'Bolt(OBSOLETE)'
+    -- WAND   = 0, -- 'Wand(OBSOLETE)'
+    -- BOLT   = 1, -- 'Bolt(OBSOLETE)'
     ARROW  = 2, -- 'Arrow'
     BULLET = 3, -- 'Bullet'
-    THROWN = 4, -- 'Thrown(OBSOLETE)'
+    -- THROWN = 4, -- 'Thrown(OBSOLETE)'
 }
 
 _G.HL_ITEM_SUB_CLASS.TRADESKILL = {
-    TRADE_GOODS            = 0,  -- 'Trade Goods (OBSOLETE)'
+    -- TRADE_GOODS            = 0,  -- 'Trade Goods (OBSOLETE)'
     PARTS                  = 1,  -- 'Parts'
-    EXPLOSIVES             = 2,  -- 'Explosives (OBSOLETE)'
-    DEVICES                = 3,  -- 'Devices (OBSOLETE)'
+    -- EXPLOSIVES             = 2,  -- 'Explosives (OBSOLETE)'
+    -- DEVICES                = 3,  -- 'Devices (OBSOLETE)'
     JEWELCRAFTING          = 4,  -- 'Jewelcrafting'
     CLOTH                  = 5,  -- 'Cloth'
     LEATHER                = 6,  -- 'Leather'
@@ -192,11 +198,11 @@ _G.HL_ITEM_SUB_CLASS.TRADESKILL = {
     ELEMENTAL              = 10, -- 'Elemental'
     OTHER                  = 11, -- 'Other'
     ENCHANTING             = 12, -- 'Enchanting'
-    MATERIALS              = 13, -- 'Materials (OBSOLETE)'
-    ITEM_ENCHANTMENT       = 14, -- 'Item Enchantment (OBSOLETE)'
-    WEAPON_ENCHANTMENT     = 15, -- 'Weapon Enchantment - Obsolete'
+    -- MATERIALS              = 13, -- 'Materials (OBSOLETE)'
+    -- ITEM_ENCHANTMENT       = 14, -- 'Item Enchantment (OBSOLETE)'
+    -- WEAPON_ENCHANTMENT     = 15, -- 'Weapon Enchantment - Obsolete'
     INSCRIPTION            = 16, -- 'Inscription'
-    EXPLOSIVES_AND_DEVICES = 17, -- 'Explosives and Devices (OBSOLETE)'
+    -- EXPLOSIVES_AND_DEVICES = 17, -- 'Explosives and Devices (OBSOLETE)'
 }
 
 _G.HL_ITEM_SUB_CLASS.ITEM_ENHANCEMENT = {
@@ -233,8 +239,8 @@ _G.HL_ITEM_SUB_CLASS.RECIPE = {
 }
 
 _G.HL_ITEM_SUB_CLASS.QUIVER = {
-    QUIVER     = 0, -- 'Quiver(OBSOLETE)'
-    BOLT       = 1, -- 'Bolt(OBSOLETE)'
+    -- QUIVER     = 0, -- 'Quiver(OBSOLETE)'
+    -- BOLT       = 1, -- 'Bolt(OBSOLETE)'
     QUIVER     = 2, -- 'Quiver'
     AMMO_POUCH = 3, -- 'Ammo Pouch'
 }

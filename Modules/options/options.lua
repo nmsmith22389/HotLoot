@@ -159,7 +159,7 @@ local defaults = {
 
         toggleEnableLootMonitor     = true,
         toggleShowLootMonitorAnchor = true,
-        
+
         toggleFarmingMode = false,
         selectFarmingModeRate = 'hour',
 
@@ -278,6 +278,8 @@ local defaults = {
         -- ─── FILTERS ─────────────────────────────────────────────────────
         --
 
+        tableFilters = {},
+
         toggleGoldFilter       = true,
         toggleQuestFilter      = true,
         toggleCurrencyFilter   = true,
@@ -344,6 +346,257 @@ local defaults = {
         toggleUseQuantValue  = false,
     }
 }
+
+--
+-- ─── FILTER GENERATOR ───────────────────────────────────────────────────────────
+--
+
+-- TODO: Get from dynamic func from HL FILTER TYPE
+local tableFilterTypes = {
+    [tostring(HL_FILTER_TYPE.TYPE)] = 'Type',
+    [tostring(HL_FILTER_TYPE.VALUE)] = 'Value',
+    [tostring(HL_FILTER_TYPE.QUALITY)] = 'Quality'
+}
+
+local tableComparators = {
+    equalTo = 'Equal To',
+    lessThan = 'Less Than',
+    greaterThan = 'Greater Than'
+}
+
+local tableQualities = {
+    ['0'] = ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC..'|r',
+    ['1'] = ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC..'|r',
+    ['2'] = ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC..'|r',
+    ['3'] = ITEM_QUALITY_COLORS[3].hex..ITEM_QUALITY3_DESC..'|r',
+    ['4'] = ITEM_QUALITY_COLORS[4].hex..ITEM_QUALITY4_DESC..'|r',
+    ['5'] = ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC..'|r',
+    ['6'] = ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC..'|r',
+    ['7'] = ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r',
+}
+
+local function GetItemTypeTable()
+    local t = {}
+    for k,v in pairs(HL_ITEM_CLASS) do
+        t[tostring(v)] = GetItemClassInfo(v)
+    end
+    return t
+end
+
+local function GetItemSubTypeTable(itemType)
+    local t = {}
+    local classString = 'TRADESKILL'
+    for k,v in pairs(HL_ITEM_CLASS) do
+        if tonumber(itemType) == v then
+            classString = k
+        end
+    end
+    for k,v in pairs(HL_ITEM_SUB_CLASS[classString]) do
+        t[tostring(v)] = GetItemSubClassInfo(HL_ITEM_CLASS[classString], v)
+    end
+    t.NONE = NONE
+    return t
+end
+
+function Options:CreateFilter(info, name)
+    if not self:Get('tableFilters')[name] then
+        self.db.profile.tableFilters[name] = {
+            conditions = {},
+            enabled = true
+        }
+    end
+end
+
+function Options:GetFilterList()
+    local list = {}
+    for k,v in pairs(self:Get('tableFilters')) do
+        list[k] = k
+    end
+    return list
+end
+
+function Options:AddCondition()
+    local conditionTemplate = {
+        type = tostring(HL_FILTER_TYPE.TYPE),
+        value = tostring(HL_ITEM_CLASS.TRADESKILL),
+        subvalue = tostring(HL_ITEM_SUB_CLASS.TRADESKILL.HERB)
+    }
+    table.insert(self.db.profile.tableFilters[self:Get('selectFilter')].conditions, conditionTemplate)
+end
+
+local function GetConditionArgs(num, condition)
+    local args = {}
+    local currentFilter = Options:Get('selectFilter')
+
+    args['selectConditionType'..num] = {
+        name = 'Filter Type',
+        type = 'select',
+        values = tableFilterTypes,
+        order = 1,
+        set = function(info, value)
+            Options.db.profile.tableFilters[currentFilter].conditions[num].type = value
+            if tonumber(value) == HL_FILTER_TYPE.TYPE then
+                Options.db.profile.tableFilters[currentFilter].conditions[num].value = tostring(HL_ITEM_CLASS.TRADESKILL)
+                Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = tostring(HL_ITEM_SUB_CLASS.TRADESKILL.HERB)
+            elseif tonumber(value) == HL_FILTER_TYPE.VALUE then
+                Options.db.profile.tableFilters[currentFilter].conditions[num].value = 'equalTo'
+                Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = 0
+            elseif tonumber(value) == HL_FILTER_TYPE.QUALITY then
+                Options.db.profile.tableFilters[currentFilter].conditions[num].value = 'equalTo'
+                Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = '0'
+            end
+            Options:ViewFilter(currentFilter)
+        end,
+        get = function(info)
+            return Options.db.profile.tableFilters[currentFilter].conditions[num].type
+        end
+    }
+
+    if condition.type == tostring(HL_FILTER_TYPE.TYPE) then
+
+        local containsEnum = false
+        for enum,subClass in pairs(GetItemSubTypeTable(Options.db.profile.tableFilters[currentFilter].conditions[num].value)) do
+            if tonumber(enum) == tonumber(Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue) then
+                containsEnum = true
+            end
+        end
+        if not containsEnum then
+            Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = 'NONE'
+        end
+
+        args['selectConditionValue'..num] = {
+            name = 'Item Type',
+            type = 'select',
+            values = GetItemTypeTable(),
+            order = 2,
+            set = function(info, value)
+                Options.db.profile.tableFilters[currentFilter].conditions[num].value = value
+                Options:ViewFilter(currentFilter)
+        end,
+            get = function(info)
+                return Options.db.profile.tableFilters[currentFilter].conditions[num].value
+            end
+        }
+        args['selectConditionSubValue'..num] = {
+            name = 'Item Sub Type',
+            type = 'select',
+            values = GetItemSubTypeTable(Options.db.profile.tableFilters[currentFilter].conditions[num].value) or {NONE = NONE},
+            order = 3,
+            set = function(info, value)
+                Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = value
+            end,
+            get = function(info)
+                return Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue
+            end
+        }
+    elseif condition.type == tostring(HL_FILTER_TYPE.VALUE) then
+        args['selectConditionValue'..num] = {
+            name = 'Comparator',
+            type = 'select',
+            values = tableComparators,
+            order = 2,
+            set = function(info, value)
+                Options.db.profile.tableFilters[currentFilter].conditions[num].value = value
+            end,
+            get = function(info)
+                return Options.db.profile.tableFilters[currentFilter].conditions[num].value
+            end
+        }
+        args['selectConditionSubValue'..num] = {
+            name = 'Value',
+            type = 'input',
+            order = 3,
+            set = function(info, value)
+                if not value or value:trim() == '' then
+                    value = 0
+                else
+                    value = Util:ToCopper(value)
+                end
+                Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = value
+            end,
+            get = function(info)
+                local value = Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue
+                if not tonumber(value) then
+                    value = 0
+                end
+                return Util:FormatMoney(value, 'SMART', true)
+            end
+        }
+    elseif condition.type == tostring(HL_FILTER_TYPE.QUALITY) then
+        args['selectConditionValue'..num] = {
+            name = 'Comparator',
+            type = 'select',
+            values = tableComparators,
+            order = 2,
+            set = function(info, value)
+                Options.db.profile.tableFilters[currentFilter].conditions[num].value = value
+            end,
+            get = function(info)
+                return Options.db.profile.tableFilters[currentFilter].conditions[num].value
+            end
+        }
+        --[[ args['selectConditionSubValue'..num] = {
+            name = 'Item Quality',
+            type = 'select',
+            values = GetItemSubTypeTable(Options.db.profile.tableFilters[currentFilter].conditions[num].value),
+            order = 3,
+            set = function(info, value)
+                Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = value
+            end,
+            get = function(info)
+                return Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue
+            end
+        } ]]
+    end
+
+    return args
+end
+
+function Options:ViewFilter(name)
+    local opts = {}
+    local filter = Options:Get('tableFilters')[name]
+
+    opts.selectFilter = {
+        name = 'Current Filter',
+        type = 'select',
+        values = 'GetFilterList',
+        set = function(info, value)
+            Options:ViewFilter(value)
+            Options:Set(info, value)
+        end,
+        order = 2
+    }
+    opts.inputCreateFilter = {
+        name = 'Create Filter',
+        type = 'input',
+        set = 'CreateFilter',
+        get = function() return '' end,
+        order = 4
+    }
+    opts.headerFilter = {
+        name = name,
+        type = 'header',
+        order = 6
+    }
+    opts.buttonAddCondition = {
+        name = 'Add Condition',
+        type = 'execute',
+        order = 1000,
+        func = 'AddCondition'
+    }
+
+    for i,condition in ipairs(filter.conditions) do
+        opts['groupCondition'..i] = {
+            name = 'Condition '..i,
+            type = 'group',
+            inline = true,
+            order = 10 +  i,
+            args = GetConditionArgs(i, condition)
+        }
+    end
+
+    optionsTable.args.groupLootFilters.args = opts
+end
 
 --
 -- ─── OPTIONS ────────────────────────────────────────────────────────────────────
@@ -1441,453 +1694,24 @@ optionsTable = {
             type = 'group',
             order = 5,
             args = {
-                groupGeneral = {
-                    name = L['genGeneral'],
-                    type = 'group',
-                    order = 1,
-                    inline = true,
-                    args = {
-                        buttonEnableAllFiltersGeneral = {
-                            name = L['buttonEnableAll'],
-                            type = 'execute',
-                            order = 1,
-                            func = function()
-                                Options:Set('toggleGoldFilter',       true)
-                                Options:Set('toggleCurrencyFilter',   true)
-                                Options:Set('toggleQuestFilter',      true)
-                                Options:Set('toggleJunkFilter',       true)
-                                Options:Set('togglePickpocketFilter', true)
-                            end
-                        },
-                        buttonDisableAllFiltersGeneral = {
-                            name = L['buttonDisableAll'],
-                            type = 'execute',
-                            order = 2,
-                            func = function()
-                                Options:Set('toggleGoldFilter',       false)
-                                Options:Set('toggleCurrencyFilter',   false)
-                                Options:Set('toggleQuestFilter',      false)
-                                Options:Set('toggleJunkFilter',       false)
-                                Options:Set('togglePickpocketFilter', false)
-                            end
-                        },
-                        toggleGoldFilter = {
-                            name = L['toggleGoldFilterName'],
-                            desc = L['toggleGoldFilterDesc'],
-                            type = 'toggle',
-                            order = 3
-                        },
-                        toggleCurrencyFilter = {
-                            name = L['toggleCurrencyFilterName'],
-                            desc = L['toggleCurrencyFilterDesc'],
-                            type = 'toggle',
-                            order = 4
-                        },
-                        toggleQuestFilter = {
-                            name = L['toggleQuestFilterName'],
-                            desc = L['toggleQuestFilterDesc'],
-                            type = 'toggle',
-                            order = 5
-                        },
-                        togglePickpocketFilter = {
-                            name = L['togglePickpocketFilterName'],
-                            desc = L['togglePickpocketFilterName'],
-                            type = 'toggle',
-                            order = 7
-                        }
-                    }
+                selectFilter = {
+                    name = 'Current Filter',
+                    type = 'select',
+                    values = 'GetFilterList',
+                    set = function(info, value)
+                        Options:ViewFilter(value)
+                        Options:Set(info, value)
+                    end,
+                    order = 2
                 },
-                groupProfessions = {
-                    name = L['groupProfessions'],
-                    type = 'group',
-                    order = 2,
-                    inline = true,
-                    args = {
-                        buttonEnableAllFiltersProfessions = {
-                            name = L['buttonEnableAll'],
-                            type = 'execute',
-                            order = 1,
-                            func = function()
-                                Options:Set('toggleClothFilter',      true)
-                                Options:Set('toggleMiningFilter',     true)
-                                Options:Set('toggleGemFilter',        true)
-                                Options:Set('toggleHerbFilter',       true)
-                                Options:Set('toggleLeatherFilter',    true)
-                                Options:Set('toggleFishingFilter',    true)
-                                Options:Set('toggleEnchantingFilter', true)
-                                Options:Set('togglePigmentsFilter',   true)
-                                Options:Set('toggleCookingFilter',    true)
-                                Options:Set('toggleRecipeFilter',     true)
-                            end
-                        },
-                        buttonDisableAllFiltersProfessions = {
-                            name = L['buttonDisableAll'],
-                            type = 'execute',
-                            order = 2,
-                            func = function()
-                                Options:Set('toggleClothFilter',      false)
-                                Options:Set('toggleMiningFilter',     false)
-                                Options:Set('toggleGemFilter',        false)
-                                Options:Set('toggleHerbFilter',       false)
-                                Options:Set('toggleLeatherFilter',    false)
-                                Options:Set('toggleFishingFilter',    false)
-                                Options:Set('toggleEnchantingFilter', false)
-                                Options:Set('togglePigmentsFilter',   false)
-                                Options:Set('toggleCookingFilter',    false)
-                                Options:Set('toggleRecipeFilter',     false)
-                            end
-                        },
-                        toggleClothFilter = {
-                            -- name = L['toggleClothFilterName'],
-                            -- desc = L['toggleClothFilterDesc'],
-                            name = L['FilterNameTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.CLOTH)),
-                            desc = L['FilterDescTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.CLOTH)),
-                            type = 'toggle',
-                            order = 3
-                        },
-                        toggleMiningFilter = {
-                            -- name = L['toggleMiningFilterName'],
-                            -- desc = L['toggleMiningFilterDesc'],
-                            name = L['FilterNameTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.METAL_STONE)),
-                            desc = L['FilterDescTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.METAL_STONE)),
-                            type = 'toggle',
-                            order = 4
-                        },
-                        toggleGemFilter = {
-                            -- name = L['toggleGemFilterName'],
-                            -- desc = L['toggleGemFilterDesc'],
-                            name = L['FilterNameTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.JEWELCRAFTING)),
-                            desc = L['FilterDescTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.JEWELCRAFTING)),
-                            type = 'toggle',
-                            order = 5
-                        },
-                        toggleHerbFilter = {
-                            -- name = L['toggleHerbFilterName'],
-                            -- desc = L['toggleHerbFilterDesc'],
-                            name = L['FilterNameTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.HERB)),
-                            desc = L['FilterDescTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.HERB)),
-                            type = 'toggle',
-                            order = 6
-                        },
-                        toggleLeatherFilter = {
-                            -- name = L['toggleLeatherFilterName'],
-                            -- desc = L['toggleLeatherFilterDesc'],
-                            name = L['FilterNameTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER)),
-                            desc = L['FilterDescTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER)),
-                            type = 'toggle',
-                            order = 7
-                        },
-                        toggleFishingFilter = {
-                            -- name = L['toggleFishingFilterName'],
-                            -- desc = L['toggleFishingFilterDesc'],
-                            name = L['FilterNameTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.RECIPE, HL_ITEM_SUB_CLASS.RECIPE.FISHING)),
-                            desc = L['FilterDescTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.RECIPE, HL_ITEM_SUB_CLASS.RECIPE.FISHING)),
-                            type = 'toggle',
-                            order = 8
-                        },
-                        toggleEnchantingFilter = {
-                            -- name = L['toggleEnchantingFilterName'],
-                            -- desc = L['toggleEnchantingFilterDesc'],
-                            name = L['FilterNameTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.ENCHANTING)),
-                            desc = L['FilterDescTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.ENCHANTING)),
-                            type = 'toggle',
-                            order = 9
-                        },
-                        togglePigmentsFilter = {
-                            -- name = L['togglePigmentsFilterName']..Util:ColorText(' (experimental)', 'warning'),
-                            -- desc = L['togglePigmentsFilterDesc'],
-                            name = L['FilterNameTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.INSCRIPTION)),
-                            desc = L['FilterDescTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.INSCRIPTION)),
-                            type = 'toggle',
-                            order = 10
-                        },
-                        toggleCookingFilter = {
-                            -- name = L['toggleCookingFilterName'],
-                            -- desc = L['toggleCookingFilterDesc'],
-                            name = L['FilterNameTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.COOKING)),
-                            desc = L['FilterDescTemplate']:format(GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.COOKING)),
-                            type = 'toggle',
-                            width = 'full',
-                            order = 11
-                        },
-                        toggleRecipeFilter = {
-                            -- name = L['toggleRecipeFilterName'],
-                            -- desc = L['toggleRecipeFilterDesc'],
-                            name = L['FilterNameTemplate']:format(GetItemClassInfo(HL_ITEM_CLASS.RECIPE)),
-                            desc = L['FilterDescTemplate']:format(GetItemClassInfo(HL_ITEM_CLASS.RECIPE)),
-                            type = 'toggle',
-                            order = 12
-                        }
-                    }
-                },
-                groupCommonDrops = {
-                    name = L['groupCommonDrops'],
-                    type = 'group',
-                    order = 3,
-                    inline = true,
-                    args = {
-                        buttonEnableAllFiltersCommon = {
-                            name = L['buttonEnableAll'],
-                            type = 'execute',
-                            order = 1,
-                            func = function()
-                                Options:Set('togglePotionFilter',    true)
-                                Options:Set('toggleFlaskFilter',     true)
-                                Options:Set('toggleElixirFilter',    true)
-                                Options:Set('toggleElementalFilter', true)
-                            end
-                        },
-                        buttonDisableAllFiltersCommon = {
-                            name = L['buttonDisableAll'],
-                            type = 'execute',
-                            order = 2,
-                            func = function()
-                                Options:Set('togglePotionFilter',    false)
-                                Options:Set('toggleFlaskFilter',     false)
-                                Options:Set('toggleElixirFilter',    false)
-                                Options:Set('toggleElementalFilter', false)
-                            end
-                        },
-                        togglePotionFilter = {
-                            name = L['togglePotionFilterName'],
-                            desc = L['togglePotionFilterDesc'],
-                            type = 'toggle',
-                            order = 3
-                        },
-                        selectPotionType = {
-                            name = L['selectPotionTypeName'],
-                            desc = L['selectPotionTypeDesc'],
-                            type = 'select',
-                            values = tablePotionType,
-                            order = 4
-                        },
-                        toggleFlaskFilter = {
-                            name = L['toggleFlaskFilterName'],
-                            desc = L['toggleFlaskFilterDesc'],
-                            type = 'toggle',
-                            order = 5
-                        },
-                        toggleElixirFilter = {
-                            name = L['toggleElixirFilterName'],
-                            desc = L['toggleElixirFilterDesc'],
-                            type = 'toggle',
-                            order = 6
-                        },
-                        toggleElementalFilter = {
-                            name = L['toggleElementalFilterName'],
-                            desc = L['toggleElementalFilterDesc'],
-                            type = 'toggle',
-                            order = 7
-                        }
-                    }
-                },
-                groupLegion = {
-                    name = L['genLegion'],
-                    type = 'group',
-                    order = 4,
-                    inline = true,
-                    args = {
-                        buttonEnableAllFiltersLegion = {
-                            name = L['buttonEnableAll'],
-                            type = 'execute',
-                            order = 1,
-                            func = function()
-                                Options:Set('toggleAPFilter', true)
-                                Options:Set('toggleAugmentRuneFilter', true)
-                                Options:Set('toggleKnowledgeScrollFilter', true)
-                                Options:Set('toggleSentinaxBeaconFilter', true)
-                            end
-                        },
-                        buttonDisableAllFiltersLegion = {
-                            name = L['buttonDisableAll'],
-                            type = 'execute',
-                            order = 2,
-                            func = function()
-                                Options:Set('toggleAPFilter', false)
-                                Options:Set('toggleAugmentRuneFilter', false)
-                                Options:Set('toggleKnowledgeScrollFilter', false)
-                                Options:Set('toggleSentinaxBeaconFilter', false)
-                            end
-                        },
-                        toggleAPFilter = {
-                            name = L['FilterNameTemplate']:format(ARTIFACT_POWER),
-                            desc = L['FilterDescTemplate']:format(ARTIFACT_POWER),
-                            type = 'toggle',
-                            width = 'double',
-                            order = 3
-                        },
-                        toggleAugmentRuneFilter = {
-                            name = L['toggleAugmentRuneFilterName'],
-                            desc = L['toggleAugmentRuneFilterDesc'],
-                            type = 'toggle',
-                            width = 'double',
-                            order = 4
-                        },
-                        toggleKnowledgeScrollFilter = {
-                            name = L['toggleKnowledgeScrollFilterName'],
-                            desc = L['toggleKnowledgeScrollFilterDesc'],
-                            type = 'toggle',
-                            width = 'double',
-                            order = 5
-                        },
-                        toggleSentinaxBeaconFilter = {
-                            name = L['toggleSentinaxBeaconFilterName'],
-                            desc = L['toggleSentinaxBeaconFilterDesc'],
-                            type = 'toggle',
-                            width = 'double',
-                            order = 6
-                        },
-                    }
-                },
+                inputCreateFilter = {
+                    name = 'Create Filter',
+                    type = 'input',
+                    set = 'CreateFilter',
+                    get = function() return '' end,
+                    order = 4
+                }
             }
-        },
-        groupItemQualityFilters = {
-            name = L['groupItemQualityFilters'],
-            type = 'group',
-            order = 6,
-            args = {
-                descItemQualityFilters = {
-                    name = Util:ColorText(L['descItemQualityFilters'], 'info')..'\n',
-                    type = 'description',
-                    order = 1,
-                },
-                buttonEnableAllFiltersQuality = {
-                    name = L['buttonEnableAll'],
-                    type = 'execute',
-                    order = 2,
-                    func = function()
-                        Options:Set('togglePoorQualityFilter',      true)
-                        Options:Set('toggleCommonQualityFilter',    true)
-                        Options:Set('toggleUncommonQualityFilter',  true)
-                        Options:Set('toggleRareQualityFilter',      true)
-                        Options:Set('toggleEpicQualityFilter',      true)
-                        Options:Set('toggleLegendaryQualityFilter', true)
-                        Options:Set('toggleArtifactQualityFilter',  true)
-                        Options:Set('toggleHeirloomQualityFilter',  true)
-                    end
-                },
-                buttonDisableAllFiltersQuality = {
-                    name = L['buttonDisableAll'],
-                    type = 'execute',
-                    order = 3,
-                    func = function()
-                        Options:Set('togglePoorQualityFilter',      false)
-                        Options:Set('toggleCommonQualityFilter',    false)
-                        Options:Set('toggleUncommonQualityFilter',  false)
-                        Options:Set('toggleRareQualityFilter',      false)
-                        Options:Set('toggleEpicQualityFilter',      false)
-                        Options:Set('toggleLegendaryQualityFilter', false)
-                        Options:Set('toggleArtifactQualityFilter',  false)
-                        Options:Set('toggleHeirloomQualityFilter',  false)
-                    end
-                },
-                togglePoorQualityFilter = {
-                    name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC..'|r'),
-                    desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC..'|r'),
-                    type = 'toggle',
-                    width = 'full',
-                    order = 6,
-                },
-                toggleSellPoorItems = {
-                    name = '    '..L['toggleSellPoorItemsName'],
-                    desc = L['toggleSellPoorItemsDesc'],
-                    type = 'toggle',
-                    width = 'full',
-                    order = 8,
-                },
-                toggleCommonQualityFilter = {
-                    name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC..'|r'),
-                    desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC..'|r'),
-                    type = 'toggle',
-                    width = 'full',
-                    order = 9,
-                },
-                toggleUncommonQualityFilter = {
-                    name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC..'|r'),
-                    desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC..'|r'),
-                    type = 'toggle',
-                    order = 10,
-                    width = 'full',
-                },
-                toggleRareQualityFilter = {
-                    name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[3].hex..ITEM_QUALITY3_DESC..'|r'),
-                    desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[3].hex..ITEM_QUALITY3_DESC..'|r'),
-                    type = 'toggle',
-                    width = 'full',
-                    order = 11,
-                },
-                toggleEpicQualityFilter = {
-                    name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[4].hex..ITEM_QUALITY4_DESC..'|r'),
-                    desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[4].hex..ITEM_QUALITY4_DESC..'|r'),
-                    type = 'toggle',
-                    width = 'full',
-                    order = 13,
-                },
-                toggleLegendaryQualityFilter = {
-                    name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC..'|r'),
-                    desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC..'|r'),
-                    type = 'toggle',
-                    width = 'full',
-                    order = 15,
-                },
-                toggleArtifactQualityFilter = {
-                    name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC..'|r'),
-                    desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC..'|r'),
-                    type = 'toggle',
-                    width = 'full',
-                    order = 17,
-                },
-                toggleHeirloomQualityFilter = {
-                    name = L['toggleItemQualityFilterName']:format(ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r'),
-                    desc = L['toggleItemQualityFilterDesc']:format(ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r'),
-                    type = 'toggle',
-                    width = 'full',
-                    order = 19,
-                },
-                groupOnlyEquipQuality = {
-                    name = L['groupOnlyEquipQuality'],
-                    type = 'group',
-                    order = 21,
-                    inline = true,
-                    args = {
-                        descOnlyEquipQuality = {
-                            name = Util:ColorText(L['descOnlyEquipQuality'], 'info')..'\n',
-                            type = 'description',
-                            order = 1,
-                        },
-                        toggleOnlyEquipQuality = {
-                            name = L['genEnable'],
-                            desc = L['toggleOnlyEquipQualityDesc'],
-                            type = 'toggle',
-                            width = 'full',
-                            order = 2,
-                        },
-                        selectMinEquipQuality = {
-                            name = L['selectMinEquipQualityName'],
-                            desc = L['selectMinEquipQualityDesc'],
-                            type = 'select',
-                            values = tableItemQuality,
-                            order = 3,
-                        },
-                        inputMinItemLevel = {
-                            name = L['inputMinItemLevelName'],
-                            desc = L['inputMinItemLevelDesc'],
-                            type = 'input',
-                            -- pattern = '%d+',
-                            order = 4,
-                            set = function(info, value)
-                                if value == '' or not tonumber(value) then
-                                    Options.db.profile.inputMinItemLevel = 0
-                                    Util:Debug('inputMinItemLevel not set (defaulting to 0)')
-                                else
-                                    Options.db.profile.inputMinItemLevel = value
-                                    Util:DebugOption('inputMinItemLevel', value)
-                                end
-                            end
-                        },
-                    }
-                },
-            },
         },
         groupIncludeExclude = {
             name = L['groupIncludeExclude'],
@@ -1978,126 +1802,6 @@ optionsTable = {
                 },
             },
         },
-        groupValueThresholds = {
-            name = L['groupValueThresholds'],
-            type = 'group',
-            order = 8,
-            args = {
-                descValueThresholds = {
-                    name = Util:ColorText(L['descValueThresholds'], 'info')..'\n',
-                    type = 'description',
-                    order = 0
-                },
-                groupThreshold1 = {
-                    name = L['groupThreshold1'],
-                    type = 'group',
-                    order = 1,
-                    inline = true,
-                    args = {
-                        selectThresholdType1 = {
-                            name = L['selectThresholdTypeName'],
-                            desc = L['selectThresholdTypeDesc'],
-                            type = 'select',
-                            values = tableFilterTypes,
-                            order = 1
-                        },
-                        inputThresholdValue1 = {
-                            name = L['inputThresholdValueName'],
-                            type = 'input',
-                            -- pattern = '(%d*)[gsc]?%s*(%d?%d?)[gsc]?%s*(%d?%d?)[gsc]?',
-                            -- pattern = '^(?:%d+g[ ]*)?(?:[0-9]?[0-9]s[ ]*)?(?:[0-9]?[0-9]c)?$',
-                            -- usage = L['inputThresholdValueDesc'],
-                            set = 'SetMoney',
-                            get = 'GetMoney',
-                            order = 2
-                        },
-                    },
-                },
-                groupThreshold2 = {
-                    name = L['groupThreshold2'],
-                    type = 'group',
-                    order = 2,
-                    inline = true,
-                    args = {
-                        selectThresholdType2 = {
-                            name = L['selectThresholdTypeName'],
-                            desc = L['selectThresholdTypeDesc'],
-                            type = 'select',
-                            values = tableFilterTypes,
-                            order = 1
-                        },
-                        inputThresholdValue2 = {
-                            name = L['inputThresholdValueName'],
-                            type = 'input',
-                            -- pattern = '(%d?%d?)[gsc]?%s*(%d?%d?)[gsc]?%s*(%d?%d)[gsc]',
-                            -- usage = L['inputThresholdValueDesc'],
-                            set = 'SetMoney',
-                            get = 'GetMoney',
-                            order = 2
-                        },
-                    },
-                },
-                groupThreshold3 = {
-                    name = L['groupThreshold3'],
-                    type = 'group',
-                    order = 3,
-                    inline = true,
-                    args = {
-                        selectThresholdType3 = {
-                            name = L['selectThresholdTypeName'],
-                            desc = L['selectThresholdTypeDesc'],
-                            type = 'select',
-                            values = tableFilterTypes,
-                            order = 1
-                        },
-                        inputThresholdValue3 = {
-                            name = L['inputThresholdValueName'],
-                            type = 'input',
-                            -- pattern = '(%d?%d?)[gsc]?%s*(%d?%d?)[gsc]?%s*(%d?%d)[gsc]',
-                            -- usage = L['inputThresholdValueDesc'],
-                            set = 'SetMoney',
-                            get = 'GetMoney',
-                            order = 2
-                        },
-                    },
-                },
-                toggleUseQuantValue = {
-                    name = L['toggleUseQuantValueName'],
-                    desc = L['toggleUseQuantValueDesc'],
-                    type = 'toggle',
-                    order = 4
-                },
-                -- TODO: Localize
-                groupTSMSource = {
-                    name = 'Tradeskill Master',
-                    type = 'group',
-                    order = 6,
-                    inline = true,
-                    args = {
-                        descTSMSource = {
-                            -- FIXME: make sure this slash code is right
-                            name = Util:ColorText(L['inputValueTSMSourceDescNote']:format(Util:ColorText('/tsm source', 'success')..Util:GetColorString('info')), 'info'),
-                            type = 'description',
-                            order = 2,
-                        },
-                        toggleUseTSMValue = {
-                            name = 'Use TSM Value',
-                            desc = 'When looking at an items value use TSM as the source.',
-                            type = 'toggle',
-                            order = 4
-                        },
-                        -- FIXME: This is too much like the other tsm option name so make it something diff... prob the ones above too!
-                        -- Dont forget to change it in core.lua too!
-                        inputUseTSMValueSource = {
-                            name = L['inputValueTSMSourceName'],
-                            desc = L['inputValueTSMSourceDesc'],
-                            type = 'input',
-                            order = 6
-                        }
-                    }
-                },
-            },
-        },
         groupLootFrame = {
                             -- TODO: Localize
             name = 'Loot Frame',
@@ -2162,6 +1866,9 @@ function Options:OnInitialize()
     --     TransferAllSettings()
     --     self.db.profile.bOldSettingsTransferred = true
     -- end
+
+    -- Initialize Loot Filter View
+    self:ViewFilter(self:Get('selectFilter'))
 
     tableChatWindows = GetChatWindows()
 

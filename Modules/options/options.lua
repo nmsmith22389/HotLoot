@@ -1830,7 +1830,7 @@ optionsTable = {
                 groupGeneralFilters = {
                     name = 'General Filters',
                     type = 'group',
-                    order = 1,
+                    order = 2,
                     args = {
                         toggleGoldFilter = {
                             name = L['toggleGoldFilterName'],
@@ -1858,7 +1858,7 @@ optionsTable = {
                 groupCustomFilters = {
                     name = 'Custom Filters',
                     type = 'group',
-                    order = 2,
+                    order = 4,
                     args = {
                         selectFilter = {
                             name = 'Current Filter',
@@ -1877,6 +1877,48 @@ optionsTable = {
                             get = function() return '' end,
                             order = 4
                         }
+                    }
+                },
+                groupFilterOptions = {
+                    name = 'Filter Options',
+                    type = 'group',
+                    order = 6,
+                    args = {
+                        toggleUseQuantValue = {
+                            name = L['toggleUseQuantValueName'],
+                            desc = L['toggleUseQuantValueDesc'],
+                            type = 'toggle',
+                            order = 4
+                        },
+                        -- TODO: Localize
+                        groupTSMSource = {
+                            name = 'Tradeskill Master',
+                            type = 'group',
+                            order = 6,
+                            inline = true,
+                            args = {
+                                descTSMSource = {
+                                    -- FIXME: make sure this slash code is right
+                                    name = Util:ColorText(L['inputValueTSMSourceDescNote']:format(Util:ColorText('/tsm source', 'success')..Util:GetColorString('info')), 'info'),
+                                    type = 'description',
+                                    order = 2,
+                                },
+                                toggleUseTSMValue = {
+                                    name = 'Use TSM Value',
+                                    desc = 'When looking at an items value use TSM as the source.',
+                                    type = 'toggle',
+                                    order = 4
+                                },
+                                -- FIXME: This is too much like the other tsm option name so make it something diff... prob the ones above too!
+                                -- Dont forget to change it in core.lua too!
+                                inputTSMValueSource = {
+                                    name = L['inputValueTSMSourceName'],
+                                    desc = L['inputValueTSMSourceDesc'],
+                                    type = 'input',
+                                    order = 6
+                                }
+                            }
+                        },
                     }
                 }
             }

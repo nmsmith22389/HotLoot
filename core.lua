@@ -465,7 +465,7 @@ end
 local function GetItemPrice(itemLink, itemQuantity)
     if Options:Get('toggleUseTSMValue') and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
         local tsmSources = _G.TSMAPI:GetPriceSources()
-        local tsmValueSource = Options:Get('inputUseTSMValueSource')
+        local tsmValueSource = Options:Get('inputTSMValueSource')
         local priceSource = (tsmSources[tsmValueSource]) and tsmValueSource or 'DBMarket'
         local tsmPrice = TSMAPI:GetItemValue(_G.TSMAPI.Item:ToItemString(itemLink), priceSource)
         sellAmount = tsmPrice or sellAmount

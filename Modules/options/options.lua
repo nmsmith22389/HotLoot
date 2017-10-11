@@ -358,7 +358,7 @@ local tableFilterTypes = {
     [tostring(HL_FILTER_TYPE.QUALITY)] = 'Quality'
 }
 
-local tableComparators = {
+local tableComparisons = {
     equalTo = 'Equal To',
     lessThan = 'Less Than',
     greaterThan = 'Greater Than'
@@ -385,15 +385,20 @@ end
 
 local function GetItemSubTypeTable(itemType)
     local t = {}
-    local classString = 'TRADESKILL'
+    local classString = nil
+
     for k,v in pairs(HL_ITEM_CLASS) do
         if tonumber(itemType) == v then
             classString = k
         end
     end
-    for k,v in pairs(HL_ITEM_SUB_CLASS[classString]) do
-        t[tostring(v)] = GetItemSubClassInfo(HL_ITEM_CLASS[classString], v)
+
+    if classString then
+        for k,v in pairs(HL_ITEM_SUB_CLASS[classString]) do
+            t[tostring(v)] = GetItemSubClassInfo(HL_ITEM_CLASS[classString], v)
+        end
     end
+
     t.NONE = NONE
     return t
 end
@@ -419,103 +424,128 @@ function Options:AddCondition()
     local conditionTemplate = {
         type = tostring(HL_FILTER_TYPE.TYPE),
         value = tostring(HL_ITEM_CLASS.TRADESKILL),
-        subvalue = tostring(HL_ITEM_SUB_CLASS.TRADESKILL.HERB)
+        subvalue = 'NONE'
     }
     table.insert(self.db.profile.tableFilters[self:Get('selectFilter')].conditions, conditionTemplate)
+    Options:ViewFilter(Options:Get('selectFilter'))
 end
 
 local function GetConditionArgs(num, condition)
     local args = {}
     local currentFilter = Options:Get('selectFilter')
 
+    Util:Debug('------------------')
+    Util:DebugOption('Current Filter', currentFilter)
+    Util:DebugOption('num', num)
+    Util:DebugOption('type', condition.type)
+    Util:DebugOption('value', condition.value)
+    Util:DebugOption('subvalue', condition.subvalue)
+
     args['selectConditionType'..num] = {
         name = 'Filter Type',
         type = 'select',
         values = tableFilterTypes,
+        width = 'double',
         order = 1,
         set = function(info, value)
-            Options.db.profile.tableFilters[currentFilter].conditions[num].type = value
+            condition.type = value
             if tonumber(value) == HL_FILTER_TYPE.TYPE then
-                Options.db.profile.tableFilters[currentFilter].conditions[num].value = tostring(HL_ITEM_CLASS.TRADESKILL)
-                Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = tostring(HL_ITEM_SUB_CLASS.TRADESKILL.HERB)
+                condition.value = tostring(HL_ITEM_CLASS.TRADESKILL)
+                condition.subvalue = 'NONE'
             elseif tonumber(value) == HL_FILTER_TYPE.VALUE then
-                Options.db.profile.tableFilters[currentFilter].conditions[num].value = 'equalTo'
-                Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = 0
+                condition.value = 'equalTo'
+                condition.subvalue = 0
             elseif tonumber(value) == HL_FILTER_TYPE.QUALITY then
-                Options.db.profile.tableFilters[currentFilter].conditions[num].value = 'equalTo'
-                Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = '0'
+                condition.value = 'equalTo'
+                condition.subvalue = '0'
             end
-            Options:ViewFilter(currentFilter)
+            Options:ViewFilter(Options:Get('selectFilter'))
         end,
         get = function(info)
-            return Options.db.profile.tableFilters[currentFilter].conditions[num].type
+            return condition.type
+        end
+    }
+
+    args['buttonRemoveCondition'..num] = {
+        name = 'Remove Condition',
+        type = 'execute',
+        order = 10,
+        width = 'full',
+        func = function()
+            table.remove(Options.db.profile.tableFilters[Options:Get('selectFilter')].conditions, num)
+            Options:ViewFilter(Options:Get('selectFilter'))
         end
     }
 
     if condition.type == tostring(HL_FILTER_TYPE.TYPE) then
 
-        local containsEnum = false
-        for enum,subClass in pairs(GetItemSubTypeTable(Options.db.profile.tableFilters[currentFilter].conditions[num].value)) do
-            if tonumber(enum) == tonumber(Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue) then
-                containsEnum = true
-            end
-        end
-        if not containsEnum then
-            Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = 'NONE'
-        end
+        -- local containsEnum = false
+        -- for enum,subClass in pairs(GetItemSubTypeTable(condition.value)) do
+        --     if tonumber(enum) == tonumber(condition.subvalue) then
+        --         containsEnum = true
+        --     end
+        -- end
+        -- if not containsEnum then
+        --     condition.subvalue = 'NONE'
+        -- end
 
         args['selectConditionValue'..num] = {
             name = 'Item Type',
             type = 'select',
             values = GetItemTypeTable(),
+            width = 'double',
             order = 2,
             set = function(info, value)
-                Options.db.profile.tableFilters[currentFilter].conditions[num].value = value
-                Options:ViewFilter(currentFilter)
+                condition.value = value
+                condition.subvalue = 'NONE'
+                Options:ViewFilter(Options:Get('selectFilter'))
         end,
             get = function(info)
-                return Options.db.profile.tableFilters[currentFilter].conditions[num].value
+                return condition.value
             end
         }
         args['selectConditionSubValue'..num] = {
             name = 'Item Sub Type',
             type = 'select',
-            values = GetItemSubTypeTable(Options.db.profile.tableFilters[currentFilter].conditions[num].value) or {NONE = NONE},
+            values = GetItemSubTypeTable(condition and condition.value or nil),
+            width = 'double',
             order = 3,
             set = function(info, value)
-                Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = value
+                condition.subvalue = value
             end,
             get = function(info)
-                return Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue
+                return condition.subvalue
             end
         }
     elseif condition.type == tostring(HL_FILTER_TYPE.VALUE) then
         args['selectConditionValue'..num] = {
-            name = 'Comparator',
+            name = 'Comparison',
             type = 'select',
-            values = tableComparators,
+            values = tableComparisons,
+            width = 'double',
             order = 2,
             set = function(info, value)
-                Options.db.profile.tableFilters[currentFilter].conditions[num].value = value
+                condition.value = value
             end,
             get = function(info)
-                return Options.db.profile.tableFilters[currentFilter].conditions[num].value
+                return condition.value
             end
         }
         args['selectConditionSubValue'..num] = {
             name = 'Value',
             type = 'input',
             order = 3,
+            width = 'double',
             set = function(info, value)
                 if not value or value:trim() == '' then
                     value = 0
                 else
                     value = Util:ToCopper(value)
                 end
-                Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = value
+                condition.subvalue = value
             end,
             get = function(info)
-                local value = Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue
+                local value = condition.subvalue
                 if not tonumber(value) then
                     value = 0
                 end
@@ -524,29 +554,31 @@ local function GetConditionArgs(num, condition)
         }
     elseif condition.type == tostring(HL_FILTER_TYPE.QUALITY) then
         args['selectConditionValue'..num] = {
-            name = 'Comparator',
+            name = 'Comparison',
             type = 'select',
-            values = tableComparators,
+            values = tableComparisons,
+            width = 'double',
             order = 2,
             set = function(info, value)
-                Options.db.profile.tableFilters[currentFilter].conditions[num].value = value
+                condition.value = value
             end,
             get = function(info)
-                return Options.db.profile.tableFilters[currentFilter].conditions[num].value
+                return condition.value
             end
         }
-        --[[ args['selectConditionSubValue'..num] = {
+        args['selectConditionSubValue'..num] = {
             name = 'Item Quality',
             type = 'select',
-            values = GetItemSubTypeTable(Options.db.profile.tableFilters[currentFilter].conditions[num].value),
+            values = tableItemQuality,
+            width = 'double',
             order = 3,
             set = function(info, value)
-                Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue = value
+                condition.subvalue = value
             end,
             get = function(info)
-                return Options.db.profile.tableFilters[currentFilter].conditions[num].subvalue
+                return condition.subvalue
             end
-        } ]]
+        }
     end
 
     return args
@@ -573,6 +605,20 @@ function Options:ViewFilter(name)
         get = function() return '' end,
         order = 4
     }
+    opts.buttonDeleteFilter = {
+        name = Util:ColorText('Delete Current Filter', 'alert'),
+        type = 'execute',
+        confirm = function()
+            return ('Are you sure you want to delete \"%s\"?'):format(name);
+        end,
+        func = function()
+            Options.db.profile.tableFilters[name] = nil
+            local nextFilter = next(Options:GetFilterList())
+            Options:Set('selectFilter', nextFilter)
+            Options:ViewFilter(nextFilter)
+        end,
+        order = 5
+    }
     opts.headerFilter = {
         name = name,
         type = 'header',
@@ -582,6 +628,7 @@ function Options:ViewFilter(name)
         name = 'Add Condition',
         type = 'execute',
         order = 1000,
+        width = 'full',
         func = 'AddCondition'
     }
 
@@ -595,7 +642,7 @@ function Options:ViewFilter(name)
         }
     end
 
-    optionsTable.args.groupLootFilters.args = opts
+    optionsTable.args.groupLootFilters.args.groupCustomFilters.args = opts
 end
 
 --
@@ -981,7 +1028,7 @@ optionsTable = {
             name = L['groupLootMonitor'],
             type = 'group',
             order = 4,
-            childGroups = 'tab',
+            -- childGroups = 'tab',
             args = {
                 toggleEnableLootMonitor = {
                     name = L['toggleEnableLootMonitorName'],
@@ -990,104 +1037,74 @@ optionsTable = {
                     width = 'full',
                     order = 2
                 },
-                buttonTestLootMonitor = {
-                    name = L['buttonTestLootMonitor'],
-                    type = 'execute',
-                    -- width = 'double',
-                    order = 3,
-                    func = function()
-                        HotLoot:TestLootMonitor()
-                    end
+                toggleShowLootMonitorAnchor = {
+                    name = L['toggleShowLootMonitorAnchorName'],
+                    desc = L['toggleShowLootMonitorAnchorDesc'],
+                    type = 'toggle',
+                    width = 'full',
+                    order = 2,
+                    set = 'SetShowLootMonitorAnchor'
                 },
-                buttonResetLootMonitor = {
-                    name = L['buttonResetLootMonitorName'],
-                    desc = L['buttonResetLootMonitorDesc'],
-                    type = 'execute',
-                    -- width = 'double',
-                    order = 4,
-                    func = function()
-                        HotLoot.Anchor:ClearAllPoints()
-                        HotLoot.Anchor:SetPoint('CENTER', 0, 0)
-                        Options.db.profile.anchorPosition.x = anchor:GetLeft()
-                        Options.db.profile.anchorPosition.y = anchor:GetBottom()
-                        Util:Announce(L['AnchorReset'])
-                    end
+                spacer = {
+                    name = '',
+                    type = 'description',
+                    width = 'full',
+                    order = 4
                 },
-                groupLootMonitorGeneral = {
-                    name = L['genGeneral'],
+                groupFarmingMode = {
+                    name = L['groupFarmingMode'],
                     type = 'group',
-                    order = 4,
+                    inline = true,
+                    order = 12,
                     args = {
-                        toggleShowLootMonitorAnchor = {
-                            name = L['toggleShowLootMonitorAnchorName'],
-                            desc = L['toggleShowLootMonitorAnchorDesc'],
-                            type = 'toggle',
-                            width = 'double',
-                            order = 2,
-                            set = 'SetShowLootMonitorAnchor'
-                        },
-                        spacer = {
-                            name = '',
+                        descFarmingMode = {
+                            name = Util:ColorText(L['descFarmingMode'], 'info'),
                             type = 'description',
                             width = 'full',
-                            order = 4
+                            order = 2
                         },
-                        groupFarmingMode = {
-                            name = L['groupFarmingMode'],
-                            type = 'group',
-                            inline = true,
+                        descListAddWarning = {
+                            name = Util:ColorText(L['descListAddWarning'], 'warning'),
+                            type = 'description',
+                            width = 'full',
+                            order = 6
+                        },
+                        toggleFarmingMode = {
+                            name = L['genEnable'],
+                            -- desc = L['toggleFarmingMode'],
+                            type = 'toggle',
+                            width = 'full',
+                            order = 7
+                        },
+                        selectFarmingList = {
+                            name = L['selectListName'],
+                            type = 'select',
+                            values = 'GetFarmingList',
+                            order = 8,
+                        },
+                        inputFarmingListAdd = {
+                            name = L['inputListAddName'],
+                            desc = L['inputListAddDesc'],
+                            type = 'input',
+                            order = 10,
+                            set = 'AddToFarmingList',
+                            get = function(info)
+                                return ''
+                            end
+                        },
+                        buttonRemoveFromFarmingList = {
+                            name = L['buttonRemoveFromListName'],
+                            type = 'execute',
                             order = 12,
-                            args = {
-                                descFarmingMode = {
-                                    name = Util:ColorText(L['descFarmingMode'], 'info'),
-                                    type = 'description',
-                                    width = 'full',
-                                    order = 2
-                                },
-                                descListAddWarning = {
-                                    name = Util:ColorText(L['descListAddWarning'], 'warning'),
-                                    type = 'description',
-                                    width = 'full',
-                                    order = 6
-                                },
-                                toggleFarmingMode = {
-                                    name = L['genEnable'],
-                                    -- desc = L['toggleFarmingMode'],
-                                    type = 'toggle',
-                                    width = 'full',
-                                    order = 7
-                                },
-                                selectFarmingList = {
-                                    name = L['selectListName'],
-                                    type = 'select',
-                                    values = 'GetFarmingList',
-                                    order = 8,
-                                },
-                                inputFarmingListAdd = {
-                                    name = L['inputListAddName'],
-                                    desc = L['inputListAddDesc'],
-                                    type = 'input',
-                                    order = 10,
-                                    set = 'AddToFarmingList',
-                                    get = function(info)
-                                        return ''
-                                    end
-                                },
-                                buttonRemoveFromFarmingList = {
-                                    name = L['buttonRemoveFromListName'],
-                                    type = 'execute',
-                                    order = 12,
-                                    func = 'RemoveFromFarmingList'
-                                },
-                                selectFarmingModeRate = {
-                                    name = L['selectFarmingModeRateName'],
-                                    desc = L['selectFarmingModeRateDesc'],
-                                    type = 'select',
-                                    values = tableFarmingModeRate,
-                                    order = 14
-                                }
-                            }
+                            func = 'RemoveFromFarmingList'
                         },
+                        selectFarmingModeRate = {
+                            name = L['selectFarmingModeRateName'],
+                            desc = L['selectFarmingModeRateDesc'],
+                            type = 'select',
+                            values = tableFarmingModeRate,
+                            order = 14
+                        }
                     }
                 },
                 groupLootMonitorAppearance = {
@@ -1098,27 +1115,50 @@ optionsTable = {
                         -------
                         -- NEW
                         -------
+                        buttonTestLootMonitor = {
+                            name = L['buttonTestLootMonitor'],
+                            type = 'execute',
+                            -- width = 'double',
+                            order = 2,
+                            func = function()
+                                HotLoot:TestLootMonitor()
+                            end
+                        },
+                        buttonResetLootMonitor = {
+                            name = L['buttonResetLootMonitorName'],
+                            desc = L['buttonResetLootMonitorDesc'],
+                            type = 'execute',
+                            -- width = 'double',
+                            order = 4,
+                            func = function()
+                                HotLoot.Anchor:ClearAllPoints()
+                                HotLoot.Anchor:SetPoint('CENTER', 0, 0)
+                                Options.db.profile.anchorPosition.x = anchor:GetLeft()
+                                Options.db.profile.anchorPosition.y = anchor:GetBottom()
+                                Util:Announce(L['AnchorReset'])
+                            end
+                        },
                         --
                         -- GENERAL
                         --
                         headerLootMonitorAppearance = {
                             name = L['genGeneral'],
                             type = 'header',
-                            order = 1
+                            order = 6
                         },
                         selectGrowthDirection = {
                             name = L['selectGrowthDirectionName'],
                             desc = L['selectGrowthDirectionDesc'],
                             type = 'select',
                             values = tableDirectionVertical,
-                            order = 2
+                            order = 8
                         },
                         selectThemeSize = {
                             name = L['selectThemeSizeName'],
                             desc = L['selectThemeSizeDesc'],
                             type = 'select',
                             values = tableThemeSize,
-                            order = 3
+                            order = 10
                         },
                         rangeTransparency = {
                             name = L['genTransparency'],
@@ -1128,7 +1168,7 @@ optionsTable = {
                             max = 1,
                             step = 0.1,
                             bigStep = 0.1,
-                            order = 4
+                            order = 12
                         },
                         rangeToastPadding = {
                             name = L['rangeToastPaddingName'],
@@ -1138,13 +1178,13 @@ optionsTable = {
                             max = 16,
                             step = 1,
                             bigStep = 1,
-                            order = 5
+                            order = 14
                         },
                         inputMinWidth = {
                             name = L['inputMinWidthName'],
                             desc = L['inputMinWidthDesc'],
                             type = 'input',
-                            order = 6
+                            order = 16
                         },
                         --
                         -- TEXTURES
@@ -1152,7 +1192,7 @@ optionsTable = {
                         headerLootMonitorTexture = {
                             name = L['genTexture'],
                             type = 'header',
-                            order = 7
+                            order = 18
                         },
                         selectThemeBackground = {
                             name = L['genBackground'],
@@ -1161,7 +1201,7 @@ optionsTable = {
                             dialogControl = 'LSM30_Background',
                             values = AceGUIWidgetLSMlists.background,
                             width = 'double',
-                            order = 8
+                            order = 20
                         },
                         selectThemeBorder = {
                             name = L['genBorder'],
@@ -1170,14 +1210,14 @@ optionsTable = {
                             dialogControl = 'LSM30_Border',
                             values = AceGUIWidgetLSMlists.border,
                             width = 'double',
-                            order = 9
+                            order = 22
                         },
                         colorThemeBackground = {
                             name = L['colorThemeBGName'],
                             --desc = L['ThemeSelDesc'],
                             type = 'color',
                             hasAlpha = true,
-                            order = 10,
+                            order = 24,
                             set = 'SetColor',
                             get = 'GetColor'
                         },
@@ -1186,7 +1226,7 @@ optionsTable = {
                             --desc = L['ThemeSelDesc'],
                             type = 'color',
                             hasAlpha = true,
-                            order = 11,
+                            order = 26,
                             set = 'SetColor',
                             get = 'GetColor'
                         },
@@ -1194,13 +1234,13 @@ optionsTable = {
                             name = L['toggleColorByQualityName'],
                             desc = L['toggleColorByQualityDesc'],
                             type = 'toggle',
-                            order = 12
+                            order = 28
                         },
                         toggleThemeBackgroundTile = {
                             name = L['toggleThemeBackgroundTileName'],
                             desc = L['toggleThemeBackgroundTileDesc'],
                             type = 'toggle',
-                            order = 13
+                            order = 30
                         },
                         rangeThemeBackgroundTileSize = {
                             name = L['rangeThemeBackgroundTileSizeName'],
@@ -1210,7 +1250,7 @@ optionsTable = {
                             max = 32,
                             step = 1,
                             bigStep = 1,
-                            order = 14
+                            order = 32
                         },
                         rangeThemeBorderEdgeSize = {
                             name = L['rangeThemeBorderEdgeSizeName'],
@@ -1220,7 +1260,7 @@ optionsTable = {
                             max = 32,
                             step = 1,
                             bigStep = 1,
-                            order = 15
+                            order = 34
                         },
                         rangeThemeBorderInset = {
                             name = L['rangeThemeBorderInsetName'],
@@ -1230,7 +1270,7 @@ optionsTable = {
                             max = 32,
                             step = 1,
                             bigStep = 1,
-                            order = 16
+                            order = 36
                         },
                         --
                         -- ICON
@@ -1238,7 +1278,7 @@ optionsTable = {
                         headerLootMonitorIcon = {
                             name = L['genIcon'],
                             type = 'header',
-                            order = 17
+                            order = 38
                         },
                         rangeIconSize = {
                             name = L['rangeIconSizeName'],
@@ -1251,7 +1291,7 @@ optionsTable = {
                             disabled = function()
                                 return Options.db.profile.selectThemeSize == 1
                             end,
-                            order = 18
+                            order = 40
                         },
                         --
                         -- ANIMATION AND FADING
@@ -1259,7 +1299,7 @@ optionsTable = {
                         headerLootMonitorAnimation = {
                             name = L['genAnimation'],
                             type = 'header',
-                            order = 19
+                            order = 42
                         },
                         -- NOTE: Changed from rangeInitialDelay
                         rangeDisplayTime = {
@@ -1271,7 +1311,7 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 20
+                            order = 44
                         },
                         -- NOTE: Changed from rangeSecondaryDelay
                         rangeMultipleDelay = {
@@ -1284,7 +1324,7 @@ optionsTable = {
                             bigStep = 0.5,
                             --width = 'half',
                             -- hidden = 'Advanced',
-                            order = 21
+                            order = 46
                         },
                         rangeFadeSpeed = {
                             name = L['rangeFadeSpeedName'],
@@ -1295,13 +1335,13 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 22
+                            order = 48
                         },
                         toggleShowAnimation = {
                             name = L['toggleShowAnimationName'],
                             desc = L['toggleShowAnimationDesc'],
                             type = 'toggle',
-                            order = 23
+                            order = 50
                         },
                         -- • • • • •
                         rangeToastScale = {
@@ -1313,7 +1353,7 @@ optionsTable = {
                             step = 0.1,
                             bigStep = 0.1,
                             hidden = true,
-                            order = 60
+                            order = 52
                         },
 
 
@@ -1329,6 +1369,29 @@ optionsTable = {
                     type = 'group',
                     order = 6,
                     args = {
+                        buttonTestLootMonitor = {
+                            name = L['buttonTestLootMonitor'],
+                            type = 'execute',
+                            -- width = 'double',
+                            order = 2,
+                            func = function()
+                                HotLoot:TestLootMonitor()
+                            end
+                        },
+                        buttonResetLootMonitor = {
+                            name = L['buttonResetLootMonitorName'],
+                            desc = L['buttonResetLootMonitorDesc'],
+                            type = 'execute',
+                            -- width = 'double',
+                            order = 4,
+                            func = function()
+                                HotLoot.Anchor:ClearAllPoints()
+                                HotLoot.Anchor:SetPoint('CENTER', 0, 0)
+                                Options.db.profile.anchorPosition.x = anchor:GetLeft()
+                                Options.db.profile.anchorPosition.y = anchor:GetBottom()
+                                Util:Announce(L['AnchorReset'])
+                            end
+                        },
                         --
                         -- GENERAL
                         --
@@ -1336,14 +1399,14 @@ optionsTable = {
                             name = L['toggleFontColorByQualName'],
                             desc = L['toggleFontColorByQualDesc'],
                             type = 'toggle',
-                            order = 1
+                            order = 6
                         },
                         selectTextSide = {
                             name = L['selectTextSideName'],
                             desc = L['selectTextSideDesc'],
                             type = 'select',
                             values = tableDirectionHorizontal,
-                            order = 2
+                            order = 8
                         },
                         --
                         -- NAME
@@ -1351,7 +1414,7 @@ optionsTable = {
                         headerNameText = {
                             name = L['headerNameText'],
                             type = 'header',
-                            order = 3
+                            order = 10
                         },
                         selectNameTextFont = {
                             name = L['genFont'],
@@ -1360,7 +1423,7 @@ optionsTable = {
                             dialogControl = 'LSM30_Font',
                             values = AceGUIWidgetLSMlists.font,
                             width = 'double',
-                            order = 4
+                            order = 12
                         },
                         rangeNameTextSize = {
                             name = L['rangeFontSizeName'],
@@ -1371,13 +1434,13 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 6
+                            order = 14
                         },
                         selectNameTextOutline = {
                             name = L['genOutline'],
                             type = 'select',
                             values = tableFontOutline,
-                            order = 8
+                            order = 16
                         },
                         --[[colorNameTextFont = {
                             name = L['colorFontColorName'],
@@ -1417,7 +1480,7 @@ optionsTable = {
                         headerQuantText = {
                             name = L['headerQuantText'],
                             type = 'header',
-                            order = 10,
+                            order = 18,
                         },
                         -- TODO: Consider changing the name for this and the other lines from 'Enable' to 'Show' (or 'Hide'?)
                         toggleShowItemQuant = {
@@ -1425,14 +1488,14 @@ optionsTable = {
                             desc = L['toggleShowItemQuantDesc'],
                             type = 'toggle',
                             -- width = 'double',
-                            order = 12
+                            order = 20
                         },
                         toggleShowTotalQuant = {
                             name = L['toggleShowTotalQuantName'],
                             desc = L['toggleShowTotalQuantDesc'],
                             type = 'toggle',
                             -- width = 'double',
-                            order = 14
+                            order = 22
                         },
                         selectQuantTextFont = {
                             name = L['genFont'],
@@ -1441,7 +1504,7 @@ optionsTable = {
                             dialogControl = 'LSM30_Font',
                             values = AceGUIWidgetLSMlists.font,
                             width = 'double',
-                            order = 16
+                            order = 24
                         },
                         rangeQuantTextSize = {
                             name = L['rangeFontSizeName'],
@@ -1452,13 +1515,13 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 18
+                            order = 26
                         },
                         selectQuantTextOutline = {
                             name = L['genOutline'],
                             type = 'select',
                             values = tableFontOutline,
-                            order = 20
+                            order = 28
                         },
                         colorQuantTextFont = {
                             name = L['colorFontColorName'],
@@ -1466,7 +1529,7 @@ optionsTable = {
                             type = 'color',
                             -- hidden = 'Advanced',
                             hasAlpha = true,
-                            order = 22,
+                            order = 30,
                             set = 'SetColor',
                             get = 'GetColor'
                         },
@@ -1498,12 +1561,12 @@ optionsTable = {
                         headerLine1Text = {
                             name = L['headerLine1Text'],
                             type = 'header',
-                            order = 24,
+                            order = 32,
                         },
                         descLine1Text = {
                             name = L['descSmartInfo'],
                             type = 'description',
-                            order = 26,
+                            order = 34,
                         },
                         -- TODO: Add toggle to show type when no smart info. (off by default)
                         -- TODO: Change to match Line 1
@@ -1512,14 +1575,14 @@ optionsTable = {
                             -- desc = L['toggleShowItemTypeDesc'],
                             type = 'toggle',
                             width = 'double',
-                            order = 28
+                            order = 36
                         },
                         toggleShowItemTypeNoInfo = {
                             name = L['toggleShowItemTypeNoInfoName'],
                             desc = L['toggleShowItemTypeNoInfoDesc'],
                             type = 'toggle',
                             -- width = 'double',
-                            order = 30
+                            order = 38
                         },
                         selectLine1TextFont = {
                             name = L['genFont'],
@@ -1528,13 +1591,13 @@ optionsTable = {
                             dialogControl = 'LSM30_Font',
                             values = AceGUIWidgetLSMlists.font,
                             width = 'double',
-                            order = 32
+                            order = 40
                         },
                         selectLine1TextOutline = {
                             name = L['genOutline'],
                             type = 'select',
                             values = tableFontOutline,
-                            order = 34
+                            order = 42
                         },
                         rangeLine1TextSize = {
                             name = L['rangeFontSizeName'],
@@ -1545,7 +1608,7 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 36
+                            order = 44
                         },
                         colorLine1TextFont = {
                             name = L['colorFontColorName'],
@@ -1553,7 +1616,7 @@ optionsTable = {
                             type = 'color',
                             -- hidden = 'Advanced',
                             hasAlpha = true,
-                            order = 38,
+                            order = 46,
                             set = 'SetColor',
                             get = 'GetColor'
                         },
@@ -1585,14 +1648,14 @@ optionsTable = {
                         headerLine2Text = {
                             name = L['headerLine2Text'],
                             type = 'header',
-                            order = 40,
+                            order = 48,
                         },
                         toggleShowSellPrice = {
                             name = L['genEnable'], -- Used to be toggleShowSellPriceName
                             desc = L['toggleShowSellPriceDesc'],
                             type = 'toggle',
                             width = 'double',
-                            order = 42
+                            order = 50
                         },
                         selectLine2TextFont = {
                             name = L['genFont'],
@@ -1601,7 +1664,7 @@ optionsTable = {
                             dialogControl = 'LSM30_Font',
                             values = AceGUIWidgetLSMlists.font,
                             width = 'double',
-                            order = 44
+                            order = 52
                         },
                         rangeLine2TextSize = {
                             name = L['rangeFontSizeName'],
@@ -1612,13 +1675,13 @@ optionsTable = {
                             step = 1,
                             bigStep = 1,
                             -- hidden = 'Advanced',
-                            order = 46
+                            order = 54
                         },
                         selectLine2TextOutline = {
                             name = L['genOutline'],
                             type = 'select',
                             values = tableFontOutline,
-                            order = 48
+                            order = 56
                         },
                         colorLine2TextFont = {
                             name = L['colorFontColorName'],
@@ -1626,14 +1689,14 @@ optionsTable = {
                             type = 'color',
                             -- hidden = 'Advanced',
                             hasAlpha = true,
-                            order = 50,
+                            order = 58,
                             set = 'SetColor',
                             get = 'GetColor'
                         },
                         groupTSMValue = {
                             name = L['groupTSMValue'],
                             type = 'group',
-                            order = 52,
+                            order = 60,
                             inline = true,
                             args = {
                                 descTSMSource = {
@@ -1694,22 +1757,57 @@ optionsTable = {
             type = 'group',
             order = 5,
             args = {
-                selectFilter = {
-                    name = 'Current Filter',
-                    type = 'select',
-                    values = 'GetFilterList',
-                    set = function(info, value)
-                        Options:ViewFilter(value)
-                        Options:Set(info, value)
-                    end,
-                    order = 2
+                groupGeneralFilters = {
+                    name = 'General Filters',
+                    type = 'group',
+                    order = 1,
+                    args = {
+                        toggleGoldFilter = {
+                            name = L['toggleGoldFilterName'],
+                            desc = L['toggleGoldFilterDesc'],
+                            type = 'toggle',
+                            width = 'full',
+                            order = 2
+                        },
+                        toggleCurrencyFilter = {
+                            name = L['toggleCurrencyFilterName'],
+                            desc = L['toggleCurrencyFilterDesc'],
+                            type = 'toggle',
+                            width = 'full',
+                            order = 4
+                        },
+                        toggleAPFilter = {
+                            name = L['FilterNameTemplate']:format(ARTIFACT_POWER),
+                            desc = L['FilterDescTemplate']:format(ARTIFACT_POWER),
+                            type = 'toggle',
+                            width = 'full',
+                            order = 6
+                        },
+                    }
                 },
-                inputCreateFilter = {
-                    name = 'Create Filter',
-                    type = 'input',
-                    set = 'CreateFilter',
-                    get = function() return '' end,
-                    order = 4
+                groupCustomFilters = {
+                    name = 'Custom Filters',
+                    type = 'group',
+                    order = 2,
+                    args = {
+                        selectFilter = {
+                            name = 'Current Filter',
+                            type = 'select',
+                            values = 'GetFilterList',
+                            set = function(info, value)
+                                Options:ViewFilter(value)
+                                Options:Set(info, value)
+                            end,
+                            order = 2
+                        },
+                        inputCreateFilter = {
+                            name = 'Create Filter',
+                            type = 'input',
+                            set = 'CreateFilter',
+                            get = function() return '' end,
+                            order = 4
+                        }
+                    }
                 }
             }
         },

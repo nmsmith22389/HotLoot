@@ -380,6 +380,7 @@ local function CanStack(iname, scount, lquant)
     --end
 end
 
+-- TODO: Figure out how to add leather to new filters?
 local untypedItems = {
     ['Leather'] = {
         [124439] = true,
@@ -420,48 +421,6 @@ local function CheckUntyped(type, itemLink)
     end
 end
 
-local function CheckThreshold(itemType, itemLink, sellAmount, itemQuantity)
-    if Options:Get('toggleUseTSMValue') and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
-        local tsmSources = TSMAPI:GetPriceSources()
-        local priceSource = (tsmSources[Options:Get('inputUseTSMValueSource')]) and Options:Get('inputUseTSMValueSource') or 'DBMarket'
-        local sellAmountOld = sellAmount
-
-        sellAmount = TSMAPI:GetItemValue(_G.TSMAPI.Item:ToItemString(itemLink), priceSource)
-        if not sellAmount then
-            sellAmount = sellAmountOld
-        end
-    end
-
-    local value
-    if Options:Get('toggleUseQuantValue') and itemQuantity ~= nil then
-        value = itemQuantity * sellAmount
-    else
-        value = sellAmount
-    end
-
-    if Options:Get('selectThresholdType1') == itemType then
-        if Options:Get('inputThresholdValue1') <= value then
-            return true
-        else
-            return false
-        end
-    elseif Options:Get('selectThresholdType2') == itemType then
-        if Options:Get('inputThresholdValue2') <= value then
-            return true
-        else
-            return false
-        end
-    elseif Options:Get('selectThresholdType3') == itemType then
-        if Options:Get('inputThresholdValue3') <= value then
-            return true
-        else
-            return false
-        end
-    else
-        return true
-    end
-end
-
 local function GetItemPrice(itemLink, itemQuantity)
     if Options:Get('toggleUseTSMValue') and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
         local tsmSources = _G.TSMAPI:GetPriceSources()
@@ -478,19 +437,6 @@ local function GetItemPrice(itemLink, itemQuantity)
         value = sellAmount
     end
     return value
-end
-
-
-local function CheckILvl(iLvl)
-    if Options:Get('inputMinItemLevel') then
-        if tonumber(iLvl) >= tonumber(Options:Get('inputMinItemLevel')) then
-            return true
-        else
-            return false
-        end
-    else
-        return true
-    end
 end
 
 -- NOTE: Returns 2 vars...

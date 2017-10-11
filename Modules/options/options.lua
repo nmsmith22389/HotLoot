@@ -355,13 +355,20 @@ local defaults = {
 local tableFilterTypes = {
     [tostring(HL_FILTER_TYPE.TYPE)] = 'Type',
     [tostring(HL_FILTER_TYPE.VALUE)] = 'Value',
-    [tostring(HL_FILTER_TYPE.QUALITY)] = 'Quality'
+    [tostring(HL_FILTER_TYPE.QUALITY)] = 'Quality',
+    [tostring(HL_FILTER_TYPE.NAME)] = 'Name',
+    [tostring(HL_FILTER_TYPE.ILVL)] = 'Item Level'
 }
 
 local tableComparisons = {
     equalTo = 'Equal To',
     lessThan = 'Less Than',
     greaterThan = 'Greater Than'
+}
+
+local tableStringComparisons = {
+    matches = 'Matches',
+    contains = 'Contains'
 }
 
 local tableQualities = {
@@ -458,6 +465,12 @@ local function GetConditionArgs(num, condition)
             elseif tonumber(value) == HL_FILTER_TYPE.QUALITY then
                 condition.value = 'equalTo'
                 condition.subvalue = '0'
+            elseif tonumber(value) == HL_FILTER_TYPE.NAME then
+                condition.value = 'matches'
+                condition.subvalue = ''
+            elseif tonumber(value) == HL_FILTER_TYPE.NAME then
+                condition.value = 'equalTo'
+                condition.subvalue = 0
             end
             Options:ViewFilter(Options:Get('selectFilter'))
         end,
@@ -577,6 +590,63 @@ local function GetConditionArgs(num, condition)
             end,
             get = function(info)
                 return condition.subvalue
+            end
+        }
+    elseif condition.type == tostring(HL_FILTER_TYPE.NAME) then
+        args['selectConditionValue'..num] = {
+            name = 'Comparison',
+            type = 'select',
+            values = tableStringComparisons,
+            width = 'double',
+            order = 2,
+            set = function(info, value)
+                condition.value = value
+            end,
+            get = function(info)
+                return condition.value
+            end
+        }
+        args['selectConditionSubValue'..num] = {
+            name = 'Text',
+            type = 'input',
+            order = 3,
+            width = 'double',
+            set = function(info, value)
+                condition.subvalue = value
+            end,
+            get = function(info)
+                return condition.subvalue
+            end
+        }
+    elseif condition.type == tostring(HL_FILTER_TYPE.ILVL) then
+        args['selectConditionValue'..num] = {
+            name = 'Comparison',
+            type = 'select',
+            values = tableComparisons,
+            width = 'double',
+            order = 2,
+            set = function(info, value)
+                condition.value = value
+            end,
+            get = function(info)
+                return condition.value
+            end
+        }
+        args['selectConditionSubValue'..num] = {
+            name = 'Item Level',
+            type = 'input',
+            order = 3,
+
+            width = 'double',
+            set = function(info, value)
+                if not value or value == '' then
+                    condition.subvalue = 0
+                else
+                    condition.subvalue = tonumber(value)
+                end
+            end,
+            get = function(info)
+                return tostring(condition.subvalue)
             end
         }
     end

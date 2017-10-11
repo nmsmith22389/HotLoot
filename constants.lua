@@ -62,6 +62,8 @@ _G.HL_FILTER_TYPE = {
     TYPE = 0,
     VALUE = 1,
     QUALITY = 2,
+    NAME = 3,
+    ILVL = 4
 }
 
 -- @usage

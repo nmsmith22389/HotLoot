@@ -488,6 +488,7 @@ local function FilterSlot(loot)
             --> Custom Filters
             for filterName, filter in pairs(Options:Get('tableFilters')) do
                 if filter.enabled then
+                    local triggerType = filter.trigger
                     local conditionsMet = 0
                     for num, condition in ipairs(filter.conditions) do
                         if tonumber(condition.type) == HL_FILTER_TYPE.TYPE then
@@ -558,7 +559,8 @@ local function FilterSlot(loot)
                         end
                     end
 
-                    if conditionsMet == #filter.conditions then
+                    if (triggerType == 'any' and conditionsMet >= 1) or
+                        (triggerType == 'all' and conditionsMet == #filter.conditions) then
                         return true, 'Filter: '..filterName
                     end
                 end

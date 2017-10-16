@@ -414,7 +414,8 @@ function Options:CreateFilter(info, name)
     if not self:Get('tableFilters')[name] then
         self.db.profile.tableFilters[name] = {
             conditions = {},
-            enabled = true
+            enabled = true,
+            trigger = 'all'
         }
     end
 end
@@ -693,6 +694,32 @@ function Options:ViewFilter(name)
         name = name,
         type = 'header',
         order = 6
+    }
+    opts.toggleEnableFilter = {
+        name = L['genEnable'],
+        type = 'toggle',
+        set = function(info, value)
+            Options.db.profile.tableFilters[name].enabled = value
+        end,
+        get = function()
+            return Options.db.profile.tableFilters[name].enabled
+        end,
+        order = 7
+    }
+    opts.selectFilterTriggerType = {
+        name = 'Trigger Type',
+        type = 'select',
+        order = 8,
+        values = {
+            ['all'] = 'All Conditions',
+            ['any'] = 'Any Condition'
+        },
+        set = function(info, value)
+            Options.db.profile.tableFilters[name].trigger = value
+        end,
+        get = function(info)
+            return Options.db.profile.tableFilters[name].trigger
+        end
     }
     opts.buttonAddCondition = {
         name = 'Add Condition',

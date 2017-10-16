@@ -421,20 +421,19 @@ local function CheckUntyped(type, itemLink)
     end
 end
 
-local function GetItemPrice(itemLink, itemQuantity)
+local function GetItemPrice(loot)
+    local value = loot.value
+
     if Options:Get('toggleUseTSMValue') and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
         local tsmSources = _G.TSMAPI:GetPriceSources()
         local tsmValueSource = Options:Get('inputTSMValueSource')
         local priceSource = (tsmSources[tsmValueSource]) and tsmValueSource or 'DBMarket'
         local tsmPrice = TSMAPI:GetItemValue(_G.TSMAPI.Item:ToItemString(itemLink), priceSource)
-        sellAmount = tsmPrice or sellAmount
+        value = tsmPrice or value
     end
 
-    local value
     if Options:Get('toggleUseQuantValue') and itemQuantity ~= nil then
-        value = itemQuantity * sellAmount
-    else
-        value = sellAmount
+        value = itemQuantity * value
     end
     return value
 end
@@ -462,6 +461,7 @@ local function FilterSlot(loot)
         end
     elseif loot.slotType == HL_LOOT_SLOT_TYPE.ITEM and (not Options:Get('toggleDisableInRaid') or GetLootMethod() ~= 'master') then
         local _, _, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice, itemClass, itemSubClass = GetItemInfo(loot.link)
+        loot.value = itemSellPrice
 
         if (HasRoom(1) or CanStack(loot.item, itemStackCount, loot.quantity)) then
 
@@ -494,7 +494,7 @@ local function FilterSlot(loot)
                             end
                         elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE then
                             --> Item Value
-                            local itemValue = GetItemPrice(loot.link, loot.quantity)
+                            local itemValue = GetItemPrice(loot)
 
                             if condition.value == 'equalTo' then
                                 if condition.subvalue == itemSellPrice then

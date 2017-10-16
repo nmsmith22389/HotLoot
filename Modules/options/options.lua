@@ -417,6 +417,8 @@ function Options:CreateFilter(info, name)
             enabled = true,
             trigger = 'all'
         }
+        self:ViewFilter(name)
+        self:Set('selectFilter', name)
     end
 end
 
@@ -651,6 +653,7 @@ end
 function Options:ViewFilter(name)
     local opts = {}
     local filter = Options:Get('tableFilters')[name]
+    if not filter then return false end
 
     opts.selectFilter = {
         name = 'Current Filter',

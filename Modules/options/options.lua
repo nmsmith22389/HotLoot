@@ -442,13 +442,6 @@ local function GetConditionArgs(num, condition)
     local args = {}
     local currentFilter = Options:Get('selectFilter')
 
-    Util:Debug('------------------')
-    Util:DebugOption('Current Filter', currentFilter)
-    Util:DebugOption('num', num)
-    Util:DebugOption('type', condition.type)
-    Util:DebugOption('value', condition.value)
-    Util:DebugOption('subvalue', condition.subvalue)
-
     args['selectConditionType'..num] = {
         name = 'Filter Type',
         type = 'select',
@@ -1911,6 +1904,11 @@ optionsTable = {
                     type = 'group',
                     order = 6,
                     args = {
+                        headerValue = {
+                            name = 'Value',
+                            type = 'header',
+                            order = 2
+                        },
                         toggleUseQuantValue = {
                             name = L['toggleUseQuantValueName'],
                             desc = L['toggleUseQuantValueDesc'],

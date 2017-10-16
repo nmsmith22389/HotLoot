@@ -487,18 +487,24 @@ local function FilterSlot(loot)
 
             --> Custom Filters
             for filterName, filter in pairs(Options:Get('tableFilters')) do
+                Util:Debug('Running filter '..filterName)
                 if filter.enabled then
                     local triggerType = filter.trigger
                     local conditionsMet = 0
                     for num, condition in ipairs(filter.conditions) do
                         if tonumber(condition.type) == HL_FILTER_TYPE.TYPE then
+                            Util:Debug('Item Type')
                             --> Item Type
                             if itemClass == tonumber(condition.value) then
+                                Util:Debug('Item Class Met: '..GetItemClassInfo(itemClass))
                                 if (tonumber(condition.subvalue) == itemSubClass or condition.subvalue == 'NONE') then
+                                    Util:Debug('Item SubClass Met: '..GetItemSubClassInfo(itemClass, itemSubClass))
                                     conditionsMet = conditionsMet + 1
+                                    Util:Debug('Conditions Met: '..conditionsMet)
                                 end
                             end
                         elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE then
+                            Util:Debug('Item value')
                             --> Item Value
                             local itemValue = GetItemPrice(loot)
 
@@ -516,6 +522,7 @@ local function FilterSlot(loot)
                                 end
                             end
                         elseif tonumber(condition.type) == HL_FILTER_TYPE.QUALITY then
+                            Util:Debug('Item quality')
                             --> Item Quality
                             if condition.value == 'equalTo' then
                                 if condition.subvalue == loot.quality then
@@ -531,6 +538,7 @@ local function FilterSlot(loot)
                                 end
                             end
                         elseif tonumber(condition.type) == HL_FILTER_TYPE.NAME then
+                            Util:Debug('Item name')
                             --> Item Name
                             if condition.value == 'contains' then
                                 if loot.item:match(condition.subvalue)then
@@ -542,6 +550,7 @@ local function FilterSlot(loot)
                                 end
                             end
                         elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL then
+                            Util:Debug('Item level')
                             --> Item Level
                             if condition.value == 'equalTo' then
                                 if condition.subvalue == itemLevel then

@@ -480,6 +480,11 @@ local function FilterSlot(loot)
                 return true, HL_LOOT_REASON.INCLUDE
             end
 
+            --> Artifact Power
+            if Options:Get('toggleAPFilter') and TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link), true) then
+                return true, HL_LOOT_REASON.ARTIFACT_POWER
+            end
+
             --> Custom Filters
             for filterName, filter in pairs(Options:Get('tableFilters')) do
                 if filter.enabled then

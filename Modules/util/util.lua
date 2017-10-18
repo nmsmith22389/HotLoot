@@ -65,6 +65,21 @@ function Util:DebugOption(option, value, old)
     end
 end
 
+function Util:ScanBags(proc, getItem)
+    if type(proc) ~= 'function' then return false end
+
+    for bag=0, NUM_BAG_SLOTS do
+        for slot = 1, GetContainerNumSlots(bag) do
+            if getItem then
+                local itemID = GetContainerItemLink(bag,slot)
+                proc(bag, slot, itemID)
+            else
+                proc(bag, slot)
+            end
+        end
+    end
+end
+
 function Util:ToCopper(input)
     local gold, silver, copper = 0, 0, 0
     local goldPatColored = '(%d+)[ ]?%|cffffd700[ ]?[gG]'

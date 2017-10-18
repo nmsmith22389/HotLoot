@@ -50,18 +50,6 @@ end
 --
 -- ─── DIALOGS ────────────────────────────────────────────────────────────────────
 --
-local function GetFirstRunDialogText()
-    local text = ''
-    if Util and Util.ColorText then
-        text = Util:ColorText('Thanks for using HotLoot!', 'success')..'\n\n'
-        text = text..Util:ColorText('Please ensure all other looting addons and Blizzard\'s auto loot are turned off.','warning')
-    else
-        text = 'Thanks for using HotLoot!'..'\n\n'
-        text = text..'Please ensure all other looting addons and Blizzard\'s auto loot are turned off.'
-    end
-    return text
-end
-
 local function OpenOptionsWindow()
     local Ace = LibStub('AceConfigDialog-3.0')
     Ace:Open('HotLoot')
@@ -1221,16 +1209,18 @@ function HotLoot:ChatCommand(input)
         --InterfaceOptionsFrame_OpenToCategory(Options:Get('rame'))
         OpenOptionsWindow()
     elseif input == "help" then
+        -- TODO: Localize
         Util:Print('--- Available Commands ---')
         Util:Print('UNDER CONSTRUCTION')
-        Util:Print('- '..Util:ColorText('enable', 'info')..': Enables/disables the addon')
-        -- Util:Print('- '..Util:ColorText('debug', 'info')..': Enables/disables debug mode')
+        Util:Print('- '..Util:ColorText('enable',       'info')..': Enables/disables the addon')
+        -- Util:Print('- '..Util:ColorText('debug',     'info')..': Enables/disables debug mode')
         -- Util:Print('- '..Util:ColorText('autoclose', 'info')..': Toggles the autoclose option')
-        -- Util:Print('- '..Util:ColorText('skinning', 'info')..': Toggles skinning mode')
-        -- Util:Print('- '..Util:ColorText('monitor', 'info')..': Toggles loot monitor')
-        Util:Print('- '..Util:ColorText('include', 'info')..' <item>: Adds the item to the Include List')
-        Util:Print('- '..Util:ColorText('exclude', 'info')..' <item>: Adds the item to the Exclude List')
-        Util:Print('- '..Util:ColorText('filter', 'info')..' <item>: Test to see if an item will be looted')
+        -- Util:Print('- '..Util:ColorText('skinning',  'info')..': Toggles skinning mode')
+        -- Util:Print('- '..Util:ColorText('monitor',   'info')..': Toggles loot monitor')
+        Util:Print('- '..Util:ColorText('include',      'info')..' <item>: Adds the item to the Include List')
+        Util:Print('- '..Util:ColorText('exclude',      'info')..' <item>: Adds the item to the Exclude List')
+        Util:Print('- '..Util:ColorText('filter',       'info')..' <item>: Test to see if an item will be looted')
+        Util:Print('- '..Util:ColorText('sellFilter',   'info')..' <item>: Test to see if an item will be looted')
     elseif string.find(input, '^enable') then
         if Options:Get('toggleSystemEnable') then
             Options:Set('toggleSystemEnable', false)

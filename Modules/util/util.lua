@@ -157,13 +157,13 @@ function Util:IsEmpty(t)
 end
 
 function Util:SlotIsGold(slot)
-    if GetLootSlotType(slot) == HL_LOOT_SLOT_TYPE.COIN then 
+    if GetLootSlotType(slot) == HL_LOOT_SLOT_TYPE.COIN then
         return true
     end
 end
 
 function Util:SlotIsCurrency(slot)
-    if GetLootSlotType(slot) == HL_LOOT_SLOT_TYPE.CURRENCY then 
+    if GetLootSlotType(slot) == HL_LOOT_SLOT_TYPE.CURRENCY then
         return true
     end
 end

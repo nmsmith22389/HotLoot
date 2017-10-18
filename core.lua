@@ -492,7 +492,7 @@ local function FilterSlot(loot)
                     local triggerType = filter.trigger
                     local conditionsMet = 0
                     for num, condition in ipairs(filter.conditions) do
-                        if tonumber(condition.type) == HL_FILTER_TYPE.TYPE then
+                        if tonumber(condition.type) == HL_FILTER_TYPE.TYPE and itemClass then
                             Util:Debug('Item Type')
                             --> Item Type
                             if itemClass == tonumber(condition.value) then
@@ -503,45 +503,45 @@ local function FilterSlot(loot)
                                     Util:Debug('Conditions Met: '..conditionsMet)
                                 end
                             end
-                        elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE then
+                        elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE and loot.value then
                             Util:Debug('Item value')
                             --> Item Value
                             local itemValue = GetItemPrice(loot)
 
                             if condition.value == 'equalTo' then
-                                if condition.subvalue == itemSellPrice then
+                                if condition.subvalue == itemValue then
                                     conditionsMet = conditionsMet + 1
                                 end
                             elseif condition.value == 'greaterThan' then
-                                if condition.subvalue > itemSellPrice then
+                                if itemValue > condition.subvalue then
                                     conditionsMet = conditionsMet + 1
                                 end
                             elseif condition.value == 'lessThan' then
-                                if condition.subvalue < itemSellPrice then
+                                if itemValue < condition.subvalue then
                                     conditionsMet = conditionsMet + 1
                                 end
                             end
-                        elseif tonumber(condition.type) == HL_FILTER_TYPE.QUALITY then
+                        elseif tonumber(condition.type) == HL_FILTER_TYPE.QUALITY and loot.quality then
                             Util:Debug('Item quality')
                             --> Item Quality
                             if condition.value == 'equalTo' then
-                                if condition.subvalue == loot.quality then
+                                if tonumber(condition.subvalue) == loot.quality then
                                     conditionsMet = conditionsMet + 1
                                 end
                             elseif condition.value == 'greaterThan' then
-                                if condition.subvalue > loot.quality then
+                                if loot.quality > tonumber(condition.subvalue) then
                                     conditionsMet = conditionsMet + 1
                                 end
                             elseif condition.value == 'lessThan' then
-                                if condition.subvalue < loot.quality then
+                                if loot.quality < tonumber(condition.subvalue) then
                                     conditionsMet = conditionsMet + 1
                                 end
                             end
-                        elseif tonumber(condition.type) == HL_FILTER_TYPE.NAME then
+                        elseif tonumber(condition.type) == HL_FILTER_TYPE.NAME and loot.item then
                             Util:Debug('Item name')
                             --> Item Name
                             if condition.value == 'contains' then
-                                if loot.item:match(condition.subvalue)then
+                                if loot.item:match(condition.subvalue) then
                                     conditionsMet = conditionsMet + 1
                                 end
                             elseif condition.value == 'matches' then
@@ -549,19 +549,19 @@ local function FilterSlot(loot)
                                     conditionsMet = conditionsMet + 1
                                 end
                             end
-                        elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL then
+                        elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL and itemLevel and Util:IsEquippableOrRelic(loot.link) then
                             Util:Debug('Item level')
                             --> Item Level
                             if condition.value == 'equalTo' then
-                                if condition.subvalue == itemLevel then
+                                if tonumber(condition.subvalue) == itemLevel then
                                     conditionsMet = conditionsMet + 1
                                 end
                             elseif condition.value == 'greaterThan' then
-                                if condition.subvalue > itemLevel then
+                                if itemLevel > tonumber(condition.subvalue) then
                                     conditionsMet = conditionsMet + 1
                                 end
                             elseif condition.value == 'lessThan' then
-                                if condition.subvalue < itemLevel then
+                                if itemLevel < tonumber(condition.subvalue) then
                                     conditionsMet = conditionsMet + 1
                                 end
                             end

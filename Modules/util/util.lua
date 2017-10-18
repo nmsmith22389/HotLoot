@@ -168,6 +168,11 @@ function Util:SlotIsCurrency(slot)
     end
 end
 
+function Util:IsEquippableOrRelic(itemLink) -- or itemID
+    local _, _, _, _, _, itemClass, itemSubClass = GetItemInfoInstant(itemLink)
+    return IsEquippableItem(itemLink) or  (itemClass == HL_ITEM_CLASS.GEM and itemSubClass == HL_ITEM_SUB_CLASS.GEM.ARTIFACT_RELIC)
+end
+
 function Util:ShortNumber(num, places)
     local ret
     local placeValue = ("%%.%df"):format(places or 0)

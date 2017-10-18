@@ -279,6 +279,7 @@ local defaults = {
         --
 
         tableFilters = {},
+        tableSellFilters = {},
 
         toggleGoldFilter       = true,
         toggleQuestFilter      = true,
@@ -410,41 +411,46 @@ local function GetItemSubTypeTable(itemType)
     return t
 end
 
-function Options:CreateFilter(info, name)
-    if not self:Get('tableFilters')[name] then
-        self.db.profile.tableFilters[name] = {
+function Options:CreateFilter(info, name, isSellFilter)
+    if not self:Get(isSellFilter and 'tableSellFilters' or 'tableFilters')[name] then
+        self.db.profile[isSellFilter and 'tableSellFilters' or 'tableFilters'][name] = {
             conditions = {},
             enabled = true,
             trigger = 'all'
         }
-        self:ViewFilter(name)
-        self:Set('selectFilter', name)
+        self:ViewFilter(name, isSellFilter)
+        self:Set(isSellFilter and 'selectSellFilter' or 'selectFilter', name)
     end
 end
 
-function Options:GetFilterList()
+function Options:GetFilterList(isSellFilter)
     local list = {}
-    for k,v in pairs(self:Get('tableFilters')) do
+    for k,v in pairs(self:Get(isSellFilter and 'tableSellFilters' or 'tableFilters')) do
         list[k] = k
     end
     return list
 end
 
-function Options:AddCondition()
+function Options:AddCondition(isSellFilter)
     local conditionTemplate = {
         type = tostring(HL_FILTER_TYPE.TYPE),
         value = tostring(HL_ITEM_CLASS.TRADESKILL),
         subvalue = 'NONE'
     }
-    table.insert(self.db.profile.tableFilters[self:Get('selectFilter')].conditions, conditionTemplate)
-    Options:ViewFilter(Options:Get('selectFilter'))
+    table.insert(self.db.profile[isSellFilter and 'tableSellFilters' or 'tableFilters'][self:Get(isSellFilter and 'selectSellFilter' or 'selectFilter')].conditions, conditionTemplate)
+    Options:ViewFilter(Options:Get(isSellFilter and 'selectSellFilter' or 'selectFilter'), isSellFilter)
 end
 
-local function GetConditionArgs(num, condition)
-    local args = {}
-    local currentFilter = Options:Get('selectFilter')
+local function GetConditionArgs(num, condition, isSellFilter)
+    local function sellOrNot(text)
+        local sellText = isSellFilter and 'Sell' or ''
+        return text:format(sellText)
+    end
 
-    args['selectConditionType'..num] = {
+    local args = {}
+    local currentFilter = sellOrNot('select%sFilter')
+
+    args[sellOrNot('selectConditionType%s')..num] = {
         name = 'Filter Type',
         type = 'select',
         values = tableFilterTypes,
@@ -468,21 +474,21 @@ local function GetConditionArgs(num, condition)
                 condition.value = 'equalTo'
                 condition.subvalue = 0
             end
-            Options:ViewFilter(Options:Get('selectFilter'))
+            Options:ViewFilter(Options:Get(currentFilter), isSellFilter)
         end,
         get = function(info)
             return condition.type
         end
     }
 
-    args['buttonRemoveCondition'..num] = {
+    args[sellOrNot('buttonRemoveCondition%s')..num] = {
         name = 'Remove Condition',
         type = 'execute',
         order = 10,
         width = 'full',
         func = function()
-            table.remove(Options.db.profile.tableFilters[Options:Get('selectFilter')].conditions, num)
-            Options:ViewFilter(Options:Get('selectFilter'))
+            table.remove(Options.db.profile[sellOrNot('table%sFilters')][Options:Get(currentFilter)].conditions, num)
+            Options:ViewFilter(Options:Get(currentFilter), isSellFilter)
         end
     }
 
@@ -498,7 +504,7 @@ local function GetConditionArgs(num, condition)
         --     condition.subvalue = 'NONE'
         -- end
 
-        args['selectConditionValue'..num] = {
+        args[sellOrNot('selectConditionValue%s')..num] = {
             name = 'Item Type',
             type = 'select',
             values = GetItemTypeTable(),
@@ -507,13 +513,13 @@ local function GetConditionArgs(num, condition)
             set = function(info, value)
                 condition.value = value
                 condition.subvalue = 'NONE'
-                Options:ViewFilter(Options:Get('selectFilter'))
+                Options:ViewFilter(Options:Get(currentFilter), isSellFilter)
         end,
             get = function(info)
                 return condition.value
             end
         }
-        args['selectConditionSubValue'..num] = {
+        args[sellOrNot('selectConditionSubValue%s')..num] = {
             name = 'Item Sub Type',
             type = 'select',
             values = GetItemSubTypeTable(condition and condition.value or nil),
@@ -527,7 +533,7 @@ local function GetConditionArgs(num, condition)
             end
         }
     elseif condition.type == tostring(HL_FILTER_TYPE.VALUE) then
-        args['selectConditionValue'..num] = {
+        args[sellOrNot('selectConditionValue%s')..num] = {
             name = 'Comparison',
             type = 'select',
             values = tableComparisons,
@@ -540,7 +546,7 @@ local function GetConditionArgs(num, condition)
                 return condition.value
             end
         }
-        args['selectConditionSubValue'..num] = {
+        args[sellOrNot('selectConditionSubValue%s')..num] = {
             name = 'Value',
             type = 'input',
             order = 3,
@@ -562,7 +568,7 @@ local function GetConditionArgs(num, condition)
             end
         }
     elseif condition.type == tostring(HL_FILTER_TYPE.QUALITY) then
-        args['selectConditionValue'..num] = {
+        args[sellOrNot('selectConditionValue%s')..num] = {
             name = 'Comparison',
             type = 'select',
             values = tableComparisons,
@@ -575,7 +581,7 @@ local function GetConditionArgs(num, condition)
                 return condition.value
             end
         }
-        args['selectConditionSubValue'..num] = {
+        args[sellOrNot('selectConditionSubValue%s')..num] = {
             name = 'Item Quality',
             type = 'select',
             values = tableItemQuality,
@@ -589,7 +595,7 @@ local function GetConditionArgs(num, condition)
             end
         }
     elseif condition.type == tostring(HL_FILTER_TYPE.NAME) then
-        args['selectConditionValue'..num] = {
+        args[sellOrNot('selectConditionValue%s')..num] = {
             name = 'Comparison',
             type = 'select',
             values = tableStringComparisons,
@@ -602,7 +608,7 @@ local function GetConditionArgs(num, condition)
                 return condition.value
             end
         }
-        args['selectConditionSubValue'..num] = {
+        args[sellOrNot('selectConditionSubValue%s')..num] = {
             name = 'Text',
             type = 'input',
             order = 3,
@@ -615,7 +621,7 @@ local function GetConditionArgs(num, condition)
             end
         }
     elseif condition.type == tostring(HL_FILTER_TYPE.ILVL) then
-        args['selectConditionValue'..num] = {
+        args[sellOrNot('selectConditionValue%s')..num] = {
             name = 'Comparison',
             type = 'select',
             values = tableComparisons,
@@ -628,7 +634,7 @@ local function GetConditionArgs(num, condition)
                 return condition.value
             end
         }
-        args['selectConditionSubValue'..num] = {
+        args[sellOrNot('selectConditionSubValue%s')..num] = {
             name = 'Item Level',
             type = 'input',
             order = 3,
@@ -650,55 +656,66 @@ local function GetConditionArgs(num, condition)
     return args
 end
 
-function Options:ViewFilter(name)
+function Options:ViewFilter(name, isSellFilter)
+    local function sellOrNot(text)
+        local sellText = isSellFilter and 'Sell' or ''
+        return text:format(sellText)
+    end
+
     local opts = {}
-    local filter = Options:Get('tableFilters')[name]
+    local filterTable = sellOrNot('table%sFilters')
+    local filter = self.db.profile[filterTable][name]
     if not filter then return false end
 
-    opts.selectFilter = {
+
+    opts[sellOrNot('select%sFilter')] = {
         name = 'Current Filter',
         type = 'select',
-        values = 'GetFilterList',
+        values = function()
+            return Options:GetFilterList(isSellFilter)
+        end,
         set = function(info, value)
-            Options:ViewFilter(value)
+            Options:ViewFilter(value, isSellFilter)
             Options:Set(info, value)
         end,
         order = 2
     }
-    opts.inputCreateFilter = {
+    opts[sellOrNot('inputCreate%sFilter')] = {
         name = 'Create Filter',
         type = 'input',
-        set = 'CreateFilter',
+        set = function(info, value)
+            Options:CreateFilter(info, value, isSellFilter)
+        end,
         get = function() return '' end,
         order = 4
     }
-    opts.buttonDeleteFilter = {
+    opts[sellOrNot('buttonDelete%sFilter')] = {
         name = Util:ColorText('Delete Current Filter', 'alert'),
         type = 'execute',
         confirm = function()
             return ('Are you sure you want to delete \"%s\"?'):format(name);
         end,
         func = function()
-            Options.db.profile.tableFilters[name] = nil
-            local nextFilter = next(Options:GetFilterList())
-            Options:Set('selectFilter', nextFilter)
-            Options:ViewFilter(nextFilter)
+            Options.db.profile[filterTable][name] = nil
+            local nextFilter = next(Options:GetFilterList(isSellFilter))
+            Options:Set(sellOrNot('select%sFilter'), nextFilter)
+            Options:ViewFilter(nextFilter, isSellFilter)
         end,
         order = 5
     }
-    opts.headerFilter = {
+    opts[sellOrNot('header%sFilter')] = {
         name = name,
         type = 'header',
         order = 6
     }
-    opts.toggleEnableFilter = {
+    opts[sellOrNot('toggleEnable%sFilter')] = {
         name = L['genEnable'],
         type = 'toggle',
         set = function(info, value)
-            Options.db.profile.tableFilters[name].enabled = value
+            Options.db.profile[filterTable][name].enabled = value
         end,
         get = function()
-            return Options.db.profile.tableFilters[name].enabled
+            return Options.db.profile[filterTable][name].enabled
         end,
         order = 7
     }
@@ -711,10 +728,10 @@ function Options:ViewFilter(name)
             ['any'] = 'Any Condition'
         },
         set = function(info, value)
-            Options.db.profile.tableFilters[name].trigger = value
+            Options.db.profile[filterTable][name].trigger = value
         end,
         get = function(info)
-            return Options.db.profile.tableFilters[name].trigger
+            return Options.db.profile[filterTable][name].trigger
         end
     }
     opts.buttonAddCondition = {
@@ -722,7 +739,9 @@ function Options:ViewFilter(name)
         type = 'execute',
         order = 1000,
         width = 'full',
-        func = 'AddCondition'
+        func = function()
+            Options:AddCondition(isSellFilter)
+        end
     }
 
     for i,condition in ipairs(filter.conditions) do
@@ -731,11 +750,15 @@ function Options:ViewFilter(name)
             type = 'group',
             inline = true,
             order = 10 +  i,
-            args = GetConditionArgs(i, condition)
+            args = GetConditionArgs(i, condition, isSellFilter)
         }
     end
 
-    optionsTable.args.groupLootFilters.args.groupCustomFilters.args = opts
+    if isSellFilter then
+        optionsTable.args.groupSellFilters.args.groupCustomFilters.args = opts
+    else
+        optionsTable.args.groupLootFilters.args.groupCustomFilters.args = opts
+    end
 end
 
 --
@@ -1886,7 +1909,9 @@ optionsTable = {
                         selectFilter = {
                             name = 'Current Filter',
                             type = 'select',
-                            values = 'GetFilterList',
+                            values = function()
+                                return Options:GetFilterList()
+                            end,
                             set = function(info, value)
                                 Options:ViewFilter(value)
                                 Options:Set(info, value)
@@ -1896,7 +1921,9 @@ optionsTable = {
                         inputCreateFilter = {
                             name = 'Create Filter',
                             type = 'input',
-                            set = 'CreateFilter',
+                            set = function(info, value)
+                                Options:CreateFilter(info, value, false)
+                            end,
                             get = function() return '' end,
                             order = 4
                         }
@@ -2040,6 +2067,69 @@ optionsTable = {
                 },
             },
         },
+        groupSellFilters = {
+            name = 'Sell Filters',
+            type = 'group',
+            order = 8,
+            args = {
+                --[[ groupGeneralFilters = {
+                    name = 'General Filters',
+                    type = 'group',
+                    order = 2,
+                    args = {
+                        toggleGoldFilter = {
+                            name = L['toggleGoldFilterName'],
+                            desc = L['toggleGoldFilterDesc'],
+                            type = 'toggle',
+                            width = 'full',
+                            order = 2
+                        },
+                        toggleCurrencyFilter = {
+                            name = L['toggleCurrencyFilterName'],
+                            desc = L['toggleCurrencyFilterDesc'],
+                            type = 'toggle',
+                            width = 'full',
+                            order = 4
+                        },
+                        toggleAPFilter = {
+                            name = L['FilterNameTemplate']:format(ARTIFACT_POWER),
+                            desc = L['FilterDescTemplate']:format(ARTIFACT_POWER),
+                            type = 'toggle',
+                            width = 'full',
+                            order = 6
+                        },
+                    }
+                }, ]]
+                groupCustomFilters = {
+                    name = 'Custom Filters',
+                    type = 'group',
+                    order = 4,
+                    args = {
+                        selectSellFilter = {
+                            name = 'Current Filter',
+                            type = 'select',
+                            values = function()
+                                return Options:GetFilterList(true)
+                            end,
+                            set = function(info, value)
+                                Options:ViewFilter(value, true)
+                                Options:Set(info, value)
+                            end,
+                            order = 2
+                        },
+                        inputCreateSellFilter = {
+                            name = 'Create Filter',
+                            type = 'input',
+                            set = function(info, value)
+                                Options:CreateFilter(info, value, true)
+                            end,
+                            get = function() return '' end,
+                            order = 4
+                        }
+                    }
+                },
+            }
+        },
         groupLootFrame = {
                             -- TODO: Localize
             name = 'Loot Frame',
@@ -2107,6 +2197,7 @@ function Options:OnInitialize()
 
     -- Initialize Loot Filter View
     self:ViewFilter(self:Get('selectFilter'))
+    self:ViewFilter(self:Get('selectSellFilter'), true)
 
     tableChatWindows = GetChatWindows()
 

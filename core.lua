@@ -594,29 +594,103 @@ end
 -- ─── SELL POOR ITEMS ────────────────────────────────────────────────────────────
 --
 
-local function SellPoorItems()
-    local bag, slot
-    local totalPrice = 0
-    local totalCount = 0
-    for bag=0, NUM_BAG_SLOTS do
-        for slot = 1, GetContainerNumSlots(bag) do
-            local item = GetContainerItemID(bag,slot)
-            if item then
-                local itemName, itemLink, itemQuality = GetItemInfo(item)
-                local sellPrice = select(11,GetItemInfo(item))
-                if itemQuality == 0 and sellPrice > 0 then
-                    local itemCount = select(2,GetContainerItemInfo(bag,slot))
-                    Util:Debug(string.format(L["GreyItemSold"], itemLink, itemCount, Util:FormatMoney(sellPrice * itemCount, 'SMART', true)))
-                    UseContainerItem(bag,slot)
-                    totalPrice = totalPrice + sellPrice * itemCount
-                    totalCount = totalCount + itemCount
+local function SellFilters()
+    local sellFunc = function(bag, slot, itemID)
+        if not itemID then return false end
+        local item = {}
+        item.id = itemID
+        -- TODO: Make sure these are right!
+        item.item, item.link, item.quality, item.ilvl, item.minLvl, _, _, _, _, _, item.value, item.class, item.subClass = GetItemInfo(item.id)
+
+        --> Custom Filters
+        for filterName, filter in pairs(Options:Get('tableSellFilters')) do
+            if filter.enabled then
+                local triggerType = filter.trigger
+                local conditionsMet = 0
+                for num, condition in ipairs(filter.conditions) do
+                    if tonumber(condition.type) == HL_FILTER_TYPE.TYPE and item.class then
+                        --> Item Type
+                        if item.class == tonumber(condition.value) then
+                            if tonumber(condition.subvalue) == item.subClass or condition.subvalue == 'NONE' then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        end
+                    elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE and item.value then
+                        --> Item Value
+                        local itemValue = GetItemPrice(item)
+
+                        if condition.value == 'equalTo' then
+                            if condition.subvalue == itemValue then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        elseif condition.value == 'greaterThan' then
+                            if itemValue > condition.subvalue then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        elseif condition.value == 'lessThan' then
+                            if itemValue < condition.subvalue then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        end
+                    elseif tonumber(condition.type) == HL_FILTER_TYPE.QUALITY and item.quality then
+                        --> Item Quality
+                        if condition.value == 'equalTo' then
+                            if tonumber(condition.subvalue) == item.quality then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        elseif condition.value == 'greaterThan' then
+                            if item.quality > tonumber(condition.subvalue) then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        elseif condition.value == 'lessThan' then
+                            if item.quality < tonumber(condition.subvalue) then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        end
+                    elseif tonumber(condition.type) == HL_FILTER_TYPE.NAME and item.item then
+                        --> Item Name
+                        if condition.value == 'contains' then
+                            if item.item:match(condition.subvalue) then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        elseif condition.value == 'matches' then
+                            if item.item:match(condition.subvalue) == item.item then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        end
+                    elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL and item.ilvl and Util:IsEquippableOrRelic(loot.link) then
+                        --> Item Level
+                        if condition.value == 'equalTo' then
+                            if tonumber(condition.subvalue) == item.ilvl then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        elseif condition.value == 'greaterThan' then
+                            if item.ilvl > tonumber(condition.subvalue) then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        elseif condition.value == 'lessThan' then
+                            if item.ilvl < tonumber(condition.subvalue) then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        end
+                    end
+                end
+
+                if (triggerType == 'any' and conditionsMet >= 1) or
+                    (triggerType == 'all' and conditionsMet == #filter.conditions) then
+                    local _, _, locked, _, _, lootable, _, _ = GetContainerItemInfo(bag, slot)
+                    if not locked and not lootable then
+                        -- UseContainerItem(bag, slot)
+                        Util:Debug('Sold '..item.link)
+                    end
                 end
             end
         end
     end
-    if totalPrice > 0 then
-        Util:Announce(string.format(L["AllGreysSold"], totalCount, Util:FormatMoney(totalPrice, 'SMART', true)))
-    end
+    Util:ScanBags(sellFunc, true)
+
+    -- TODO: Calc price of sold items (sperate by filter? say which sold what?)
+    -- NOTE: Old 'sell poor' func used L["GreyItemSold"] and L["AllGreysSold"]
 end
 
 --
@@ -1334,10 +1408,8 @@ function HotLoot:LOOT_SLOT_CLEARED(slot)
 end
 
 function HotLoot:MERCHANT_SHOW(...)
-    if Options:Get('toggleSystemEnable') and Options:Get('toggleSellPoorItems') then
-        Util:Debug("Merchant Window Opened")
-        SellPoorItems()
-    end
+    Util:Debug("Merchant Window Opened")
+    SellFilters()
 end
 
 function HotLoot:BAG_UPDATE(...)

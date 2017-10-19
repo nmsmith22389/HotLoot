@@ -307,23 +307,20 @@ local function DeleteLeftovers()
     if not Util:IsEmpty(tItemsToDelete) then
         -- TODO: Rename
         Util:Announce(L["SkinAnnounce1"])
-        for bag = 0, NUM_BAG_SLOTS do
-            for slot = 1, GetContainerNumSlots(bag) do
-                local itemLink = GetContainerItemLink(bag, slot)
-                local itemName
-                if itemLink then
-                    itemName = select(1, GetItemInfo(itemLink))
-                    if itemName and tItemsToDelete[itemName] then
-                        PickupContainerItem(bag, slot)
-                        if CursorHasItem() then
-                            DeleteCursorItem()
-                            -- TODO: Rename
-                            Util:Announce(itemLink .. L["SkinAnnounce2"])
-                        end
+        Util:ScanBags(function(bag, slot, itemLink)
+            local itemName
+            if itemLink then
+                itemName = select(1, GetItemInfo(itemLink))
+                if itemName and tItemsToDelete[itemName] then
+                    PickupContainerItem(bag, slot)
+                    if CursorHasItem() then
+                        DeleteCursorItem()
+                        -- TODO: Rename
+                        Util:Announce(itemLink .. L["SkinAnnounce2"])
                     end
                 end
             end
-        end
+        end, true)
         tItemsToDelete = {}
     end
 end
@@ -672,7 +669,7 @@ local function SellFilters()
                     (triggerType == 'all' and conditionsMet == #filter.conditions) then
                     local _, _, locked, _, _, lootable, _, _ = GetContainerItemInfo(bag, slot)
                     if not locked and not lootable then
-                        -- UseContainerItem(bag, slot)
+                        UseContainerItem(bag, slot)
                         Util:Debug('Sold '..item.link)
                     end
                 end
@@ -1275,6 +1272,7 @@ function HotLoot:ChatCommand(input)
             printStr = '%s was not caught. Reason: %s'
             Util:Print(printStr:format(loot.link, reason))
         end
+    elseif string.find(input, '^sellFilter%s') then
     else
         OpenOptionsWindow()
         -- print(input.." | trim: ".. input:trim())

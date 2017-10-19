@@ -268,9 +268,9 @@ local defaults = {
             b = 1.0,
             a = 1.0
         },
-        toggleShowTSMValue    = false,
+        toggleTextTSMValue    = false,
         toggleShowValuePrefix = false,
-        inputValueTSMSource   = 'DBMinBuyout',
+        inputTextTSMSource   = 'DBMinBuyout',
         rangeLine2TextXOffset = 0,
         rangeLine2TextYOffset = 0,
 
@@ -1821,7 +1821,7 @@ optionsTable = {
                                     type = 'description',
                                     order = 2,
                                 },
-                                toggleShowTSMValue = {
+                                toggleTextTSMValue = {
                                     name = L['toggleShowTSMValueName'],
                                     desc = L['toggleShowTSMValueDesc'],
                                     type = 'toggle',
@@ -1834,7 +1834,7 @@ optionsTable = {
                                     type = 'toggle',
                                     order = 6
                                 },
-                                inputValueTSMSource = {
+                                inputTextTSMSource = {
                                     name = L['inputValueTSMSourceName'],
                                     desc = L['inputValueTSMSourceDesc'],
                                     type = 'input',
@@ -1958,15 +1958,13 @@ optionsTable = {
                                     type = 'description',
                                     order = 2,
                                 },
-                                toggleUseTSMValue = {
+                                toggleFilterTSMValue = {
                                     name = 'Use TSM Value',
                                     desc = 'When looking at an items value use TSM as the source.',
                                     type = 'toggle',
                                     order = 4
                                 },
-                                -- FIXME: This is too much like the other tsm option name so make it something diff... prob the ones above too!
-                                -- Dont forget to change it in core.lua too!
-                                inputTSMValueSource = {
+                                inputFilterTSMSource = {
                                     name = L['inputValueTSMSourceName'],
                                     desc = L['inputValueTSMSourceDesc'],
                                     type = 'input',
@@ -2128,6 +2126,44 @@ optionsTable = {
                         }
                     }
                 },
+                groupSellFilterOptions = {
+                    name = 'Sell Filter Options',
+                    type = 'group',
+                    order = 6,
+                    args = {
+                        headerValue = {
+                            name = 'Value',
+                            type = 'header',
+                            order = 2
+                        },
+                        -- TODO: Localize
+                        groupTSMSource = {
+                            name = 'Tradeskill Master',
+                            type = 'group',
+                            order = 6,
+                            inline = true,
+                            args = {
+                                descTSMSource = {
+                                    name = Util:ColorText(L['inputValueTSMSourceDescNote']:format(Util:ColorText('/tsm source', 'success')..Util:GetColorString('info')), 'info'),
+                                    type = 'description',
+                                    order = 2,
+                                },
+                                toggleSellFilterTSMValue = {
+                                    name = 'Use TSM Value',
+                                    desc = 'When looking at an items value use TSM as the source.',
+                                    type = 'toggle',
+                                    order = 4
+                                },
+                                inputSellFilterTSMSource = {
+                                    name = L['inputValueTSMSourceName'],
+                                    desc = L['inputValueTSMSourceDesc'],
+                                    type = 'input',
+                                    order = 6
+                                }
+                            }
+                        },
+                    }
+                }
             }
         },
         groupLootFrame = {

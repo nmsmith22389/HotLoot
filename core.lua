@@ -409,19 +409,23 @@ local function CheckUntyped(type, itemLink)
     end
 end
 
-local function GetItemPrice(loot)
-    local value = loot.value
+local function GetItemPrice(item, optionEnable, optionSource, optionUseQuant)
+    -- NOTE: The item table must contain value, link, and quant
+    -- optionEnable   = 'toggleFilterTSMValue'
+    -- optionSource   = 'inputFilterTSMSource'
+    -- optionUseQuant = 'toggleUseQuantValue'
+    local value = item.value
 
-    if Options:Get('toggleUseTSMValue') and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
+    if optionEnable and optionSource and Options:Get(optionEnable) and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
         local tsmSources = _G.TSMAPI:GetPriceSources()
-        local tsmValueSource = Options:Get('inputTSMValueSource')
+        local tsmValueSource = Options:Get(optionSource)
         local priceSource = (tsmSources[tsmValueSource]) and tsmValueSource or 'DBMarket'
-        local tsmPrice = TSMAPI:GetItemValue(_G.TSMAPI.Item:ToItemString(itemLink), priceSource)
+        local tsmPrice = TSMAPI:GetItemValue(_G.TSMAPI.Item:ToItemString(item.link), priceSource)
         value = tsmPrice or value
     end
 
-    if Options:Get('toggleUseQuantValue') and itemQuantity ~= nil then
-        value = itemQuantity * value
+    if Options:Get(optionUseQuant) and item.quantity ~= nil then
+        value = item.quantity * value
     end
     return value
 end
@@ -494,7 +498,7 @@ local function FilterSlot(loot)
                         elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE and loot.value then
                             Util:Debug('Item value')
                             --> Item Value
-                            local itemValue = GetItemPrice(loot)
+                            local itemValue = GetItemPrice(loot, 'toggleFilterTSMValue', 'inputFilterTSMSource', 'toggleUseQuantValue')
 
                             if condition.value == 'equalTo' then
                                 if condition.subvalue == itemValue then
@@ -605,7 +609,7 @@ local function SellFilters()
                         end
                     elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE and item.value then
                         --> Item Value
-                        local itemValue = GetItemPrice(item)
+                        local itemValue = GetItemPrice(item, 'toggleSellFilterTSMValue', 'inputSellFilterTSMSource')
 
                         if condition.value == 'equalTo' then
                             if condition.subvalue == itemValue then
@@ -685,32 +689,31 @@ end
 -- ─── NEW LOOT ICON FUNCTIONS ────────────────────────────────────────────────────
 --
 
-local function GetItemValueText(itemLink, useTSM)
-    local itemValue
-    local prefixText = ''
+-- FIXME: Figure out why sometimes as of 7.2.5 it gets nil as the value
+local function GetItemValueText(item)
+    item.value = item.value or select(11, GetItemInfo(item.link))
 
-    -- FIXME: Figure out why sometimes as of 7.2.5 it gets nil as the value
-    if useTSM and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
+    local prefixText = ''
+    local itemValue = GetItemPrice(item, 'toggleTextTSMValue', 'inputTextTSMSource')
+
+    if Options:Get('toggleTextTSMValue') then
         local tsmSources = TSMAPI:GetPriceSources()
-        local priceSource = (tsmSources[Options:Get('inputValueTSMSource')]) and Options:Get('inputValueTSMSource') or 'DBMarket'
-        prefixText = tsmSources[priceSource]
+        prefixText = tsmSources[Options:Get('inputTextTSMSource')] or tsmSources['DBMarket']
 
         if prefixText:len() > 20 then
-           prefixText = prefixText:match('^%a+%s%-%s([%w%s]+)') or priceSource
-        end
-
-        itemValue = TSMAPI:GetItemValue(_G.TSMAPI.Item:ToItemString(itemLink), priceSource)
-        if not itemValue then
-            return GetItemValueText(itemLink, false)
-        end
+            prefixText = prefixText:match('^%a+%s%-%s([%w%s]+)')
+         end
     else
-        itemValue = select(11, GetItemInfo(itemLink))
         -- TODO: Localize
         prefixText = 'Vendor'
     end
 
-    prefixText = (prefixText ~= '' and Options:Get('toggleShowValuePrefix')) and prefixText..': ' or ''
-    return prefixText..Util:FormatMoney(itemValue, 'SMART', true)
+    if not itemValue then
+        return Util:FormatMoney(item.value, 'SMART', true)
+    else
+        prefixText = (prefixText ~= '' and Options:Get('toggleShowValuePrefix')) and prefixText..': ' or ''
+        return prefixText..Util:FormatMoney(itemValue, 'SMART', true)
+    end
 end
 
 local function GetSmartInfoText(loot)
@@ -909,7 +912,7 @@ local function SetLoot(frame, loot)
 
         if Options:Get('toggleShowSellPrice') and loot.quantity > 0 and loot.slotType == HL_LOOT_SLOT_TYPE.ITEM then
 
-            frame.value:SetText(GetItemValueText(loot.link, Options:Get('toggleShowTSMValue')))
+            frame.value:SetText(GetItemValueText(loot))
 
             -- frame.value:ClearAllPoints()
             --[[if theme.text.value.top then

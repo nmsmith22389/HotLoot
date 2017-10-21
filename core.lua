@@ -647,7 +647,7 @@ local function SellFilters()
                                 conditionsMet = conditionsMet + 1
                             end
                         end
-                    elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL and item.ilvl and Util:IsEquippableOrRelic(loot.link) then
+                    elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL and item.ilvl and Util:IsEquippableOrRelic(item.link) then
                         --> Item Level
                         if condition.value == 'equalTo' then
                             if tonumber(condition.subvalue) == item.ilvl then

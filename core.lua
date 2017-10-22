@@ -427,6 +427,89 @@ local function GetItemPrice(item, optionEnable, optionSource, optionUseQuant)
     return value
 end
 
+local function RunConditions(filters, item, tsmToggleOpt, tsmSourceOpt, useQuantValue)
+    for filterName, filter in pairs(Options:Get(filters)) do
+        if filter.enabled then
+            local conditionsMet = 0
+            for num, condition in ipairs(filter.conditions) do
+                if tonumber(condition.type) == HL_FILTER_TYPE.TYPE and item.class then
+                    --> Item Type
+                    if item.class == tonumber(condition.value) then
+                        if tonumber(condition.subvalue) == item.subClass or condition.subvalue == 'NONE' then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    end
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE and item.value then
+                    --> Item Value
+                    local itemValue = GetItemPrice(item, tsmToggleOpt, tsmSourceOpt, useQuantValue)
+
+                    if condition.value == 'equalTo' then
+                        if condition.subvalue == itemValue then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'greaterThan' then
+                        if itemValue > condition.subvalue then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'lessThan' then
+                        if itemValue < condition.subvalue then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    end
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.QUALITY and item.quality then
+                    --> Item Quality
+                    if condition.value == 'equalTo' then
+                        if tonumber(condition.subvalue) == item.quality then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'greaterThan' then
+                        if item.quality > tonumber(condition.subvalue) then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'lessThan' then
+                        if item.quality < tonumber(condition.subvalue) then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    end
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.NAME and item.item then
+                    --> Item Name
+                    if condition.value == 'contains' then
+                        if item.item:match(condition.subvalue) then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'matches' then
+                        if item.item:match(condition.subvalue) == item.item then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    end
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL and item.ilvl and Util:IsEquippableOrRelic(item.link) then
+                    --> Item Level
+                    if condition.value == 'equalTo' then
+                        if tonumber(condition.subvalue) == item.ilvl then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'greaterThan' then
+                        if item.ilvl > tonumber(condition.subvalue) then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'lessThan' then
+                        if item.ilvl < tonumber(condition.subvalue) then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    end
+                end
+            end
+
+            if (filter.trigger == 'any' and conditionsMet >= 1) or
+                (filter.trigger == 'all' and conditionsMet == #filter.conditions) then
+                return true, filterName
+            end
+        end
+    end
+
+    return false
+end
+
 -- NOTE: Returns 2 vars...
 --      1: result [boolean]
 --      2: filter caught in / reason not caught [string]
@@ -452,6 +535,19 @@ local function FilterSlot(loot)
         local _, _, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice, itemClass, itemSubClass = GetItemInfo(loot.link)
         loot.value = itemSellPrice
 
+        local item = {
+            item = loot.item,
+            link = loot.link,
+            slotType = loot.slotType,
+            value = loot.value,
+            quantity = loot.quantity,
+            quality = loot.quality,
+            texture = loot.texture,
+            ilvl = itemLevel,
+            class = itemClass,
+            subClass = itemSubClass
+        }
+
         if (HasRoom(1) or CanStack(loot.item, itemStackCount, loot.quantity)) then
 
             -- TODO: Normalize these so that the check order is (pref, type, subtype, other) (there may be special cases)
@@ -475,96 +571,9 @@ local function FilterSlot(loot)
             end
 
             --> Custom Filters
-            for filterName, filter in pairs(Options:Get('tableFilters')) do
-                Util:Debug('Running filter '..filterName)
-                if filter.enabled then
-                    local triggerType = filter.trigger
-                    local conditionsMet = 0
-                    for num, condition in ipairs(filter.conditions) do
-                        if tonumber(condition.type) == HL_FILTER_TYPE.TYPE and itemClass then
-                            Util:Debug('Item Type')
-                            --> Item Type
-                            if itemClass == tonumber(condition.value) then
-                                Util:Debug('Item Class Met: '..GetItemClassInfo(itemClass))
-                                if (tonumber(condition.subvalue) == itemSubClass or condition.subvalue == 'NONE') then
-                                    Util:Debug('Item SubClass Met: '..GetItemSubClassInfo(itemClass, itemSubClass))
-                                    conditionsMet = conditionsMet + 1
-                                    Util:Debug('Conditions Met: '..conditionsMet)
-                                end
-                            end
-                        elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE and loot.value then
-                            Util:Debug('Item value')
-                            --> Item Value
-                            local itemValue = GetItemPrice(loot, 'toggleFilterTSMValue', 'inputFilterTSMSource', 'toggleUseQuantValue')
+            local filterTriggered, filterName = RunConditions('tableFilters', item, 'toggleFilterTSMValue', 'inputFilterTSMSource', 'toggleUseQuantValue')
 
-                            if condition.value == 'equalTo' then
-                                if condition.subvalue == itemValue then
-                                    conditionsMet = conditionsMet + 1
-                                end
-                            elseif condition.value == 'greaterThan' then
-                                if itemValue > condition.subvalue then
-                                    conditionsMet = conditionsMet + 1
-                                end
-                            elseif condition.value == 'lessThan' then
-                                if itemValue < condition.subvalue then
-                                    conditionsMet = conditionsMet + 1
-                                end
-                            end
-                        elseif tonumber(condition.type) == HL_FILTER_TYPE.QUALITY and loot.quality then
-                            Util:Debug('Item quality')
-                            --> Item Quality
-                            if condition.value == 'equalTo' then
-                                if tonumber(condition.subvalue) == loot.quality then
-                                    conditionsMet = conditionsMet + 1
-                                end
-                            elseif condition.value == 'greaterThan' then
-                                if loot.quality > tonumber(condition.subvalue) then
-                                    conditionsMet = conditionsMet + 1
-                                end
-                            elseif condition.value == 'lessThan' then
-                                if loot.quality < tonumber(condition.subvalue) then
-                                    conditionsMet = conditionsMet + 1
-                                end
-                            end
-                        elseif tonumber(condition.type) == HL_FILTER_TYPE.NAME and loot.item then
-                            Util:Debug('Item name')
-                            --> Item Name
-                            if condition.value == 'contains' then
-                                if loot.item:match(condition.subvalue) then
-                                    conditionsMet = conditionsMet + 1
-                                end
-                            elseif condition.value == 'matches' then
-                                if loot.item:match(condition.subvalue) == loot.item then
-                                    conditionsMet = conditionsMet + 1
-                                end
-                            end
-                        elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL and itemLevel and Util:IsEquippableOrRelic(loot.link) then
-                            Util:Debug('Item level')
-                            --> Item Level
-                            if condition.value == 'equalTo' then
-                                if tonumber(condition.subvalue) == itemLevel then
-                                    conditionsMet = conditionsMet + 1
-                                end
-                            elseif condition.value == 'greaterThan' then
-                                if itemLevel > tonumber(condition.subvalue) then
-                                    conditionsMet = conditionsMet + 1
-                                end
-                            elseif condition.value == 'lessThan' then
-                                if itemLevel < tonumber(condition.subvalue) then
-                                    conditionsMet = conditionsMet + 1
-                                end
-                            end
-                        end
-                    end
-
-                    if (triggerType == 'any' and conditionsMet >= 1) or
-                        (triggerType == 'all' and conditionsMet == #filter.conditions) then
-                        return true, 'Filter: '..filterName
-                    end
-                end
-            end
-
-            return false, HL_LOOT_REASON.NOT_FOUND
+            return filterTriggered, filterTriggered and filterName or HL_LOOT_REASON.NOT_FOUND
         else
             Util:Announce(L["BagsFull"])
             Util:Debug(ERR_INV_FULL)
@@ -584,95 +593,17 @@ end
 --
 
 local function SellFilters()
-    local sellFunc = function(bag, slot, itemID)
-        if not itemID then return false end
+    local sellFunc = function(bag, slot, itemLink)
+        if not itemLink then return false end
         local item = {}
-        item.id = itemID
-        -- TODO: Make sure these are right!
-        item.item, item.link, item.quality, item.ilvl, item.minLvl, _, _, _, _, _, item.value, item.class, item.subClass = GetItemInfo(item.id)
+        item.link = itemLink
+        item.item, _, item.quality, item.ilvl, item.minLvl, _, _, _, _, _, item.value, item.class, item.subClass = GetItemInfo(item.link)
 
-        --> Custom Filters
-        for filterName, filter in pairs(Options:Get('tableSellFilters')) do
-            if filter.enabled then
-                local triggerType = filter.trigger
-                local conditionsMet = 0
-                for num, condition in ipairs(filter.conditions) do
-                    if tonumber(condition.type) == HL_FILTER_TYPE.TYPE and item.class then
-                        --> Item Type
-                        if item.class == tonumber(condition.value) then
-                            if tonumber(condition.subvalue) == item.subClass or condition.subvalue == 'NONE' then
-                                conditionsMet = conditionsMet + 1
-                            end
-                        end
-                    elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE and item.value then
-                        --> Item Value
-                        local itemValue = GetItemPrice(item, 'toggleSellFilterTSMValue', 'inputSellFilterTSMSource')
+        local filterTriggered, filterName = RunConditions('tableSellFilters', item, 'toggleSellFilterTSMValue', 'inputSellFilterTSMSource')
+        local _, itemCount, locked, _, _, lootable, _, _ = GetContainerItemInfo(bag, slot)
 
-                        if condition.value == 'equalTo' then
-                            if condition.subvalue == itemValue then
-                                conditionsMet = conditionsMet + 1
-                            end
-                        elseif condition.value == 'greaterThan' then
-                            if itemValue > condition.subvalue then
-                                conditionsMet = conditionsMet + 1
-                            end
-                        elseif condition.value == 'lessThan' then
-                            if itemValue < condition.subvalue then
-                                conditionsMet = conditionsMet + 1
-                            end
-                        end
-                    elseif tonumber(condition.type) == HL_FILTER_TYPE.QUALITY and item.quality then
-                        --> Item Quality
-                        if condition.value == 'equalTo' then
-                            if tonumber(condition.subvalue) == item.quality then
-                                conditionsMet = conditionsMet + 1
-                            end
-                        elseif condition.value == 'greaterThan' then
-                            if item.quality > tonumber(condition.subvalue) then
-                                conditionsMet = conditionsMet + 1
-                            end
-                        elseif condition.value == 'lessThan' then
-                            if item.quality < tonumber(condition.subvalue) then
-                                conditionsMet = conditionsMet + 1
-                            end
-                        end
-                    elseif tonumber(condition.type) == HL_FILTER_TYPE.NAME and item.item then
-                        --> Item Name
-                        if condition.value == 'contains' then
-                            if item.item:match(condition.subvalue) then
-                                conditionsMet = conditionsMet + 1
-                            end
-                        elseif condition.value == 'matches' then
-                            if item.item:match(condition.subvalue) == item.item then
-                                conditionsMet = conditionsMet + 1
-                            end
-                        end
-                    elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL and item.ilvl and Util:IsEquippableOrRelic(item.link) then
-                        --> Item Level
-                        if condition.value == 'equalTo' then
-                            if tonumber(condition.subvalue) == item.ilvl then
-                                conditionsMet = conditionsMet + 1
-                            end
-                        elseif condition.value == 'greaterThan' then
-                            if item.ilvl > tonumber(condition.subvalue) then
-                                conditionsMet = conditionsMet + 1
-                            end
-                        elseif condition.value == 'lessThan' then
-                            if item.ilvl < tonumber(condition.subvalue) then
-                                conditionsMet = conditionsMet + 1
-                            end
-                        end
-                    end
-                end
-
-                if (triggerType == 'any' and conditionsMet >= 1) or
-                    (triggerType == 'all' and conditionsMet == #filter.conditions) then
-                    local _, _, locked, _, _, lootable, _, _ = GetContainerItemInfo(bag, slot)
-                    if not locked and not lootable then
-                        UseContainerItem(bag, slot)
-                        Util:Debug('Sold '..item.link)
-                    end
-                end
+        if filterTriggered and not locked and not lootable then
+            UseContainerItem(bag, slot)
             end
         end
     end

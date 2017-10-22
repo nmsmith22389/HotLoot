@@ -1,6 +1,6 @@
 local L = LibStub("AceLocale-3.0"):NewLocale("HotLoot", "enUS", true)
 
-L["AllGreysSold"] = "Sold %d Poor items for a total of %s."
+L["TotalItemsSold"] = "Sold %d items for a total of %s."
 L["AnchorReset"] = "Loot Monitor position reset."
 L["AnnounceItemExcluded"] = "%s has been excluded from looting."
 L["AnnounceListAdd"] = "%s has been added to the %s."
@@ -51,7 +51,7 @@ L["genSettings"] = "Settings"
 L["genText"] = "Text"
 L["genTexture"] = "Texture"
 L["genTransparency"] = "Transparency"
-L["GreyItemSold"] = "Sold %s x%s for %s"
+L["ItemSold"] = "Sold %s for %s."
 L["groupAnnounceEvents"] = "Announce Events"
 L["groupCloseLootWindow"] = "Autoclose Loot Window"
 L["groupCommonDrops"] = "Common Drops"

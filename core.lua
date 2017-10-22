@@ -593,6 +593,8 @@ end
 --
 
 local function SellFilters()
+    local totalPrice = 0
+    local totalCount = 0
     local sellFunc = function(bag, slot, itemLink)
         if not itemLink then return false end
         local item = {}
@@ -604,13 +606,19 @@ local function SellFilters()
 
         if filterTriggered and not locked and not lootable then
             UseContainerItem(bag, slot)
+            totalPrice = totalPrice + item.value * itemCount
+            totalCount = totalCount + itemCount
+            if Options:Get('toggleSellFiltersPrintEachItem') then
+                Util:Announce(L['ItemSold']:format(item.link, Util:FormatMoney(item.value, 'SMART', true)))
             end
         end
     end
     Util:ScanBags(sellFunc, true)
 
     -- TODO: Calc price of sold items (sperate by filter? say which sold what?)
-    -- NOTE: Old 'sell poor' func used L["GreyItemSold"] and L["AllGreysSold"]
+    if totalPrice > 0 and Options:Get('toggleSellFiltersPrintTotal') then
+        Util:Announce(L["TotalItemsSold"]:format(totalCount, Util:FormatMoney(totalPrice, 'SMART', true)))
+    end
 end
 
 --

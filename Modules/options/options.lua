@@ -309,6 +309,16 @@ local defaults = {
         toggleSentinaxBeaconFilter  = true,
 
         --
+        -- ─── SELL FILTERS ────────────────────────────────────────────────
+        --
+
+        --> Filter Options
+        toggleSellFiltersPrintEachItem = false,
+        toggleSellFiltersPrintTotal = true,
+        toggleSellFilterTSMValue = false,
+        inputSellFilterTSMSource = 'DBMinBuyout',
+
+        --
         -- ─── QUALITY FILTERS ─────────────────────────────────────────────
         --
 
@@ -2131,16 +2141,33 @@ optionsTable = {
                     type = 'group',
                     order = 6,
                     args = {
-                        headerValue = {
-                            name = 'Value',
+                        headerSFGeneral = {
+                            name = L['genGeneral'],
                             type = 'header',
                             order = 2
+                        },
+                        toggleSellFiltersPrintEachItem = {
+                            name = 'Announce Each Item Sold',
+                            desc = 'Announces to chat the name and value of each item sold.',
+                            type = 'toggle',
+                            order = 4
+                        },
+                        toggleSellFiltersPrintTotal = {
+                            name = 'Announce Items Sold Total',
+                            desc = 'Announces to chat the total of all items sold.',
+                            type = 'toggle',
+                            order = 6
+                        },
+                        headerSFValue = {
+                            name = 'Value',
+                            type = 'header',
+                            order = 8
                         },
                         -- TODO: Localize
                         groupTSMSource = {
                             name = 'Tradeskill Master',
                             type = 'group',
-                            order = 6,
+                            order = 10,
                             inline = true,
                             args = {
                                 descTSMSource = {

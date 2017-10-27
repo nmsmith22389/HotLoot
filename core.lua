@@ -116,6 +116,7 @@ function HotLoot:OnEnable()
     -- self:RegisterEvent("LOOT_CLOSED")
     self:RegisterEvent("BAG_UPDATE")
     self:RegisterEvent("MERCHANT_SHOW")
+    self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 
     if not Options:Get('firstRun') then
         -- Print an option here

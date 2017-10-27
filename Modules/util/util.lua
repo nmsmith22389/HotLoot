@@ -170,6 +170,34 @@ function Util:GetItemID(itemString)
     return tonumber(itemId)
 end
 
+
+-- Add the requested item to the queue.
+-- If the item is in the local cache, it will be available immediately.
+-- If the item is not in the local cache, wait in one second increments and try again.
+-- Call this in place of GetItemInfo(item).
+-- This function does not return any data.
+-- Idea from: https://wow.gamepedia.com/GetItemInfoDelayed
+function Util:GetItemInfoDelayed(item, callback)
+   self.itemInfoQueue = self.itemInfoQueue or {}
+
+    local itemID = GetItemInfoInstant(item)
+    if itemID then
+       local itemInfo = {GetItemInfo(itemID)}
+       if itemInfo and itemInfo[1] then
+          callback(itemID, unpack(itemInfo))
+       else
+          self.itemInfoQueue[itemID] = callback
+       end
+    end
+end
+
+function HotLoot:GET_ITEM_INFO_RECEIVED(event, id)
+    if Util.itemInfoQueue and Util.itemInfoQueue[id] then
+        Util.itemInfoQueue[id](id, GetItemInfo(id))
+        Util.itemInfoQueue[id] = nil
+    end
+end
+
 -- RealUI Support
 function Util:IsRealUILootOn()
     if IsAddOnLoaded('nibRealUI') then

@@ -64,7 +64,14 @@ _G.HL_FILTER_TYPE = {
     VALUE = 1,
     QUALITY = 2,
     NAME = 3,
-    ILVL = 4
+    ILVL = 4,
+    BIND = 5
+}
+
+_G.HL_BIND_TYPE = {
+    BOA = 0,
+    BOP = 1,
+    BOE = 2
 }
 
 -- @usage

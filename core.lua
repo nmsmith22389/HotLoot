@@ -497,6 +497,21 @@ local function RunConditions(filters, item, tsmToggleOpt, tsmSourceOpt, useQuant
                             conditionsMet = conditionsMet + 1
                         end
                     end
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.BIND then
+                    --> Bind Type
+                    local bindType = Util:GetBindType(item.link)
+
+                    if bindType then
+                        if condition.value == 'is' then
+                            if tonumber(condition.subvalue) == bindType then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        elseif condition.value == 'isNot' then
+                            if tonumber(condition.subvalue) ~= bindType then
+                                conditionsMet = conditionsMet + 1
+                            end
+                        end
+                    end
                 end
             end
 

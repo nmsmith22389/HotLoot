@@ -65,6 +65,53 @@ function Util:DebugOption(option, value, old)
     end
 end
 
+function Util:GetBindType(arg1, arg2)
+    if not self.scanTip then
+        local scanTip = CreateFrame("GameTooltip", "HLScanTooltip")
+        for i = 1, 5 do
+            local L = scanTip:CreateFontString(nil, "OVERLAY", "GameFontNormal")
+            scanTip:AddFontStrings(L, scanTip:CreateFontString(nil, "OVERLAY", "GameFontNormal"))
+            scanTip[i] = L
+        end
+        self.scanTip = scanTip
+    end
+
+    local textForBind = {
+        [ITEM_ACCOUNTBOUND]        = HL_BIND_TYPE.BOA,
+        [ITEM_BNETACCOUNTBOUND]    = HL_BIND_TYPE.BOA,
+        [ITEM_BIND_TO_ACCOUNT]     = HL_BIND_TYPE.BOA,
+        [ITEM_BIND_TO_BNETACCOUNT] = HL_BIND_TYPE.BOA,
+        [ITEM_BIND_ON_EQUIP]       = HL_BIND_TYPE.BOE,
+        [ITEM_BIND_ON_USE]         = HL_BIND_TYPE.BOE,
+        [ITEM_SOULBOUND]           = HL_BIND_TYPE.BOP,
+        [ITEM_BIND_ON_PICKUP]      = HL_BIND_TYPE.BOP,
+    }
+    local link, setTooltip
+	if arg1 == "player" then
+		link = GetInventoryItemLink(arg1, arg2)
+		setTooltip = self.scanTip.SetInventoryItem
+	elseif arg2 then
+		link = GetContainerItemLink(arg1, arg2)
+		setTooltip = self.scanTip.SetBagItem
+	else
+		link = arg1
+		setTooltip = self.scanTip.SetHyperlink
+	end
+	if not link then
+		return
+	end
+
+	self.scanTip:SetOwner(WorldFrame, "ANCHOR_NONE")
+	setTooltip(self.scanTip, arg1, arg2)
+	for i = 1, 5 do
+		local text = self.scanTip[i]:GetText()
+
+        if textForBind[text] then
+            return textForBind[text]
+        end
+	end
+end
+
 function Util:ScanBags(proc, getItem)
     if type(proc) ~= 'function' then return false end
 

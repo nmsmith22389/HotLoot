@@ -368,7 +368,8 @@ local tableFilterTypes = {
     [tostring(HL_FILTER_TYPE.VALUE)] = 'Value',
     [tostring(HL_FILTER_TYPE.QUALITY)] = 'Quality',
     [tostring(HL_FILTER_TYPE.NAME)] = 'Name',
-    [tostring(HL_FILTER_TYPE.ILVL)] = 'Item Level'
+    [tostring(HL_FILTER_TYPE.ILVL)] = 'Item Level',
+    [tostring(HL_FILTER_TYPE.BIND)] = 'Bind Type'
 }
 
 local tableComparisons = {
@@ -382,6 +383,11 @@ local tableStringComparisons = {
     contains = 'Contains'
 }
 
+local tableBooleanComparisons = {
+    is = 'Is',
+    isNot = 'Is Not'
+}
+
 local tableQualities = {
     ['0'] = ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC..'|r',
     ['1'] = ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC..'|r',
@@ -391,6 +397,12 @@ local tableQualities = {
     ['5'] = ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC..'|r',
     ['6'] = ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC..'|r',
     ['7'] = ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r',
+}
+
+local tableBindTypes = {
+    [tostring(HL_BIND_TYPE.BOA)] = ITEM_BIND_TO_ACCOUNT,
+    [tostring(HL_BIND_TYPE.BOP)] = ITEM_BIND_ON_PICKUP,
+    [tostring(HL_BIND_TYPE.BOE)] = ITEM_BIND_ON_EQUIP
 }
 
 local function GetItemTypeTable()
@@ -659,6 +671,33 @@ local function GetConditionArgs(num, condition, isSellFilter)
             end,
             get = function(info)
                 return tostring(condition.subvalue)
+            end
+        }
+    elseif condition.type == tostring(HL_FILTER_TYPE.BIND) then
+        args[sellOrNot('selectConditionValue%s')..num] = {
+            name = 'Comparison',
+            type = 'select',
+            values = tableBooleanComparisons,
+            width = 'double',
+            order = 2,
+            set = function(info, value)
+                condition.value = value
+            end,
+            get = function(info)
+                return condition.value
+            end
+        }
+        args[sellOrNot('selectConditionSubValue%s')..num] = {
+            name = 'Bind Type',
+            type = 'select',
+            values = tableBindTypes,
+            width = 'double',
+            order = 3,
+            set = function(info, value)
+                condition.subvalue = value
+            end,
+            get = function(info)
+                return condition.subvalue
             end
         }
     end

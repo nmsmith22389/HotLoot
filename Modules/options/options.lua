@@ -908,52 +908,27 @@ function Options:SetShowLootMonitorAnchor(info, value)
 end
 
 --
--- ─── INCLUDE LIST ───────────────────────────────────────────────────────────────
+-- ─── LIST FUNCTIONS ─────────────────────────────────────────────────────────────
 --
 
--- TODO: Change to item id
-function Options:AddToIncludeList(info, value)
-    if type(value) == 'string' and value ~= nil then
-        local itemName = GetItemInfo(value)
-        if itemName then
-            self.db.profile.tableIncludeList[itemName] = itemName
-            Util:Announce(string.format(L['AnnounceListAdd'], Util:ColorText(itemName, 'info'), L['headerIncludeList']))
+function Options:AddToList(list, value, listName)
+    if self.db.profile[list] and type(value) == 'string' and value ~= '' then
+        listName = listName or 'List'
+        -- local listName = name or (list:match('^table(%w*)List$') or '')..' List'
+        local itemID = GetItemInfoInstant(value)
+        if itemID then
+            Options.db.profile[list][itemID] = 'Loading...'
+            Util:GetItemInfoDelayed(itemID,
+                function(returnedID, ...)
+                    local itemName, itemLink = ...
+                    Options.db.profile[list][returnedID] = itemName
+                    Util:Announce(string.format(L['AnnounceListAdd'], itemLink, listName))
+                end
+            )
         else
-            Util:Print(string.format(L['ErrorListItemNotFound'], Util:ColorText(value, 'info'), L['headerIncludeList']))
+            Util:Print(string.format(L['ErrorListItemNotFound'], Util:ColorText(value, 'info'), listName))
         end
     end
-end
-
-function Options:RemoveFromIncludeList()
-    self.db.profile.tableIncludeList[self.db.profile.selectIncludeList] = nil
-end
-
-function Options:GetIncludeList()
-    return self.db.profile.tableIncludeList
-end
-
---
--- ─── EXCLUDE LIST ───────────────────────────────────────────────────────────────
---
-
-function Options:AddToExcludeList(info, value)
-    if type(value) == 'string' and value ~= nil then
-        local itemName = GetItemInfo(value)
-        if itemName then
-            self.db.profile.tableExcludeList[itemName] = itemName
-            Util:Announce(string.format(L['AnnounceListAdd'], Util:ColorText(itemName, 'info'), L['headerExcludeList']))
-        else
-            Util:Print(string.format(L['ErrorListItemNotFound'], tostring(value), L['headerExcludeList']))
-        end
-    end
-end
-
-function Options:RemoveFromExcludeList()
-    self.db.profile.tableExcludeList[self.db.profile.selectExcludeList] = nil
-end
-
-function Options:GetExcludeList()
-    return self.db.profile.tableExcludeList
 end
 
 --
@@ -1252,7 +1227,9 @@ optionsTable = {
                             desc = L['inputListAddDesc'],
                             type = 'input',
                             order = 10,
-                            set = 'AddToFarmingList',
+                            set = function(info, value)
+                                Options:AddToList('tableFarmingList', value, 'Farming List')
+                            end,
                             get = function(info)
                                 return ''
                             end
@@ -2046,7 +2023,9 @@ optionsTable = {
                 selectIncludeList = {
                     name = L['selectListName'],
                     type = 'select',
-                    values = 'GetIncludeList',
+                    values = function()
+                        return Options.db.profile.tableIncludeList
+                    end,
                     order = 3,
                 },
                 inputIncludeListAdd = {
@@ -2054,7 +2033,9 @@ optionsTable = {
                     desc = L['inputListAddDesc'],
                     type = 'input',
                     order = 4,
-                    set = 'AddToIncludeList',
+                    set = function(info, value)
+                        Options:AddToList('tableIncludeList', value, 'Include List')
+                    end,
                     get = function(info)
                         return ''
                     end
@@ -2063,7 +2044,9 @@ optionsTable = {
                     name = L['buttonRemoveFromListName'],
                     type = 'execute',
                     order = 5,
-                    func = 'RemoveFromIncludeList'
+                    func = function()
+                        Options.db.profile.tableIncludeList[Options.db.profile.selectIncludeList] = nil
+                    end
                 },
                 toggleIncludeModifierClick = {
                     name = L['toggleIncludeModifierClickName'],
@@ -2086,17 +2069,19 @@ optionsTable = {
                 selectExcludeList = {
                     name = L['selectListName'],
                     type = 'select',
-                    values = 'GetExcludeList',
+                    values = function()
+                        return Options.db.profile.tableExcludeList
+                    end,
                     order = 9,
                 },
                 inputExcludeListAdd = {
                     name = L['inputListAddName'],
                     desc = L['inputListAddDesc'],
-                    --multiline = 10,
                     type = 'input',
-                    --width = 'full',
                     order = 10,
-                    set = 'AddToExcludeList',
+                    set = function(info, value)
+                        Options:AddToList('tableExcludeList', value, 'Exclude List')
+                    end,
                     get = function(info)
                         return ''
                     end
@@ -2105,7 +2090,9 @@ optionsTable = {
                     name = L['buttonRemoveFromListName'],
                     type = 'execute',
                     order = 11,
-                    func = 'RemoveFromExcludeList'
+                    func = function()
+                        Options.db.profile.tableExcludeList[Options.db.profile.selectExcludeList] = nil
+                    end
                 },
                 toggleShowExcludeButton = {
                     name = L['toggleShowExcludeButtonName'],
@@ -2306,12 +2293,15 @@ function Options:OnInitialize()
 
     tableChatWindows = GetChatWindows()
 
-    setmetatable(self.db.profile.tableFarmingList, {
-        __index = function(t, k)
-            return rawget(t, tostring(k))
-        end,
-        __newindex = function(t, k, v)
-            rawset(t, tostring(k), v)
-        end
-    })
+    local lists = {'tableFarmingList', 'tableIncludeList', 'tableExcludeList'}
+    for _,ls in ipairs(lists) do
+        setmetatable(self.db.profile[ls], {
+            __index = function(t, k)
+                return rawget(t, tostring(k))
+            end,
+            __newindex = function(t, k, v)
+                rawset(t, tostring(k), v)
+            end
+        })
+    end
 end

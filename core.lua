@@ -745,7 +745,7 @@ local function SetLoot(frame, loot)
         end)
         frame:SetScript('OnMouseUp', function(self, button)
             if IsShiftKeyDown() and button == 'RightButton' then
-                Options:AddToExcludeList(nil, self.item)
+                Options:AddToList('tableExcludeList', self.item, 'Exclude List')
             end
         end)
     else
@@ -1186,10 +1186,10 @@ function HotLoot:ChatCommand(input)
         end
     elseif string.find(input, '^include%s') then
         local item = string.gsub(input, '^include%s', '', 1)
-        Options:AddToIncludeList(nil, item)
+        Options:AddToList('tableIncludeList', item, 'Include List')
     elseif string.find(input, '^exclude%s') then
         local item = string.gsub(input, '^exclude%s', '', 1)
-        Options:AddToExcludeList(nil, item)
+        Options:AddToList('tableExcludeList', item, 'Exclude List')
     -- TODO: Add farming filter
     elseif string.find(input, '^filter%s') then
         local itemInput = string.gsub(input, '^filter%s', '', 1)
@@ -1349,7 +1349,7 @@ function HotLoot:LOOT_SLOT_CLEARED(slot)
     local modifier = IsAltKeyDown()
     if modifier and Options:Get('toggleIncludeModifierClick') and self.lootInfo and self.lootInfo[slot] then
         local loot = self.lootInfo[slot]
-        Options:AddToIncludeList(nil, loot.item)
+        Options:AddToList('tableIncludeList', loot.item, 'Include List')
     end
 end
 

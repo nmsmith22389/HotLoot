@@ -1,6 +1,7 @@
 --
 -- ─── CONSTANTS ──────────────────────────────────────────────────────────────────
 --
+local _G = _G
 
 _G.HL_LOOT_SLOT_TYPE = {
     ITEM     = 1,
@@ -72,15 +73,15 @@ _G.HL_FILTER_TYPE = {
 -- GetItemSubClassInfo(itemClassEnum, subClassEnum)
 
 _G.HL_ITEM_QUALITY = {
-    POOR      = LE_ITEM_QUALITY_POOR,      -- 0
-    COMMON    = LE_ITEM_QUALITY_COMMON,    -- 1
-    UNCOMMON  = LE_ITEM_QUALITY_UNCOMMON,  -- 2
-    RARE      = LE_ITEM_QUALITY_RARE,      -- 3
-    EPIC      = LE_ITEM_QUALITY_EPIC,      -- 4
-    LEGENDARY = LE_ITEM_QUALITY_LEGENDARY, -- 5
-    ARTIFACT  = LE_ITEM_QUALITY_ARTIFACT,  -- 6
-    HEIRLOOM  = LE_ITEM_QUALITY_HEIRLOOM,  -- 7
-    WOW_TOKEN = LE_ITEM_QUALITY_WOW_TOKEN, -- 8
+    POOR      = _G.LE_ITEM_QUALITY_POOR,      -- 0
+    COMMON    = _G.LE_ITEM_QUALITY_COMMON,    -- 1
+    UNCOMMON  = _G.LE_ITEM_QUALITY_UNCOMMON,  -- 2
+    RARE      = _G.LE_ITEM_QUALITY_RARE,      -- 3
+    EPIC      = _G.LE_ITEM_QUALITY_EPIC,      -- 4
+    LEGENDARY = _G.LE_ITEM_QUALITY_LEGENDARY, -- 5
+    ARTIFACT  = _G.LE_ITEM_QUALITY_ARTIFACT,  -- 6
+    HEIRLOOM  = _G.LE_ITEM_QUALITY_HEIRLOOM,  -- 7
+    WOW_TOKEN = _G.LE_ITEM_QUALITY_WOW_TOKEN, -- 8
 }
 
 _G.HL_ITEM_CLASS = {
@@ -89,18 +90,18 @@ _G.HL_ITEM_CLASS = {
     WEAPON           = _G.LE_ITEM_CLASS_WEAPON,           -- 'Weapon'           NUM = 2
     GEM              = _G.LE_ITEM_CLASS_GEM,              -- 'Gem'              NUM = 3
     ARMOR            = _G.LE_ITEM_CLASS_ARMOR,            -- 'Armor'            NUM = 4
-    REAGENT          = _G.LE_ITEM_CLASS_REAGENT,          -- 'Reagent'          NUM = 5
-    PROJECTILE       = _G.LE_ITEM_CLASS_PROJECTILE,       -- 'Projectile'       NUM = 6
+    -- REAGENT          = _G.LE_ITEM_CLASS_REAGENT,          -- 'Reagent'          NUM = 5
+    -- PROJECTILE       = _G.LE_ITEM_CLASS_PROJECTILE,       -- 'Projectile'       NUM = 6
     TRADESKILL       = _G.LE_ITEM_CLASS_TRADEGOODS,       -- 'Tradeskill'       NUM = 7
     ITEM_ENHANCEMENT = _G.LE_ITEM_CLASS_ITEM_ENHANCEMENT, -- 'Item Enhancement' NUM = 8
     RECIPE           = _G.LE_ITEM_CLASS_RECIPE,           -- 'Recipe'           NUM = 9
-    QUIVER           = _G.LE_ITEM_CLASS_QUIVER,           -- 'Quiver'           NUM = 11
+    -- QUIVER           = _G.LE_ITEM_CLASS_QUIVER,           -- 'Quiver'           NUM = 11
     QUEST            = _G.LE_ITEM_CLASS_QUESTITEM,        -- 'Quest'            NUM = 12
-    KEY              = _G.LE_ITEM_CLASS_KEY,              -- 'Key'              NUM = 13
+    -- KEY              = _G.LE_ITEM_CLASS_KEY,              -- 'Key'              NUM = 13
     MISCELLANEOUS    = _G.LE_ITEM_CLASS_MISCELLANEOUS,    -- 'Miscellaneous'    NUM = 15
     GLYPH            = _G.LE_ITEM_CLASS_GLYPH,            -- 'Glyph'            NUM = 16
     BATTLE_PETS      = _G.LE_ITEM_CLASS_BATTLEPET,        -- 'Battle Pets'      NUM = 17
-    WOW_TOKEN        = _G.LE_ITEM_CLASS_WOW_TOKEN         -- 'WoW Token'        NUM = 18
+    -- WOW_TOKEN        = _G.LE_ITEM_CLASS_WOW_TOKEN         -- 'WoW Token'        NUM = 18
 }
 
 _G.HL_ITEM_SUB_CLASS = {}
@@ -132,57 +133,57 @@ _G.HL_ITEM_SUB_CLASS.CONTAINER = {
 }
 
 _G.HL_ITEM_SUB_CLASS.WEAPON = {
-    ONE_HANDED_AXES   = LE_ITEM_WEAPON_AXE1H,       -- 'One-Handed Axes'   NUM = 0
-    TWO_HANDED_AXES   = LE_ITEM_WEAPON_AXE2H,       -- 'Two-Handed Axes'   NUM = 1
-    BOWS              = LE_ITEM_WEAPON_BOWS,        -- 'Bows'              NUM = 2
-    GUNS              = LE_ITEM_WEAPON_GUNS,        -- 'Guns'              NUM = 3
-    ONE_HANDED_MACES  = LE_ITEM_WEAPON_MACE1H,      -- 'One-Handed Maces'  NUM = 4
-    TWO_HANDED_MACES  = LE_ITEM_WEAPON_MACE2H,      -- 'Two-Handed Maces'  NUM = 5
-    POLEARMS          = LE_ITEM_WEAPON_POLEARM,     -- 'Polearms'          NUM = 6
-    ONE_HANDED_SWORDS = LE_ITEM_WEAPON_SWORD1H,     -- 'One-Handed Swords' NUM = 7
-    TWO_HANDED_SWORDS = LE_ITEM_WEAPON_SWORD2H,     -- 'Two-Handed Swords' NUM = 8
-    WARGLAIVES        = LE_ITEM_WEAPON_WARGLAIVE,   -- 'Warglaives'        NUM = 9
-    STAVES            = LE_ITEM_WEAPON_STAFF,       -- 'Staves'            NUM = 10
-    BEAR_CLAWS        = LE_ITEM_WEAPON_BEARCLAW,    -- 'Bear Claws'        NUM = 11
-    CATCLAWS          = LE_ITEM_WEAPON_CATCLAW,     -- 'CatClaws'          NUM = 12
-    FIST_WEAPONS      = LE_ITEM_WEAPON_UNARMED,     -- 'Fist Weapons'      NUM = 13
-    MISCELLANEOUS     = LE_ITEM_WEAPON_GENERIC,     -- 'Miscellaneous'     NUM = 14
-    DAGGERS           = LE_ITEM_WEAPON_DAGGER,      -- 'Daggers'           NUM = 15
-    THROWN            = LE_ITEM_WEAPON_THROWN,      -- 'Thrown'            NUM = 16
-    SPEARS            = 17,                         -- 'Spears'            NUM = 17 --- NOTE: Obsolete? Missing global
-    CROSSBOWS         = LE_ITEM_WEAPON_CROSSBOW,    -- 'Crossbows'         NUM = 18
-    WANDS             = LE_ITEM_WEAPON_WAND,        -- 'Wands'             NUM = 19
-    FISHING_POLES     = LE_ITEM_WEAPON_FISHINGPOLE, -- 'Fishing Poles'     NUM = 20
+    ONE_HANDED_AXES   = _G.LE_ITEM_WEAPON_AXE1H,       -- 'One-Handed Axes'   NUM = 0
+    TWO_HANDED_AXES   = _G.LE_ITEM_WEAPON_AXE2H,       -- 'Two-Handed Axes'   NUM = 1
+    BOWS              = _G.LE_ITEM_WEAPON_BOWS,        -- 'Bows'              NUM = 2
+    GUNS              = _G.LE_ITEM_WEAPON_GUNS,        -- 'Guns'              NUM = 3
+    ONE_HANDED_MACES  = _G.LE_ITEM_WEAPON_MACE1H,      -- 'One-Handed Maces'  NUM = 4
+    TWO_HANDED_MACES  = _G.LE_ITEM_WEAPON_MACE2H,      -- 'Two-Handed Maces'  NUM = 5
+    POLEARMS          = _G.LE_ITEM_WEAPON_POLEARM,     -- 'Polearms'          NUM = 6
+    ONE_HANDED_SWORDS = _G.LE_ITEM_WEAPON_SWORD1H,     -- 'One-Handed Swords' NUM = 7
+    TWO_HANDED_SWORDS = _G.LE_ITEM_WEAPON_SWORD2H,     -- 'Two-Handed Swords' NUM = 8
+    WARGLAIVES        = _G.LE_ITEM_WEAPON_WARGLAIVE,   -- 'Warglaives'        NUM = 9
+    STAVES            = _G.LE_ITEM_WEAPON_STAFF,       -- 'Staves'            NUM = 10
+    -- BEAR_CLAWS        = _G.LE_ITEM_WEAPON_BEARCLAW,    -- 'Bear Claws'        NUM = 11
+    -- CATCLAWS          = _G.LE_ITEM_WEAPON_CATCLAW,     -- 'CatClaws'          NUM = 12
+    FIST_WEAPONS      = _G.LE_ITEM_WEAPON_UNARMED,     -- 'Fist Weapons'      NUM = 13
+    MISCELLANEOUS     = _G.LE_ITEM_WEAPON_GENERIC,     -- 'Miscellaneous'     NUM = 14
+    DAGGERS           = _G.LE_ITEM_WEAPON_DAGGER,      -- 'Daggers'           NUM = 15
+    THROWN            = _G.LE_ITEM_WEAPON_THROWN,      -- 'Thrown'            NUM = 16
+    -- SPEARS            = 17,                         -- 'Spears'            NUM = 17 --- NOTE: Obsolete? Missing global
+    CROSSBOWS         = _G.LE_ITEM_WEAPON_CROSSBOW,    -- 'Crossbows'         NUM = 18
+    WANDS             = _G.LE_ITEM_WEAPON_WAND,        -- 'Wands'             NUM = 19
+    FISHING_POLES     = _G.LE_ITEM_WEAPON_FISHINGPOLE, -- 'Fishing Poles'     NUM = 20
 }
 
 _G.HL_ITEM_SUB_CLASS.GEM = {
-    INTELLECT       = LE_ITEM_GEM_INTELLECT,      -- 'Intellect'       NUM = 0
-    AGILITY         = LE_ITEM_GEM_AGILITY,        -- 'Agility'         NUM = 1
-    STRENGTH        = LE_ITEM_GEM_STRENGTH,       -- 'Strength'        NUM = 2
-    STAMINA         = LE_ITEM_GEM_STAMINA,        -- 'Stamina'         NUM = 3
-    SPIRIT          = LE_ITEM_GEM_SPIRIT,         -- 'Spirit'          NUM = 4
-    CRITICAL_STRIKE = LE_ITEM_GEM_CRITICALSTRIKE, -- 'Critical Strike' NUM = 5
-    MASTERY         = LE_ITEM_GEM_MASTERY,        -- 'Mastery'         NUM = 6
-    HASTE           = LE_ITEM_GEM_HASTE,          -- 'Haste'           NUM = 7
-    VERSATILITY     = LE_ITEM_GEM_VERSATILITY,    -- 'Versatility'     NUM = 8
+    INTELLECT       = _G.LE_ITEM_GEM_INTELLECT,      -- 'Intellect'       NUM = 0
+    AGILITY         = _G.LE_ITEM_GEM_AGILITY,        -- 'Agility'         NUM = 1
+    STRENGTH        = _G.LE_ITEM_GEM_STRENGTH,       -- 'Strength'        NUM = 2
+    STAMINA         = _G.LE_ITEM_GEM_STAMINA,        -- 'Stamina'         NUM = 3
+    SPIRIT          = _G.LE_ITEM_GEM_SPIRIT,         -- 'Spirit'          NUM = 4
+    CRITICAL_STRIKE = _G.LE_ITEM_GEM_CRITICALSTRIKE, -- 'Critical Strike' NUM = 5
+    MASTERY         = _G.LE_ITEM_GEM_MASTERY,        -- 'Mastery'         NUM = 6
+    HASTE           = _G.LE_ITEM_GEM_HASTE,          -- 'Haste'           NUM = 7
+    VERSATILITY     = _G.LE_ITEM_GEM_VERSATILITY,    -- 'Versatility'     NUM = 8
     OTHER           = 9,                          -- 'Other'           NUM = 9 --- NOTE: No global for this?
-    MULTIPLE_STATS  = LE_ITEM_GEM_MULTIPLESTATS,  -- 'Multiple Stats'  NUM = 10
-    ARTIFACT_RELIC  = LE_ITEM_GEM_ARTIFACTRELIC,  -- 'Artifact Relic'  NUM = 11
+    MULTIPLE_STATS  = _G.LE_ITEM_GEM_MULTIPLESTATS,  -- 'Multiple Stats'  NUM = 10
+    ARTIFACT_RELIC  = _G.LE_ITEM_GEM_ARTIFACTRELIC,  -- 'Artifact Relic'  NUM = 11
 }
 
 _G.HL_ITEM_SUB_CLASS.ARMOR = {
-    MISCELLANEOUS = LE_ITEM_ARMOR_GENERIC,  -- 'Miscellaneous' NUM = 0
-    CLOTH         = LE_ITEM_ARMOR_CLOTH,    -- 'Cloth'         NUM = 1
-    LEATHER       = LE_ITEM_ARMOR_LEATHER,  -- 'Leather'       NUM = 2
-    MAIL          = LE_ITEM_ARMOR_MAIL,     -- 'Mail'          NUM = 3
-    PLATE         = LE_ITEM_ARMOR_PLATE,    -- 'Plate'         NUM = 4
-    COSMETIC      = LE_ITEM_ARMOR_COSMETIC, -- 'Cosmetic'      NUM = 5
-    SHIELDS       = LE_ITEM_ARMOR_SHIELD,   -- 'Shields'       NUM = 6
-    LIBRAMS       = LE_ITEM_ARMOR_LIBRAM,   -- 'Librams'       NUM = 7
-    IDOLS         = LE_ITEM_ARMOR_IDOL,     -- 'Idols'         NUM = 8
-    TOTEMS        = LE_ITEM_ARMOR_TOTEM,    -- 'Totems'        NUM = 9
-    SIGILS        = LE_ITEM_ARMOR_SIGIL,    -- 'Sigils'        NUM = 10
-    RELIC         = LE_ITEM_ARMOR_RELIC,    -- 'Relic'         NUM = 11
+    MISCELLANEOUS = _G.LE_ITEM_ARMOR_GENERIC,  -- 'Miscellaneous' NUM = 0
+    CLOTH         = _G.LE_ITEM_ARMOR_CLOTH,    -- 'Cloth'         NUM = 1
+    LEATHER       = _G.LE_ITEM_ARMOR_LEATHER,  -- 'Leather'       NUM = 2
+    MAIL          = _G.LE_ITEM_ARMOR_MAIL,     -- 'Mail'          NUM = 3
+    PLATE         = _G.LE_ITEM_ARMOR_PLATE,    -- 'Plate'         NUM = 4
+    COSMETIC      = _G.LE_ITEM_ARMOR_COSMETIC, -- 'Cosmetic'      NUM = 5
+    SHIELDS       = _G.LE_ITEM_ARMOR_SHIELD,   -- 'Shields'       NUM = 6
+    LIBRAMS       = _G.LE_ITEM_ARMOR_LIBRAM,   -- 'Librams'       NUM = 7
+    IDOLS         = _G.LE_ITEM_ARMOR_IDOL,     -- 'Idols'         NUM = 8
+    TOTEMS        = _G.LE_ITEM_ARMOR_TOTEM,    -- 'Totems'        NUM = 9
+    SIGILS        = _G.LE_ITEM_ARMOR_SIGIL,    -- 'Sigils'        NUM = 10
+    RELIC         = _G.LE_ITEM_ARMOR_RELIC,    -- 'Relic'         NUM = 11
 }
 
 _G.HL_ITEM_SUB_CLASS.REAGENT = {
@@ -238,18 +239,18 @@ _G.HL_ITEM_SUB_CLASS.ITEM_ENHANCEMENT = {
 }
 
 _G.HL_ITEM_SUB_CLASS.RECIPE = {
-    BOOK           = LE_ITEM_RECIPE_BOOK,          -- 'Book'           NUM = 0
-    LEATHERWORKING = LE_ITEM_RECIPE_LEATHERWORKING,-- 'Leatherworking' NUM = 1
-    TAILORING      = LE_ITEM_RECIPE_TAILORING,     -- 'Tailoring'      NUM = 2
-    ENGINEERING    = LE_ITEM_RECIPE_ENGINEERING,   -- 'Engineering'    NUM = 3
-    BLACKSMITHING  = LE_ITEM_RECIPE_BLACKSMITHING, -- 'Blacksmithing'  NUM = 4
-    COOKING        = LE_ITEM_RECIPE_COOKING,       -- 'Cooking'        NUM = 5
-    ALCHEMY        = LE_ITEM_RECIPE_ALCHEMY,       -- 'Alchemy'        NUM = 6
-    FIRST_AID      = LE_ITEM_RECIPE_FIRST_AID,     -- 'First Aid'      NUM = 7
-    ENCHANTING     = LE_ITEM_RECIPE_ENCHANTING,    -- 'Enchanting'     NUM = 8
-    FISHING        = LE_ITEM_RECIPE_FISHING,       -- 'Fishing'        NUM = 9
-    JEWELCRAFTING  = LE_ITEM_RECIPE_JEWELCRAFTING, -- 'Jewelcrafting'  NUM = 10
-    INSCRIPTION    = LE_ITEM_RECIPE_INSCRIPTION,   -- 'Inscription'    NUM = 11
+    BOOK           = _G.LE_ITEM_RECIPE_BOOK,          -- 'Book'           NUM = 0
+    LEATHERWORKING = _G.LE_ITEM_RECIPE_LEATHERWORKING,-- 'Leatherworking' NUM = 1
+    TAILORING      = _G.LE_ITEM_RECIPE_TAILORING,     -- 'Tailoring'      NUM = 2
+    ENGINEERING    = _G.LE_ITEM_RECIPE_ENGINEERING,   -- 'Engineering'    NUM = 3
+    BLACKSMITHING  = _G.LE_ITEM_RECIPE_BLACKSMITHING, -- 'Blacksmithing'  NUM = 4
+    COOKING        = _G.LE_ITEM_RECIPE_COOKING,       -- 'Cooking'        NUM = 5
+    ALCHEMY        = _G.LE_ITEM_RECIPE_ALCHEMY,       -- 'Alchemy'        NUM = 6
+    FIRST_AID      = _G.LE_ITEM_RECIPE_FIRST_AID,     -- 'First Aid'      NUM = 7
+    ENCHANTING     = _G.LE_ITEM_RECIPE_ENCHANTING,    -- 'Enchanting'     NUM = 8
+    FISHING        = _G.LE_ITEM_RECIPE_FISHING,       -- 'Fishing'        NUM = 9
+    JEWELCRAFTING  = _G.LE_ITEM_RECIPE_JEWELCRAFTING, -- 'Jewelcrafting'  NUM = 10
+    INSCRIPTION    = _G.LE_ITEM_RECIPE_INSCRIPTION,   -- 'Inscription'    NUM = 11
 }
 
 _G.HL_ITEM_SUB_CLASS.QUIVER = {
@@ -269,12 +270,12 @@ _G.HL_ITEM_SUB_CLASS.KEY = {
 }
 
 _G.HL_ITEM_SUB_CLASS.MISCELLANEOUS = {
-    JUNK           = LE_ITEM_MISCELLANEOUS_JUNK,          -- 'Junk'           NUM = 0
-    REAGENT        = LE_ITEM_MISCELLANEOUS_REAGENT,       -- 'Reagent'        NUM = 1
-    COMPANION_PETS = LE_ITEM_MISCELLANEOUS_COMPANION_PET, -- 'Companion Pets' NUM = 2
-    HOLIDAY        = LE_ITEM_MISCELLANEOUS_HOLIDAY,       -- 'Holiday'        NUM = 3
-    OTHER          = LE_ITEM_MISCELLANEOUS_OTHER,         -- 'Other'          NUM = 4
-    MOUNT          = LE_ITEM_MISCELLANEOUS_MOUNT,         -- 'Mount'          NUM = 5
+    JUNK           = _G.LE_ITEM_MISCELLANEOUS_JUNK,          -- 'Junk'           NUM = 0
+    REAGENT        = _G.LE_ITEM_MISCELLANEOUS_REAGENT,       -- 'Reagent'        NUM = 1
+    COMPANION_PETS = _G.LE_ITEM_MISCELLANEOUS_COMPANION_PET, -- 'Companion Pets' NUM = 2
+    HOLIDAY        = _G.LE_ITEM_MISCELLANEOUS_HOLIDAY,       -- 'Holiday'        NUM = 3
+    OTHER          = _G.LE_ITEM_MISCELLANEOUS_OTHER,         -- 'Other'          NUM = 4
+    MOUNT          = _G.LE_ITEM_MISCELLANEOUS_MOUNT,         -- 'Mount'          NUM = 5
 }
 
 _G.HL_ITEM_SUB_CLASS.BATTLE_PETS = {

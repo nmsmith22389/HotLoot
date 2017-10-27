@@ -413,7 +413,7 @@ local function GetItemPrice(item, optionEnable, optionSource, optionUseQuant)
     -- optionUseQuant = 'toggleUseQuantValue'
     local value = item.value
 
-    if optionEnable and optionSource and Options:Get(optionEnable) and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
+    if optionEnable and optionSource and Options:Get(optionEnable) and Options:IsTSMLoaded() then
         local tsmSources = _G.TSMAPI:GetPriceSources()
         local tsmValueSource = Options:Get(optionSource)
         local priceSource = (tsmSources[tsmValueSource]) and tsmValueSource or 'DBMarket'
@@ -632,7 +632,7 @@ local function GetItemValueText(item)
     local prefixText = ''
     local itemValue = GetItemPrice(item, 'toggleTextTSMValue', 'inputTextTSMSource')
 
-    if Options:Get('toggleTextTSMValue') then
+    if Options:IsTSMLoaded() and Options:Get('toggleTextTSMValue') then
         local tsmSources = TSMAPI:GetPriceSources()
         prefixText = tsmSources[Options:Get('inputTextTSMSource')] or tsmSources['DBMarket']
 

@@ -839,13 +839,13 @@ function Options:Advanced()
     return not self:Get('toggleAdvancedOptions')
 end
 
--- function Options:GetThemeColorDisabled()
---     if self:Get('selectTheme'):find('custom') ~= nil then
---         return false
---     else
---         return true
---     end
--- end
+function Options:IsTSMLoaded()
+    return IsAddOnLoaded('TradeSkillMaster') and TSMAPI
+end
+
+function Options:IsTSMNotLoaded()
+    return not self:IsTSMLoaded()
+end
 
 function Options:ConfirmOption(info, value)
     if value then
@@ -1824,6 +1824,7 @@ optionsTable = {
                             type = 'group',
                             order = 60,
                             inline = true,
+                            disabled = "IsTSMNotLoaded",
                             args = {
                                 descTSMSource = {
                                     -- FIXME: make sure this slash code is right
@@ -1961,6 +1962,7 @@ optionsTable = {
                             type = 'group',
                             order = 6,
                             inline = true,
+                            disabled = "IsTSMNotLoaded",
                             args = {
                                 descTSMSource = {
                                     -- FIXME: make sure this slash code is right
@@ -2169,6 +2171,7 @@ optionsTable = {
                             type = 'group',
                             order = 10,
                             inline = true,
+                            disabled = "IsTSMNotLoaded",
                             args = {
                                 descTSMSource = {
                                     name = Util:ColorText(L['inputValueTSMSourceDescNote']:format(Util:ColorText('/tsm source', 'success')..Util:GetColorString('info')), 'info'),

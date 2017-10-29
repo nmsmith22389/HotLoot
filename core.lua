@@ -422,7 +422,7 @@ local function GetItemPrice(item, optionEnable, optionSource, optionUseQuant)
         value = tsmPrice or value
     end
 
-    if Options:Get(optionUseQuant) and item.quantity ~= nil then
+    if optionUseQuant and Options:Get(optionUseQuant) and item.quantity ~= nil then
         value = item.quantity * value
     end
     return value

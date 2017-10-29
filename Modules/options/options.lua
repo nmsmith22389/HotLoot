@@ -7,68 +7,37 @@ local Util = HotLoot:GetModule('Util')
 --       (The text options section should prob just be for actual text appearance.)
 
 --
--- ─── LOCALS ─────────────────────────────────────────────────────────────────────
+-- ─── PRIVATE ─────────────────────────────────────────────────────────────────────
 --
 
-watchListTable = {}
+local private = {
+    enum = {}
+}
 
-local tableModifierKeys = {
+--> ENUM
+private.enum.modifierKeys = {
     ['0'] = 'None',
     ['ctrl'] = 'Control',
     ['shift'] = 'Shift',
     ['alt'] = 'Alt'
 }
 
-local tableDirectionVertical = {
+private.enum.directionVertical = {
     [1] = L['Up'],
     [-1] = L['Down']
 }
 
-local tableDirectionHorizontal = {
+private.enum.directionHorizontal = {
     [0] = L['Right'],
     [1] = L['Left']
 }
 
-local tableThemeSize = {
+private.enum.themeSize = {
     [0] = L['Small'],
     [1] = L['Large']
 }
 
-local tablePotionType = {
-    ['both'] = L['Both'],
-    ['healing'] = L['Healing'],
-    ['mana'] = L['Mana'],
-}
-
--- FIXME: Make sure these reflect ALL the filter types
-local tableFilterTypes = {
-    ['0None'] = L['None'],
-    ['Quest'] = GetItemClassInfo(HL_ITEM_CLASS.QUEST),
-    --['Junk'] = L['Junk'],
-    ['Cloth'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.CLOTH),
-    ['Metal & Stone'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.METAL_STONE),
-    ['Gem'] = GetItemClassInfo(HL_ITEM_CLASS.GEM),
-    ['Herb'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.HERB),
-    ['Leather'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER),
-    ['Enchanting'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.ENCHANTING),
-    ['Inscription'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.INSCRIPTION),
-    ['Cooking Ingredient'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.COOKING),
-    ['Potion'] = GetItemSubClassInfo(HL_ITEM_CLASS.CONSUMABLE, HL_ITEM_SUB_CLASS.CONSUMABLE.POTION),
-    ['Flask'] = GetItemSubClassInfo(HL_ITEM_CLASS.CONSUMABLE, HL_ITEM_SUB_CLASS.CONSUMABLE.FLASK),
-    ['Elixir'] = GetItemSubClassInfo(HL_ITEM_CLASS.CONSUMABLE, HL_ITEM_SUB_CLASS.CONSUMABLE.ELIXIR),
-    ['Elemental'] = GetItemSubClassInfo(HL_ITEM_CLASS.TRADESKILL, HL_ITEM_SUB_CLASS.TRADESKILL.ELEMENTAL),
-    ['z1Poor'] = ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC..'|r',
-    ['z2Common'] = ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC..'|r',
-    ['z3Uncommon'] = ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC..'|r',
-    ['z4Rare'] = ITEM_QUALITY_COLORS[3].hex..ITEM_QUALITY3_DESC..'|r',
-    ['z5Epic'] = ITEM_QUALITY_COLORS[4].hex..ITEM_QUALITY4_DESC..'|r',
-    ['z6Legendary'] = ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC..'|r',
-    ['z7Artifact'] = ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC..'|r',
-    ['z8Heirloom'] = ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r',
-    ['z9Include'] = L['headerIncludeList'],
-}
-
-local tableItemQuality = {
+private.enum.itemQuality = {
     ['0'] = ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC..'|r',
     ['1'] = ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC..'|r',
     ['2'] = ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC..'|r',
@@ -79,7 +48,7 @@ local tableItemQuality = {
     ['7'] = ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r',
 }
 
-local tableFontOutline = {
+private.enum.fontOutline = {
     ["NONE"] = NONE,
     ["OUTLINE"] = "OUTLINE",
     ["MONOCHROMEOUTLINE"] = "MONOCROMEOUTLINE",
@@ -87,24 +56,27 @@ local tableFontOutline = {
 }
 
 -- TODO: Localize
-local tableFarmingModeRate = {
+private.enum.farmingModeRate = {
     ['second'] = 'Per Second',
     ['hour']   = 'Per Hour',
     ['minute'] = 'Per Minute',
 }
 
 -- TODO: fix so that it gets all window names
-local tableChatWindows
+-- FIXME: Ditch the table and just use the function itself
+private.enum.chatWindows = {}
+-- TODO: Add to private
 local function GetChatWindows()
     local windows = {}
     for index, window in pairs(CHAT_FRAMES) do
-       windows[window] = _G[window].name
+        windows[window] = _G[window].name
     end
 
     return windows
 end
-tableChatWindows = GetChatWindows()
+private.enum.chatWindows = GetChatWindows()
 
+-- TODO: Add to private
 local function GetDefaultChatWindow()
     local first
     for window,name in pairs(GetChatWindows()) do
@@ -335,8 +307,6 @@ local defaults = {
         toggleHeirloomQualityFilter  = true,
         inputMinItemLevel            = 0,
 
-        -- FIXME: Add defaults for equip only options!
-
         -- Include List
         tableIncludeList = {},
         toggleShowIncludeButton = false,
@@ -363,7 +333,7 @@ local defaults = {
 --
 
 -- TODO: Get from dynamic func from HL FILTER TYPE
-local tableFilterTypes = {
+private.enum.filterTypes = {
     [tostring(HL_FILTER_TYPE.TYPE)] = 'Type',
     [tostring(HL_FILTER_TYPE.VALUE)] = 'Value',
     [tostring(HL_FILTER_TYPE.QUALITY)] = 'Quality',
@@ -372,40 +342,32 @@ local tableFilterTypes = {
     [tostring(HL_FILTER_TYPE.BIND)] = 'Bind Type'
 }
 
-local tableComparisons = {
+private.filter = {}
+private.filter.compare = {}
+
+private.filter.compare.number = {
     equalTo = 'Equal To',
     lessThan = 'Less Than',
     greaterThan = 'Greater Than'
 }
 
-local tableStringComparisons = {
+private.filter.compare.string = {
     matches = 'Matches',
     contains = 'Contains'
 }
 
-local tableBooleanComparisons = {
+private.filter.compare.boolean = {
     is = 'Is',
     isNot = 'Is Not'
 }
 
-local tableQualities = {
-    ['0'] = ITEM_QUALITY_COLORS[0].hex..ITEM_QUALITY0_DESC..'|r',
-    ['1'] = ITEM_QUALITY_COLORS[1].hex..ITEM_QUALITY1_DESC..'|r',
-    ['2'] = ITEM_QUALITY_COLORS[2].hex..ITEM_QUALITY2_DESC..'|r',
-    ['3'] = ITEM_QUALITY_COLORS[3].hex..ITEM_QUALITY3_DESC..'|r',
-    ['4'] = ITEM_QUALITY_COLORS[4].hex..ITEM_QUALITY4_DESC..'|r',
-    ['5'] = ITEM_QUALITY_COLORS[5].hex..ITEM_QUALITY5_DESC..'|r',
-    ['6'] = ITEM_QUALITY_COLORS[6].hex..ITEM_QUALITY6_DESC..'|r',
-    ['7'] = ITEM_QUALITY_COLORS[7].hex..ITEM_QUALITY7_DESC..'|r',
-}
-
-local tableBindTypes = {
+private.enum.bindTypes = {
     [tostring(HL_BIND_TYPE.BOA)] = ITEM_BIND_TO_ACCOUNT,
     [tostring(HL_BIND_TYPE.BOP)] = ITEM_BIND_ON_PICKUP,
     [tostring(HL_BIND_TYPE.BOE)] = ITEM_BIND_ON_EQUIP
 }
 
-local function GetItemTypeTable()
+function private.filter.GetItemTypes()
     local t = {}
     for k,v in pairs(HL_ITEM_CLASS) do
         t[tostring(v)] = GetItemClassInfo(v)
@@ -413,7 +375,7 @@ local function GetItemTypeTable()
     return t
 end
 
-local function GetItemSubTypeTable(itemType)
+function private.filter.GetItemSubTypes(itemType)
     local t = {}
     local classString = nil
 
@@ -475,7 +437,7 @@ local function GetConditionArgs(num, condition, isSellFilter)
     args[sellOrNot('selectConditionType%s')..num] = {
         name = 'Filter Type',
         type = 'select',
-        values = tableFilterTypes,
+        values = private.enum.filterTypes,
         width = 'double',
         order = 1,
         set = function(info, value)
@@ -516,20 +478,10 @@ local function GetConditionArgs(num, condition, isSellFilter)
 
     if condition.type == tostring(HL_FILTER_TYPE.TYPE) then
 
-        -- local containsEnum = false
-        -- for enum,subClass in pairs(GetItemSubTypeTable(condition.value)) do
-        --     if tonumber(enum) == tonumber(condition.subvalue) then
-        --         containsEnum = true
-        --     end
-        -- end
-        -- if not containsEnum then
-        --     condition.subvalue = 'NONE'
-        -- end
-
         args[sellOrNot('selectConditionValue%s')..num] = {
             name = 'Item Type',
             type = 'select',
-            values = GetItemTypeTable(),
+            values = private.filter.GetItemTypes(),
             width = 'double',
             order = 2,
             set = function(info, value)
@@ -544,7 +496,7 @@ local function GetConditionArgs(num, condition, isSellFilter)
         args[sellOrNot('selectConditionSubValue%s')..num] = {
             name = 'Item Sub Type',
             type = 'select',
-            values = GetItemSubTypeTable(condition and condition.value or nil),
+            values = private.filter.GetItemSubTypes(condition and condition.value or nil),
             width = 'double',
             order = 3,
             set = function(info, value)
@@ -558,7 +510,7 @@ local function GetConditionArgs(num, condition, isSellFilter)
         args[sellOrNot('selectConditionValue%s')..num] = {
             name = 'Comparison',
             type = 'select',
-            values = tableComparisons,
+            values = private.filter.compare.number,
             width = 'double',
             order = 2,
             set = function(info, value)
@@ -593,7 +545,7 @@ local function GetConditionArgs(num, condition, isSellFilter)
         args[sellOrNot('selectConditionValue%s')..num] = {
             name = 'Comparison',
             type = 'select',
-            values = tableComparisons,
+            values = private.filter.compare.number,
             width = 'double',
             order = 2,
             set = function(info, value)
@@ -606,7 +558,7 @@ local function GetConditionArgs(num, condition, isSellFilter)
         args[sellOrNot('selectConditionSubValue%s')..num] = {
             name = 'Item Quality',
             type = 'select',
-            values = tableItemQuality,
+            values = private.enum.itemQuality,
             width = 'double',
             order = 3,
             set = function(info, value)
@@ -620,7 +572,7 @@ local function GetConditionArgs(num, condition, isSellFilter)
         args[sellOrNot('selectConditionValue%s')..num] = {
             name = 'Comparison',
             type = 'select',
-            values = tableStringComparisons,
+            values = private.filter.compare.string,
             width = 'double',
             order = 2,
             set = function(info, value)
@@ -646,7 +598,7 @@ local function GetConditionArgs(num, condition, isSellFilter)
         args[sellOrNot('selectConditionValue%s')..num] = {
             name = 'Comparison',
             type = 'select',
-            values = tableComparisons,
+            values = private.filter.compare.number,
             width = 'double',
             order = 2,
             set = function(info, value)
@@ -677,7 +629,7 @@ local function GetConditionArgs(num, condition, isSellFilter)
         args[sellOrNot('selectConditionValue%s')..num] = {
             name = 'Comparison',
             type = 'select',
-            values = tableBooleanComparisons,
+            values = private.filter.compare.boolean,
             width = 'double',
             order = 2,
             set = function(info, value)
@@ -690,7 +642,7 @@ local function GetConditionArgs(num, condition, isSellFilter)
         args[sellOrNot('selectConditionSubValue%s')..num] = {
             name = 'Bind Type',
             type = 'select',
-            values = tableBindTypes,
+            values = private.enum.bindTypes,
             width = 'double',
             order = 3,
             set = function(info, value)
@@ -971,6 +923,7 @@ function FormatFarmingType(text)
     return text
 end
 
+-- TODO: Get rid of the farming list function and use the general... Also change options to use them!
 function Options:AddToFarmingList(info, value)
     if type(value) == 'string' and value ~= '' then
         --[[ local reg = '%[(%w+)%:(%w+)%]'
@@ -981,7 +934,7 @@ function Options:AddToFarmingList(info, value)
 
             if cmd == 'type' then
                 local formatted = FormatFarmingType(cat)
-                if tableFilterTypes[formatted] and not self.db.profile.tableFarmingList[('type:%s'):format(cat)] then
+                if private.enum.filterTypes[formatted] and not self.db.profile.tableFarmingList[('type:%s'):format(cat)] then
                     self.db.profile.tableFarmingList[('type:%s'):format(cat)] = Util:ColorText('Type: ', 'success')..cat:gsub('(%a)', string.upper, 1)
                     Util:Announce(string.format(L['AnnounceListAdd'], Util:ColorText(Util:ColorText('Type: ', 'success')..cat:gsub('(%a)', string.upper, 1), 'info'), 'Farming List'))
                 else
@@ -1106,7 +1059,7 @@ optionsTable = {
                             name = L['selectAnnounceWindowName'],
                             desc = L['selectAnnounceWindowDesc'],
                             type = 'select',
-                            values = tableChatWindows,
+                            values = private.enum.chatWindows,
                             order = 2
                         },
                         toggleAnnounceBagsFullRaid = {
@@ -1134,7 +1087,7 @@ optionsTable = {
                             name = L['genModifierKey'],
                             desc = L['selectCloseLootWindowModifierDesc']:format(Util:ColorText(L['genEnabled']..':', 'success'), Util:ColorText(L['genDisabled']..':', 'alert')),
                             type = 'select',
-                            values = tableModifierKeys,
+                            values = private.enum.modifierKeys,
                             order = 2
                         },
                     },
@@ -1157,7 +1110,7 @@ optionsTable = {
                             name = L['genModifierKey'],
                             desc = L['selectSkinningModeModifierDesc']:format(Util:ColorText(L['genEnabled']..':', 'success'), Util:ColorText(L['genDisabled']..':', 'alert')),
                             type = 'select',
-                            values = tableModifierKeys,
+                            values = private.enum.modifierKeys,
                             order = 2
                         },
                     },
@@ -1244,7 +1197,7 @@ optionsTable = {
                             name = L['selectFarmingModeRateName'],
                             desc = L['selectFarmingModeRateDesc'],
                             type = 'select',
-                            values = tableFarmingModeRate,
+                            values = private.enum.farmingModeRate,
                             order = 14
                         }
                     }
@@ -1292,14 +1245,14 @@ optionsTable = {
                             name = L['selectGrowthDirectionName'],
                             desc = L['selectGrowthDirectionDesc'],
                             type = 'select',
-                            values = tableDirectionVertical,
+                            values = private.enum.directionVertical,
                             order = 8
                         },
                         selectThemeSize = {
                             name = L['selectThemeSizeName'],
                             desc = L['selectThemeSizeDesc'],
                             type = 'select',
-                            values = tableThemeSize,
+                            values = private.enum.themeSize,
                             order = 10
                         },
                         rangeTransparency = {
@@ -1547,7 +1500,7 @@ optionsTable = {
                             name = L['selectTextSideName'],
                             desc = L['selectTextSideDesc'],
                             type = 'select',
-                            values = tableDirectionHorizontal,
+                            values = private.enum.directionHorizontal,
                             order = 8
                         },
                         --
@@ -1581,7 +1534,7 @@ optionsTable = {
                         selectNameTextOutline = {
                             name = L['genOutline'],
                             type = 'select',
-                            values = tableFontOutline,
+                            values = private.enum.fontOutline,
                             order = 16
                         },
                         --[[colorNameTextFont = {
@@ -1662,7 +1615,7 @@ optionsTable = {
                         selectQuantTextOutline = {
                             name = L['genOutline'],
                             type = 'select',
-                            values = tableFontOutline,
+                            values = private.enum.fontOutline,
                             order = 28
                         },
                         colorQuantTextFont = {
@@ -1738,7 +1691,7 @@ optionsTable = {
                         selectLine1TextOutline = {
                             name = L['genOutline'],
                             type = 'select',
-                            values = tableFontOutline,
+                            values = private.enum.fontOutline,
                             order = 42
                         },
                         rangeLine1TextSize = {
@@ -1822,7 +1775,7 @@ optionsTable = {
                         selectLine2TextOutline = {
                             name = L['genOutline'],
                             type = 'select',
-                            values = tableFontOutline,
+                            values = private.enum.fontOutline,
                             order = 56
                         },
                         colorLine2TextFont = {
@@ -1974,7 +1927,7 @@ optionsTable = {
                         },
                         -- TODO: Localize
                         groupTSMSource = {
-                            name = 'Tradeskill Master',
+                            name = L['groupTSMValue'],
                             type = 'group',
                             order = 6,
                             inline = true,
@@ -2193,7 +2146,7 @@ optionsTable = {
                         },
                         -- TODO: Localize
                         groupTSMSource = {
-                            name = 'Tradeskill Master',
+                            name = L['groupTSMValue'],
                             type = 'group',
                             order = 10,
                             inline = true,
@@ -2291,7 +2244,7 @@ function Options:OnInitialize()
     self:ViewFilter(self:Get('selectFilter'))
     self:ViewFilter(self:Get('selectSellFilter'), true)
 
-    tableChatWindows = GetChatWindows()
+    private.enum.chatWindows = GetChatWindows()
 
     local lists = {'tableFarmingList', 'tableIncludeList', 'tableExcludeList'}
     for _,ls in ipairs(lists) do

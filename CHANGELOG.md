@@ -1,4 +1,15 @@
 # CHANGELOG
+## v3.4-alpha
+> ### This is an ALPHA release for testing purpose. Many things still do not work yet!
+> *Use at your own risk!*
+### Added
+* Completely redesigned HL to use a custom filter system!
+    * Now you make your own filters by choosing conditions that must be met before an item is looted.
+    * Sell filters are also included for you to specify when and which items will be sold automatically.
+### Fixed
+* Include, Exclude, and Farming lists now use item ID instead of item name.
+    * **Items that have been added to a list prior to this release will show up but not work.**
+
 ## v3.3.1
 ### Fixed
 * Fixed an error in Farming Mode.

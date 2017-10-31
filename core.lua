@@ -38,6 +38,7 @@ HotLoot.toasts = {}
 --
 
 -- NOTE: Put vars (hoisted) here (i suppose if everything is done right then this should be empty)
+local private = {}
 
 local function GetFont(key)
     if not LSM:IsValid('font', Options:Get(key)) then

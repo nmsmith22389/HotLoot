@@ -346,27 +346,21 @@ local function HasRoom(room)
     end
 end
 
-local function CanStack(iname, scount, lquant)
-    --if scount then
-    local q, stackRoom, n
-    stackRoom = 0
-    for b = 0, 4 do
-        for s = 1, GetContainerNumSlots(b) do
-            n = select(1, GetItemInfo(GetContainerItemID(b, s)))
-            if n == iname then
-                q = select(2, GetContainerItemInfo(b, s))
-                stackRoom = (stackRoom) + (scount - q)
-            end
-        end
-    end
-    if lquant <= stackRoom then
+local function CanStack(item, stackCount)
+    local stackRoom = 0
+    Util:ScanBags(
+       function(bag, slot, itemLink)
+           if itemLink == GetContainerItemLink(bag, slot) then
+                local bagQuant = select(2, GetContainerItemInfo(bag, slot))
+                stackRoom = stackRoom + (stackCount - bagQuant)
+           end
+       end
+    )
+    if item.quantity <= stackRoom then
         return true
     else
         return false
     end
-    --else
-    --  return true
-    --end
 end
 
 -- TODO: Figure out how to add leather to new filters?
@@ -567,7 +561,7 @@ local function FilterSlot(loot)
             subClass = itemSubClass
         }
 
-        if (HasRoom(1) or CanStack(loot.item, itemStackCount, loot.quantity)) then
+        if (HasRoom(1) or CanStack(item, itemStackCount)) then
 
             -- TODO: Normalize these so that the check order is (pref, type, subtype, other) (there may be special cases)
 

@@ -114,8 +114,8 @@ function HotLoot:OnEnable()
 
     -- Register Events
     self:RegisterEvent("LOOT_OPENED")
-    -- self:RegisterEvent("LOOT_CLOSED")
-    self:RegisterEvent("BAG_UPDATE")
+    self:RegisterEvent("LOOT_CLOSED")
+    -- self:RegisterEvent("BAG_UPDATE")
     self:RegisterEvent("MERCHANT_SHOW")
     self:RegisterEvent("GET_ITEM_INFO_RECEIVED")
 
@@ -294,26 +294,28 @@ end
 --
 
 -- TODO: Find out what happens if gold isnt set to pick up and you use skinning mode on it.
-local tItemsToDelete = {}
-local function ToSkin(slot)
-    local _, lootName, lootQuantity, _, _ = GetLootSlotInfo(slot)
-    -- local itemLink = GetLootSlotLink(slot)
-    if (Options:Get('toggleSkinningMode') or Util:IsSkinKeyDown()) and lootQuantity > 0 then
-        tItemsToDelete[lootName] = true
+function private.AddToDeleteList(slot, item)
+    if (Options:Get('toggleSkinningMode') or Util:IsSkinKeyDown()) and item.quantity > 0 then
+        private.deleteList = private.deleteList or {}
+
+        local itemID = GetItemInfoInstant(item.link)
+        if not itemID then return false end
+
+        private.deleteList[itemID] = item.item
         LootSlot(slot)
-        Util:Debug(Util:ColorText(lootName..' is set to be deleted!', 'alert'))
+        Util:Debug(Util:ColorText(item.link..' is set to be deleted!', 'alert'))
     end
 end
 
-local function DeleteLeftovers()
-    if not Util:IsEmpty(tItemsToDelete) then
+function private.RunDeleteList()
+    if not Util:IsEmpty(private.deleteList) then
         -- TODO: Rename
         Util:Announce(L["SkinAnnounce1"])
         Util:ScanBags(function(bag, slot, itemLink)
-            local itemName
             if itemLink then
-                itemName = select(1, GetItemInfo(itemLink))
-                if itemName and tItemsToDelete[itemName] then
+                local itemID = GetItemInfoInstant(itemID)
+                if itemID and private.deleteList[itemID] then
+                    ClearCursor()
                     PickupContainerItem(bag, slot)
                     if CursorHasItem() then
                         DeleteCursorItem()
@@ -323,7 +325,7 @@ local function DeleteLeftovers()
                 end
             end
         end)
-        tItemsToDelete = {}
+        private.deleteList = {}
     end
 end
 
@@ -1246,8 +1248,6 @@ function HotLoot:LOOT_OPENED()
         -- mFocus = GetMouseFocus()
         -- mFocus = (mFocus) and mFocus:GetName() or 'nil'
 
-        skinModeTrigger = 0
-
         local lootInfo = GetLootInfo()
         self.lootInfo = lootInfo
         -- For staggering the fades
@@ -1317,7 +1317,8 @@ function HotLoot:LOOT_OPENED()
                 LootSlot(slot)
             elseif not filtered then
                 Util:Debug('Item NOT looted. '..Util:ColorText('('..tostring(reason)..')', 'alert'))
-                ToSkin(slot)
+                -- Send items that aren't looted to the skinning mode functions.
+                private.AddToDeleteList(slot, lootItem)
             end
         end
 
@@ -1341,6 +1342,8 @@ function HotLoot:LOOT_OPENED()
 end
 
 function HotLoot:LOOT_CLOSED()
+    -- Delete leftover items
+    private.RunDeleteList()
     -- Clear stored loot info
     self.lootInfo = nil
 end
@@ -1357,8 +1360,4 @@ end
 function HotLoot:MERCHANT_SHOW(...)
     Util:Debug("Merchant Window Opened")
     SellFilters()
-end
-
-function HotLoot:BAG_UPDATE(...)
-    DeleteLeftovers()
 end

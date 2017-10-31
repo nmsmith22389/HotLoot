@@ -321,7 +321,7 @@ local function DeleteLeftovers()
                     end
                 end
             end
-        end, true)
+        end)
         tItemsToDelete = {}
     end
 end
@@ -629,7 +629,7 @@ local function SellFilters()
             end
         end
     end
-    Util:ScanBags(sellFunc, true)
+    Util:ScanBags(sellFunc)
 
     -- TODO: Calc price of sold items (sperate by filter? say which sold what?)
     if totalPrice > 0 and Options:Get('toggleSellFiltersPrintTotal') then

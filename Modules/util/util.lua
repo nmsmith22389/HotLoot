@@ -117,12 +117,8 @@ function Util:ScanBags(proc, getItem)
 
     for bag=0, NUM_BAG_SLOTS do
         for slot = 1, GetContainerNumSlots(bag) do
-            if getItem then
-                local itemID = GetContainerItemLink(bag,slot)
-                proc(bag, slot, itemID)
-            else
-                proc(bag, slot)
-            end
+            local itemLink = GetContainerItemLink(bag,slot)
+            proc(bag, slot, itemLink)
         end
     end
 end
@@ -228,7 +224,7 @@ function Util:IsSkinKeyDown()
 end
 
 function Util:IsEmpty(t)
-    return next(t) == nil
+    return (not t or next(t) == nil and true) or false
 end
 
 function Util:SlotIsGold(slot)

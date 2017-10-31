@@ -9,3 +9,6 @@ old-changelog.txt
 # Ignore Notes
 notes/*
 !/notes/todo.notes
+
+# VSCode
+.vscode/

@@ -399,42 +399,84 @@ function private.CheckUntyped(type, itemLink)
     end
 end ]]
 
-local function GetItemPrice(item, optionEnable, optionSource, optionUseQuant)
+function private.GetItemPrice(item, opts)
     -- NOTE: The item table must contain value, link, and quant
-    -- optionEnable   = 'toggleFilterTSMValue'
-    -- optionSource   = 'inputFilterTSMSource'
-    -- optionUseQuant = 'toggleUseQuantValue'
+    --[[
+        NOTE: Example
+        opts = {
+            useTSM   => 'toggleFilterTSMValue',
+            source   => 'inputFilterTSMSource',
+            useQuant => 'toggleUseQuantValue'
+        }
+    ]]
+    if not item or not item.value or not item.link or not item.quantity then return 0 end
+    if not opts or type(opts) ~= 'table' then
+        opts = {
+            useTSM = false,
+            source = nil,
+            useQuant = false
+        }
+    else
+        opts.useTSM = opts.useTSM or false
+        opts.useQuant = opts.useQuant or false
+    end
     local value = item.value
+    local defaultSource = 'DBMarket'
 
-    if optionEnable and optionSource and Options:Get(optionEnable) and Options:IsTSMLoaded() then
-        local tsmSources = _G.TSMAPI:GetPriceSources()
-        local tsmValueSource = Options:Get(optionSource)
-        local priceSource = (tsmSources[tsmValueSource]) and tsmValueSource or 'DBMarket'
-        local tsmPrice = TSMAPI:GetItemValue(_G.TSMAPI.Item:ToItemString(item.link), priceSource)
+    if opts.useTSM and Options:IsTSMLoaded() then
+        local tsmSources = TSMAPI:GetPriceSources()
+        local priceSource = tsmSources[opts.source] and opts.source or defaultSource
+        local tsmPrice = TSMAPI:GetItemValue(TSMAPI.Item:ToItemString(item.link), priceSource)
         value = tsmPrice or value
     end
 
-    if optionUseQuant and Options:Get(optionUseQuant) and item.quantity ~= nil then
+    if opts.useQuant and item.quantity ~= nil then
         value = item.quantity * value
     end
     return value
 end
 
-local function RunConditions(filters, item, tsmToggleOpt, tsmSourceOpt, useQuantValue)
-    for filterName, filter in pairs(Options:Get(filters)) do
+function private.RunConditions(opts)
+    --[[
+        opts = {
+            filters   => filters table,
+            item      => loot info table,
+            tsmToggle => TSM on/off,
+            tsmSource => TSM source string,
+            useQuant  => toggleUseQuantValue
+        }
+     ]]
+    if not opts or not opts.filters or type(opts.filters) ~= 'table' or not opts.item then
+        return false
+    end
+
+    opts.tsmToggle = type(opts.tsmToggle) == 'boolean' and opts.tsmToggle or false
+    opts.tsmSource = type(opts.tsmSource) == 'string'  and opts.tsmSource or 'DBMarket'
+    opts.useQuant  = type(opts.useQuant)  == 'boolean' and opts.useQuant  or false
+
+    local function debug_c(str)
+        local debug = HotLoot.DEBUG_CONDITIONS or false
+        if debug then
+            Util:Print(str)
+        end
+    end
+
+    for filterName, filter in pairs(opts.filters) do
         if filter.enabled then
             local conditionsMet = 0
             for num, condition in ipairs(filter.conditions) do
-                if tonumber(condition.type) == HL_FILTER_TYPE.TYPE and item.class then
+                if tonumber(condition.type) == HL_FILTER_TYPE.TYPE and opts.item.class then
                     --> Item Type
-                    if item.class == tonumber(condition.value) then
-                        if tonumber(condition.subvalue) == item.subClass or condition.subvalue == 'NONE' then
+                    if opts.item.class == tonumber(condition.value) then
+                        if tonumber(condition.subvalue) == opts.item.subClass or condition.subvalue == 'NONE' then
                             conditionsMet = conditionsMet + 1
                         end
                     end
-                elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE and item.value then
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE and opts.item.value then
                     --> Item Value
-                    local itemValue = GetItemPrice(item, tsmToggleOpt, tsmSourceOpt, useQuantValue)
+                    local itemValue = private.GetItemPrice(opts.item, opts.tsmToggle, opts.tsmSource, opts.useQuant)
+                    debug_c('Item Value:    '..Util:FormatMoney(itemValue, 'SMART', true))
+                    debug_c('Condition Val: '..Util:FormatMoney(condition.subvalue, 'SMART', true))
 
                     if condition.value == 'equalTo' then
                         if condition.subvalue == itemValue then
@@ -449,50 +491,50 @@ local function RunConditions(filters, item, tsmToggleOpt, tsmSourceOpt, useQuant
                             conditionsMet = conditionsMet + 1
                         end
                     end
-                elseif tonumber(condition.type) == HL_FILTER_TYPE.QUALITY and item.quality then
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.QUALITY and opts.item.quality then
                     --> Item Quality
                     if condition.value == 'equalTo' then
-                        if tonumber(condition.subvalue) == item.quality then
+                        if tonumber(condition.subvalue) == opts.item.quality then
                             conditionsMet = conditionsMet + 1
                         end
                     elseif condition.value == 'greaterThan' then
-                        if item.quality > tonumber(condition.subvalue) then
+                        if opts.item.quality > tonumber(condition.subvalue) then
                             conditionsMet = conditionsMet + 1
                         end
                     elseif condition.value == 'lessThan' then
-                        if item.quality < tonumber(condition.subvalue) then
+                        if opts.item.quality < tonumber(condition.subvalue) then
                             conditionsMet = conditionsMet + 1
                         end
                     end
-                elseif tonumber(condition.type) == HL_FILTER_TYPE.NAME and item.item then
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.NAME and opts.item.item then
                     --> Item Name
                     if condition.value == 'contains' then
-                        if item.item:match(condition.subvalue) then
+                        if opts.item.item:match(condition.subvalue) then
                             conditionsMet = conditionsMet + 1
                         end
                     elseif condition.value == 'matches' then
-                        if item.item:match(condition.subvalue) == item.item then
+                        if opts.item.item:match(condition.subvalue) == opts.item.item then
                             conditionsMet = conditionsMet + 1
                         end
                     end
-                elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL and item.ilvl and Util:IsEquippableOrRelic(item.link) then
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL and opts.item.ilvl and Util:IsEquippableOrRelic(opts.item.link) then
                     --> Item Level
                     if condition.value == 'equalTo' then
-                        if tonumber(condition.subvalue) == item.ilvl then
+                        if tonumber(condition.subvalue) == opts.item.ilvl then
                             conditionsMet = conditionsMet + 1
                         end
                     elseif condition.value == 'greaterThan' then
-                        if item.ilvl > tonumber(condition.subvalue) then
+                        if opts.item.ilvl > tonumber(condition.subvalue) then
                             conditionsMet = conditionsMet + 1
                         end
                     elseif condition.value == 'lessThan' then
-                        if item.ilvl < tonumber(condition.subvalue) then
+                        if opts.item.ilvl < tonumber(condition.subvalue) then
                             conditionsMet = conditionsMet + 1
                         end
                     end
                 elseif tonumber(condition.type) == HL_FILTER_TYPE.BIND then
                     --> Bind Type
-                    local bindType = Util:GetBindType(item.link)
+                    local bindType = Util:GetBindType(opts.item.link)
 
                     if bindType then
                         if condition.value == 'is' then
@@ -579,7 +621,13 @@ function private.FilterSlot(loot)
             end
 
             --> Custom Filters
-            local filterTriggered, filterName = RunConditions('tableFilters', item, 'toggleFilterTSMValue', 'inputFilterTSMSource', 'toggleUseQuantValue')
+            local filterTriggered, filterName = private.RunConditions{
+                filters   = Options:Get('tableFilters'),
+                item      = item,
+                tsmToggle = Options:Get('toggleFilterTSMValue'),
+                tsmSource = Options:Get('inputFilterTSMSource'),
+                useQuant  = Options:Get('toggleUseQuantValue')
+            }
 
             return filterTriggered, filterTriggered and filterName or HL_LOOT_REASON.NOT_FOUND
         else
@@ -609,7 +657,12 @@ local function SellFilters()
         item.link = itemLink
         item.item, _, item.quality, item.ilvl, item.minLvl, _, _, _, _, _, item.value, item.class, item.subClass = GetItemInfo(item.link)
 
-        local filterTriggered, filterName = RunConditions('tableSellFilters', item, 'toggleSellFilterTSMValue', 'inputSellFilterTSMSource')
+        local filterTriggered, filterName = private.RunConditions{
+            filters   = Options:Get('tableSellFilters'),
+            item      = item,
+            tsmToggle = Options:Get('toggleSellFilterTSMValue'),
+            tsmSource = Options:Get('inputSellFilterTSMSource')
+        }
         local _, itemCount, locked, _, _, lootable, _, _ = GetContainerItemInfo(bag, slot)
 
         if filterTriggered and not locked and not lootable then
@@ -638,7 +691,10 @@ local function GetItemValueText(item)
     item.value = item.value or select(11, GetItemInfo(item.link))
 
     local prefixText = ''
-    local itemValue = GetItemPrice(item, 'toggleTextTSMValue', 'inputTextTSMSource')
+    local itemValue = private.GetItemPrice(item, {
+        useTSM = Options:Get('toggleTextTSMValue'),
+        source = Options:Get('inputTextTSMSource')
+    })
 
     if Options:IsTSMLoaded() and Options:Get('toggleTextTSMValue') then
         local tsmSources = TSMAPI:GetPriceSources()
@@ -1220,6 +1276,8 @@ function HotLoot:ChatCommand(input)
             Util:Print(printStr:format(loot.link, reason))
         end
     elseif string.find(input, '^sellFilter%s') then
+    elseif string.find(input, '^debugc') then
+        self.DEBUG_CONDITIONS = not self.DEBUG_CONDITIONS
     else
         OpenOptionsWindow()
         -- print(input.." | trim: ".. input:trim())

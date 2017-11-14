@@ -112,7 +112,7 @@ function Util:GetBindType(arg1, arg2)
 	end
 end
 
-function Util:ScanBags(proc, getItem)
+function Util:ScanBags(proc)
     if type(proc) ~= 'function' then return false end
 
     for bag=0, NUM_BAG_SLOTS do

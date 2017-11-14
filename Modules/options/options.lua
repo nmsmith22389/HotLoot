@@ -457,6 +457,12 @@ local function GetConditionArgs(num, condition, isSellFilter)
             elseif tonumber(value) == HL_FILTER_TYPE.NAME then
                 condition.value = 'equalTo'
                 condition.subvalue = 0
+            elseif tonumber(value) == HL_FILTER_TYPE.ILVL then
+                condition.value = 'equalTo'
+                condition.subvalue = 0
+            elseif tonumber(value) == HL_FILTER_TYPE.BIND then
+                condition.value = 'is'
+                condition.subvalue = tostring(HL_BIND_TYPE.BOA)
             end
             Options:ViewFilter(Options:Get(currentFilter), isSellFilter)
         end,
@@ -666,93 +672,114 @@ function Options:ViewFilter(name, isSellFilter)
     local opts = {}
     local filterTable = sellOrNot('table%sFilters')
     local filter = self.db.profile[filterTable][name]
-    if not filter then return false end
-
-
-    opts[sellOrNot('select%sFilter')] = {
-        name = 'Current Filter',
-        type = 'select',
-        values = function()
-            return Options:GetFilterList(isSellFilter)
-        end,
-        set = function(info, value)
-            Options:ViewFilter(value, isSellFilter)
-            Options:Set(info, value)
-        end,
-        order = 2
-    }
-    opts[sellOrNot('inputCreate%sFilter')] = {
-        name = 'Create Filter',
-        type = 'input',
-        set = function(info, value)
-            Options:CreateFilter(info, value, isSellFilter)
-        end,
-        get = function() return '' end,
-        order = 4
-    }
-    opts[sellOrNot('buttonDelete%sFilter')] = {
-        name = Util:ColorText('Delete Current Filter', 'alert'),
-        type = 'execute',
-        confirm = function()
-            return ('Are you sure you want to delete \"%s\"?'):format(name);
-        end,
-        func = function()
-            Options.db.profile[filterTable][name] = nil
-            local nextFilter = next(Options:GetFilterList(isSellFilter))
-            Options:Set(sellOrNot('select%sFilter'), nextFilter)
-            Options:ViewFilter(nextFilter, isSellFilter)
-        end,
-        order = 5
-    }
-    opts[sellOrNot('header%sFilter')] = {
-        name = name,
-        type = 'header',
-        order = 6
-    }
-    opts[sellOrNot('toggleEnable%sFilter')] = {
-        name = L['genEnable'],
-        type = 'toggle',
-        set = function(info, value)
-            Options.db.profile[filterTable][name].enabled = value
-        end,
-        get = function()
-            return Options.db.profile[filterTable][name].enabled
-        end,
-        order = 7
-    }
-    opts.selectFilterTriggerType = {
-        name = 'Trigger Type',
-        type = 'select',
-        order = 8,
-        values = {
-            ['all'] = 'All Conditions',
-            ['any'] = 'Any Condition'
-        },
-        set = function(info, value)
-            Options.db.profile[filterTable][name].trigger = value
-        end,
-        get = function(info)
-            return Options.db.profile[filterTable][name].trigger
-        end
-    }
-    opts.buttonAddCondition = {
-        name = 'Add Condition',
-        type = 'execute',
-        order = 1000,
-        width = 'full',
-        func = function()
-            Options:AddCondition(isSellFilter)
-        end
-    }
-
-    for i,condition in ipairs(filter.conditions) do
-        opts['groupCondition'..i] = {
-            name = 'Condition '..i,
-            type = 'group',
-            inline = true,
-            order = 10 +  i,
-            args = GetConditionArgs(i, condition, isSellFilter)
+    if not name or not filter then
+        opts[sellOrNot('select%sFilter')] = {
+            name = 'Current Filter',
+            type = 'select',
+            values = function()
+                return Options:GetFilterList(isSellFilter)
+            end,
+            set = function(info, value)
+                Options:ViewFilter(value, isSellFilter)
+                Options:Set(info, value)
+            end,
+            order = 2
         }
+        opts[sellOrNot('inputCreate%sFilter')] = {
+            name = 'Create Filter',
+            type = 'input',
+            set = function(info, value)
+                Options:CreateFilter(info, value, isSellFilter)
+            end,
+            get = function() return '' end,
+            order = 4
+        }
+    else
+        opts[sellOrNot('select%sFilter')] = {
+            name = 'Current Filter',
+            type = 'select',
+            values = function()
+                return Options:GetFilterList(isSellFilter)
+            end,
+            set = function(info, value)
+                Options:ViewFilter(value, isSellFilter)
+                Options:Set(info, value)
+            end,
+            order = 2
+        }
+        opts[sellOrNot('inputCreate%sFilter')] = {
+            name = 'Create Filter',
+            type = 'input',
+            set = function(info, value)
+                Options:CreateFilter(info, value, isSellFilter)
+            end,
+            get = function() return '' end,
+            order = 4
+        }
+        opts[sellOrNot('buttonDelete%sFilter')] = {
+            name = Util:ColorText('Delete Current Filter', 'alert'),
+            type = 'execute',
+            confirm = function()
+                return ('Are you sure you want to delete \"%s\"?'):format(name);
+            end,
+            func = function()
+                Options.db.profile[filterTable][name] = nil
+                local nextFilter = next(Options:GetFilterList(isSellFilter))
+                Options:Set(sellOrNot('select%sFilter'), nextFilter)
+                Options:ViewFilter(nextFilter, isSellFilter)
+            end,
+            order = 5
+        }
+        opts[sellOrNot('header%sFilter')] = {
+            name = name,
+            type = 'header',
+            order = 6
+        }
+        opts[sellOrNot('toggleEnable%sFilter')] = {
+            name = L['genEnable'],
+            type = 'toggle',
+            set = function(info, value)
+                Options.db.profile[filterTable][name].enabled = value
+            end,
+            get = function()
+                return Options.db.profile[filterTable][name].enabled
+            end,
+            order = 7
+        }
+        opts.selectFilterTriggerType = {
+            name = 'Trigger Type',
+            type = 'select',
+            order = 8,
+            values = {
+                ['all'] = 'All Conditions',
+                ['any'] = 'Any Condition'
+            },
+            set = function(info, value)
+                Options.db.profile[filterTable][name].trigger = value
+            end,
+            get = function(info)
+                return Options.db.profile[filterTable][name].trigger
+            end
+        }
+        opts.buttonAddCondition = {
+            name = 'Add Condition',
+            type = 'execute',
+            order = 1000,
+            width = 'full',
+            func = function()
+                Options:AddCondition(isSellFilter)
+            end
+        }
+
+        for i,condition in ipairs(filter.conditions) do
+            opts['groupCondition'..i] = {
+                name = 'Condition '..i,
+                type = 'group',
+                inline = true,
+                order = 10 +  i,
+                args = GetConditionArgs(i, condition, isSellFilter)
+            }
+        end
     end
 
     if isSellFilter then

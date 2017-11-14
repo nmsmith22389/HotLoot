@@ -30,14 +30,10 @@ HotLoot.toasts = {}
 -- NOTE: These are the returns for GetItemInfo()
 -- local itemName, itemLink, itemRarity, itemLevel, itemMinLevel, itemType, itemSubType, itemStackCount, itemEquipLoc, iconFileDataID, itemSellPrice, itemClassID, itemSubClassID, bindType, expacID, itemSetID, isCraftingReagent = GetItemInfo(itemID)
 
--- WARNING: Make sure that locals are defined BEFORE they are used!
-
-
 --
 -- ─── VARS ───────────────────────────────────────────────────────────────────────
 --
 
--- NOTE: Put vars (hoisted) here (i suppose if everything is done right then this should be empty)
 local private = {}
 
 local function GetFont(key)
@@ -107,7 +103,7 @@ function HotLoot:OnEnable()
     self.minimapIcon:Register('HotLoot', LDB, Options:Get('minimapIcon'))
 
     -- Create Main Anchor Frame
-    self:CreateAnchorFrame()
+    private.CreateAnchorFrame()
 
     -- Hide anchor by default if set
     self:ToggleAnchor(Options:Get('toggleShowLootMonitorAnchor'))
@@ -131,22 +127,19 @@ end
 --
 -- ─── ANCHOR FRAME ───────────────────────────────────────────────────────────────
 --
-
 function HotLoot:RefreshAnchorPosition()
-    local anchor = self.Anchor
-
-    anchor:ClearAllPoints()
+    self.Anchor:ClearAllPoints()
     if Options:Get('anchorPosition')['x'] and Options:Get('anchorPosition')['y'] then
-        anchor:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMLEFT', Options:Get('anchorPosition')['x'], Options:Get('anchorPosition')['y'])
+        self.Anchor:SetPoint('BOTTOMLEFT', UIParent, 'BOTTOMLEFT', Options:Get('anchorPosition')['x'], Options:Get('anchorPosition')['y'])
     else
-        anchor:SetPoint('CENTER', UIParent, 'CENTER', 0, 0)
+        self.Anchor:SetPoint('CENTER', UIParent, 'CENTER', 0, 0)
     end
 end
 
-function HotLoot:CreateAnchorFrame()
-    local anchor = CreateFrame("Frame", 'HotLoot_Anchor', UIParent)
+function private.CreateAnchorFrame()
+    local anchorFrame = CreateFrame("Frame", 'HotLoot_Anchor', UIParent)
 
-    anchor:SetBackdrop({
+    anchorFrame:SetBackdrop({
         bgFile   = LSM:Fetch('background', 'HotLoot Custom'),
         edgeFile = LSM:Fetch('border', 'HotLoot Custom'),
         tile     = Options:Get('toggleThemeBackgroundTile'),
@@ -160,39 +153,39 @@ function HotLoot:CreateAnchorFrame()
         }
     })
 
-    anchor:SetBackdropColor(0, 0, 0, 0.7)
-    anchor:SetBackdropBorderColor(1, 1, 1, 1.0)
+    anchorFrame:SetBackdropColor(0, 0, 0, 0.7)
+    anchorFrame:SetBackdropBorderColor(1, 1, 1, 1.0)
 
     local frameWidth  = 200
     local frameHeight = 50
 
-    anchor:SetSize(frameWidth, frameHeight)
+    anchorFrame:SetSize(frameWidth, frameHeight)
 
-    anchor:SetClampedToScreen(true)
+    anchorFrame:SetClampedToScreen(true)
 
-    anchor.text = anchor:CreateFontString('Text', "OVERLAY")
-    anchor.text:SetPoint("CENTER", anchor, "CENTER", 0, 0)
-    anchor.text:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
-    anchor.text:SetText("HotLoot Anchor")
-    anchor.text:SetTextColor(1, 0.24, 0, 1)
+    anchorFrame.text = anchorFrame:CreateFontString('Text', "OVERLAY")
+    anchorFrame.text:SetPoint("CENTER", anchorFrame, "CENTER", 0, 0)
+    anchorFrame.text:SetFont(STANDARD_TEXT_FONT, 9, "OUTLINE")
+    anchorFrame.text:SetText("HotLoot Anchor")
+    anchorFrame.text:SetTextColor(1, 0.24, 0, 1)
 
 
-    anchor:RegisterForDrag("LeftButton")
-    anchor:SetMovable(true)
-    anchor:EnableMouse(true)
-    anchor:SetScript("OnDragStart", function()
-        anchor:StartMoving()
+    anchorFrame:RegisterForDrag("LeftButton")
+    anchorFrame:SetMovable(true)
+    anchorFrame:EnableMouse(true)
+    anchorFrame:SetScript("OnDragStart", function()
+        anchorFrame:StartMoving()
     end)
-    anchor:SetScript("OnDragStop", function()
-        anchor:StopMovingOrSizing()
-        Options:Get('anchorPosition')['x'] = anchor:GetLeft()
-        Options:Get('anchorPosition')['y'] = anchor:GetBottom()
+    anchorFrame:SetScript("OnDragStop", function()
+        anchorFrame:StopMovingOrSizing()
+        Options:Get('anchorPosition')['x'] = anchorFrame:GetLeft()
+        Options:Get('anchorPosition')['y'] = anchorFrame:GetBottom()
     end)
-    anchor:Show()
+    anchorFrame:Show()
 
-    self.Anchor = anchor
+    HotLoot.Anchor = anchorFrame
 
-    self:RefreshAnchorPosition()
+    HotLoot:RefreshAnchorPosition()
 end
 
 function HotLoot:ToggleAnchor(val)
@@ -294,6 +287,7 @@ end
 --
 
 -- TODO: Find out what happens if gold isnt set to pick up and you use skinning mode on it.
+-- TODO: Use SplitContainerItem to only delete the right quant
 function private.AddToDeleteList(slot, item)
     if (Options:Get('toggleSkinningMode') or Util:IsSkinKeyDown()) and item.quantity > 0 then
         private.deleteList = private.deleteList or {}
@@ -334,7 +328,7 @@ end
 --
 
 -- Helper Functions
-local function HasRoom(room)
+function private.HasRoom(room)
     local numFSlots = 0
     for b = 0, 4 do
         numFSlots = numFSlots + select(1, GetContainerNumFreeSlots(b))
@@ -346,7 +340,7 @@ local function HasRoom(room)
     end
 end
 
-local function CanStack(item, stackCount)
+function private.CanStack(item, stackCount)
     local stackRoom = 0
     Util:ScanBags(
        function(bag, slot, itemLink)
@@ -364,7 +358,8 @@ local function CanStack(item, stackCount)
 end
 
 -- TODO: Figure out how to add leather to new filters?
-local untypedItems = {
+-- TODO: This is left over from old filter so either incorporate it or get rid of it
+--[[ local untypedItems = {
     ['Leather'] = {
         [124439] = true,
         [124438] = true,
@@ -388,7 +383,7 @@ local untypedItems = {
     },
 }
 
-local function CheckUntyped(type, itemLink)
+function private.CheckUntyped(type, itemLink)
     local itemId = Util:GetItemID(itemLink)
 
     if not untypedItems[type] then
@@ -402,7 +397,7 @@ local function CheckUntyped(type, itemLink)
     else
         return false
     end
-end
+end ]]
 
 local function GetItemPrice(item, optionEnable, optionSource, optionUseQuant)
     -- NOTE: The item table must contain value, link, and quant
@@ -526,7 +521,7 @@ end
 -- NOTE: Returns 2 vars...
 --      1: result [boolean]
 --      2: filter caught in / reason not caught [string]
-local function FilterSlot(loot)
+function private.FilterSlot(loot)
     -- FIXME: is this check for in raid part really needed?
     if Options:Get('tableExcludeList')[loot.item] and loot.link and (not Options:Get('toggleDisableInRaid') or GetLootMethod() ~= 'master') then
         -- Don't Loot
@@ -561,7 +556,7 @@ local function FilterSlot(loot)
             subClass = itemSubClass
         }
 
-        if (HasRoom(1) or CanStack(item, itemStackCount)) then
+        if (private.HasRoom(1) or private.CanStack(item, itemStackCount)) then
 
             -- TODO: Normalize these so that the check order is (pref, type, subtype, other) (there may be special cases)
 
@@ -1214,7 +1209,7 @@ function HotLoot:ChatCommand(input)
 
         Util:Print("Running Filter...")
 
-        local result, reason = FilterSlot(loot)
+        local result, reason = private.FilterSlot(loot)
 
         local printStr = ''
         if result then
@@ -1242,6 +1237,7 @@ function HotLoot:LOOT_OPENED()
         -- mFocus = GetMouseFocus()
         -- mFocus = (mFocus) and mFocus:GetName() or 'nil'
 
+        -- TODO: CLEAN UP!
         local lootInfo = GetLootInfo()
         self.lootInfo = lootInfo
         -- For staggering the fades
@@ -1249,11 +1245,9 @@ function HotLoot:LOOT_OPENED()
 
         for slot, lootItem in pairs(lootInfo) do
             lootItem.link = GetLootSlotLink(slot)
-            lootItem.slotType = (Util:SlotIsGold(slot)     and HL_LOOT_SLOT_TYPE.COIN) or
-                                      (Util:SlotIsCurrency(slot) and HL_LOOT_SLOT_TYPE.CURRENCY) or
-                                      HL_LOOT_SLOT_TYPE.ITEM
+            lootItem.slotType = GetLootSlotType(slot)
 
-            local filtered, reason = FilterSlot(lootItem)
+            local filtered, reason = private.FilterSlot(lootItem)
 
             if filtered and not lootItem.locked then
                 Util:Debug("Item Looted in " .. Util:ColorText(reason, 'info') .. ".")

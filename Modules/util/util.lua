@@ -65,6 +65,21 @@ function Util:DebugOption(option, value, old)
     end
 end
 
+function Util:ScanBags(proc, getItem)
+    if type(proc) ~= 'function' then return false end
+
+    for bag=0, NUM_BAG_SLOTS do
+        for slot = 1, GetContainerNumSlots(bag) do
+            if getItem then
+                local itemID = GetContainerItemLink(bag,slot)
+                proc(bag, slot, itemID)
+            else
+                proc(bag, slot)
+            end
+        end
+    end
+end
+
 function Util:ToCopper(input)
     local gold, silver, copper = 0, 0, 0
     local goldPatColored = '(%d+)[ ]?%|cffffd700[ ]?[gG]'
@@ -142,15 +157,20 @@ function Util:IsEmpty(t)
 end
 
 function Util:SlotIsGold(slot)
-    if GetLootSlotType(slot) == HL_LOOT_SLOT_TYPE.COIN then 
+    if GetLootSlotType(slot) == HL_LOOT_SLOT_TYPE.COIN then
         return true
     end
 end
 
 function Util:SlotIsCurrency(slot)
-    if GetLootSlotType(slot) == HL_LOOT_SLOT_TYPE.CURRENCY then 
+    if GetLootSlotType(slot) == HL_LOOT_SLOT_TYPE.CURRENCY then
         return true
     end
+end
+
+function Util:IsEquippableOrRelic(itemLink) -- or itemID
+    local _, _, _, _, _, itemClass, itemSubClass = GetItemInfoInstant(itemLink)
+    return IsEquippableItem(itemLink) or  (itemClass == HL_ITEM_CLASS.GEM and itemSubClass == HL_ITEM_SUB_CLASS.GEM.ARTIFACT_RELIC)
 end
 
 function Util:ShortNumber(num, places)

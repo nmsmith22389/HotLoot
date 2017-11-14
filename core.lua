@@ -1,14 +1,14 @@
 -- ────────────────────────────────────────────────────────────────────────────────
 --[[
-                            )            (                     
-                         ( /(          ) )\ )               )  
-                         )\())      ( /((()/(            ( /(  
-                        ((_)\   (   )\())/(_))  (    (   )\()) 
-                         _((_)  )\ (_))/(_))    )\   )\ (_))/  
-                        | || | ((_)| |_ | |    ((_) ((_)| |_   
-                        | __ |/ _ \|  _|| |__ / _ \/ _ \|  _|  
-                        |_||_|\___/ \__||____|\___/\___/ \__|  
-                                       
+                            )            (
+                         ( /(          ) )\ )               )
+                         )\())      ( /((()/(            ( /(
+                        ((_)\   (   )\())/(_))  (    (   )\())
+                         _((_)  )\ (_))/(_))    )\   )\ (_))/
+                        | || | ((_)| |_ | |    ((_) ((_)| |_
+                        | __ |/ _ \|  _|| |__ / _ \/ _ \|  _|
+                        |_||_|\___/ \__||____|\___/\___/ \__|
+
 By Neil Smith
 https://github.com/nmsmith22389/HotLoot
 
@@ -50,18 +50,6 @@ end
 --
 -- ─── DIALOGS ────────────────────────────────────────────────────────────────────
 --
-local function GetFirstRunDialogText()
-    local text = ''
-    if Util and Util.ColorText then
-        text = Util:ColorText('Thanks for using HotLoot!', 'success')..'\n\n'
-        text = text..Util:ColorText('Please ensure all other looting addons and Blizzard\'s auto loot are turned off.','warning')
-    else
-        text = 'Thanks for using HotLoot!'..'\n\n'
-        text = text..'Please ensure all other looting addons and Blizzard\'s auto loot are turned off.'
-    end
-    return text
-end
-
 local function OpenOptionsWindow()
     local Ace = LibStub('AceConfigDialog-3.0')
     Ace:Open('HotLoot')
@@ -279,7 +267,7 @@ function HotLoot:TestLootMonitor()
         if frame.size ~= Options:Get('selectThemeSize') or frame.textSide ~= Options:Get('selectTextSide') then
             self.toasts[nextIndex] = self:CreateLootToast()
             self.toasts[nextIndex]['pos'] = frame.pos
-            frame = self.toasts[nextIndex]                
+            frame = self.toasts[nextIndex]
         end
 
         self:ShiftToastPosUp()
@@ -319,23 +307,20 @@ local function DeleteLeftovers()
     if not Util:IsEmpty(tItemsToDelete) then
         -- TODO: Rename
         Util:Announce(L["SkinAnnounce1"])
-        for bag = 0, NUM_BAG_SLOTS do
-            for slot = 1, GetContainerNumSlots(bag) do
-                local itemLink = GetContainerItemLink(bag, slot)
-                local itemName
-                if itemLink then
-                    itemName = select(1, GetItemInfo(itemLink))
-                    if itemName and tItemsToDelete[itemName] then
-                        PickupContainerItem(bag, slot)
-                        if CursorHasItem() then
-                            DeleteCursorItem()
-                            -- TODO: Rename
-                            Util:Announce(itemLink .. L["SkinAnnounce2"])
-                        end
+        Util:ScanBags(function(bag, slot, itemLink)
+            local itemName
+            if itemLink then
+                itemName = select(1, GetItemInfo(itemLink))
+                if itemName and tItemsToDelete[itemName] then
+                    PickupContainerItem(bag, slot)
+                    if CursorHasItem() then
+                        DeleteCursorItem()
+                        -- TODO: Rename
+                        Util:Announce(itemLink .. L["SkinAnnounce2"])
                     end
                 end
             end
-        end
+        end, true)
         tItemsToDelete = {}
     end
 end
@@ -380,6 +365,7 @@ local function CanStack(iname, scount, lquant)
     --end
 end
 
+-- TODO: Figure out how to add leather to new filters?
 local untypedItems = {
     ['Leather'] = {
         [124439] = true,
@@ -420,58 +406,108 @@ local function CheckUntyped(type, itemLink)
     end
 end
 
-local function CheckThreshold(itemType, itemLink, sellAmount, itemQuantity)
-    if Options:Get('toggleUseTSMValue') and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
-        local tsmSources = TSMAPI:GetPriceSources()
-        local priceSource = (tsmSources[Options:Get('inputUseTSMValueSource')]) and Options:Get('inputUseTSMValueSource') or 'DBMarket'
-        local sellAmountOld = sellAmount
+local function GetItemPrice(item, optionEnable, optionSource, optionUseQuant)
+    -- NOTE: The item table must contain value, link, and quant
+    -- optionEnable   = 'toggleFilterTSMValue'
+    -- optionSource   = 'inputFilterTSMSource'
+    -- optionUseQuant = 'toggleUseQuantValue'
+    local value = item.value
 
-        sellAmount = TSMAPI:GetItemValue(_G.TSMAPI.Item:ToItemString(itemLink), priceSource)
-        if not sellAmount then
-            sellAmount = sellAmountOld
-        end
+    if optionEnable and optionSource and Options:Get(optionEnable) and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
+        local tsmSources = _G.TSMAPI:GetPriceSources()
+        local tsmValueSource = Options:Get(optionSource)
+        local priceSource = (tsmSources[tsmValueSource]) and tsmValueSource or 'DBMarket'
+        local tsmPrice = TSMAPI:GetItemValue(_G.TSMAPI.Item:ToItemString(item.link), priceSource)
+        value = tsmPrice or value
     end
 
-    local value
-    if Options:Get('toggleUseQuantValue') and itemQuantity ~= nil then
-        value = itemQuantity * sellAmount
-    else
-        value = sellAmount
+    if Options:Get(optionUseQuant) and item.quantity ~= nil then
+        value = item.quantity * value
     end
-
-    if Options:Get('selectThresholdType1') == itemType then
-        if Options:Get('inputThresholdValue1') <= value then
-            return true
-        else
-            return false
-        end
-    elseif Options:Get('selectThresholdType2') == itemType then
-        if Options:Get('inputThresholdValue2') <= value then
-            return true
-        else
-            return false
-        end
-    elseif Options:Get('selectThresholdType3') == itemType then
-        if Options:Get('inputThresholdValue3') <= value then
-            return true
-        else
-            return false
-        end
-    else
-        return true
-    end
+    return value
 end
 
-local function CheckILvl(iLvl)
-    if Options:Get('inputMinItemLevel') then
-        if tonumber(iLvl) >= tonumber(Options:Get('inputMinItemLevel')) then
-            return true
-        else
-            return false
+local function RunConditions(filters, item, tsmToggleOpt, tsmSourceOpt, useQuantValue)
+    for filterName, filter in pairs(Options:Get(filters)) do
+        if filter.enabled then
+            local conditionsMet = 0
+            for num, condition in ipairs(filter.conditions) do
+                if tonumber(condition.type) == HL_FILTER_TYPE.TYPE and item.class then
+                    --> Item Type
+                    if item.class == tonumber(condition.value) then
+                        if tonumber(condition.subvalue) == item.subClass or condition.subvalue == 'NONE' then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    end
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE and item.value then
+                    --> Item Value
+                    local itemValue = GetItemPrice(item, tsmToggleOpt, tsmSourceOpt, useQuantValue)
+
+                    if condition.value == 'equalTo' then
+                        if condition.subvalue == itemValue then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'greaterThan' then
+                        if itemValue > condition.subvalue then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'lessThan' then
+                        if itemValue < condition.subvalue then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    end
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.QUALITY and item.quality then
+                    --> Item Quality
+                    if condition.value == 'equalTo' then
+                        if tonumber(condition.subvalue) == item.quality then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'greaterThan' then
+                        if item.quality > tonumber(condition.subvalue) then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'lessThan' then
+                        if item.quality < tonumber(condition.subvalue) then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    end
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.NAME and item.item then
+                    --> Item Name
+                    if condition.value == 'contains' then
+                        if item.item:match(condition.subvalue) then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'matches' then
+                        if item.item:match(condition.subvalue) == item.item then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    end
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL and item.ilvl and Util:IsEquippableOrRelic(item.link) then
+                    --> Item Level
+                    if condition.value == 'equalTo' then
+                        if tonumber(condition.subvalue) == item.ilvl then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'greaterThan' then
+                        if item.ilvl > tonumber(condition.subvalue) then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    elseif condition.value == 'lessThan' then
+                        if item.ilvl < tonumber(condition.subvalue) then
+                            conditionsMet = conditionsMet + 1
+                        end
+                    end
+                end
+            end
+
+            if (filter.trigger == 'any' and conditionsMet >= 1) or
+                (filter.trigger == 'all' and conditionsMet == #filter.conditions) then
+                return true, filterName
+            end
         end
-    else
-        return true
     end
+
+    return false
 end
 
 -- NOTE: Returns 2 vars...
@@ -497,6 +533,20 @@ local function FilterSlot(loot)
         end
     elseif loot.slotType == HL_LOOT_SLOT_TYPE.ITEM and (not Options:Get('toggleDisableInRaid') or GetLootMethod() ~= 'master') then
         local _, _, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice, itemClass, itemSubClass = GetItemInfo(loot.link)
+        loot.value = itemSellPrice
+
+        local item = {
+            item = loot.item,
+            link = loot.link,
+            slotType = loot.slotType,
+            value = loot.value,
+            quantity = loot.quantity,
+            quality = loot.quality,
+            texture = loot.texture,
+            ilvl = itemLevel,
+            class = itemClass,
+            subClass = itemSubClass
+        }
 
         if (HasRoom(1) or CanStack(loot.item, itemStackCount, loot.quantity)) then
 
@@ -511,283 +561,19 @@ local function FilterSlot(loot)
             end
 
             --> Include List
-            if Options:Get('tableIncludeList')[loot.item] and CheckThreshold('z9Include', loot.link, itemSellPrice, loot.quantity) then
+            if Options:Get('tableIncludeList')[loot.item] then
                 return true, HL_LOOT_REASON.INCLUDE
             end
-
-            --> Quest
-            if
-                Options:Get('toggleQuestFilter') and
-                itemClass == HL_ITEM_CLASS.QUEST and
-                CheckThreshold("Quest", loot.link, itemSellPrice, loot.quantity)
-            then
-                return true, HL_LOOT_REASON.QUEST
-            end
-
-            --> Pickpocket
-            if IsStealthed() and Options:Get('togglePickpocketFilter') and loot.quality ~= 0 then
-                return true, HL_LOOT_REASON.PICKPOCKET
-            end
-
-            --> Cloth
-            if
-                Options:Get('toggleClothFilter') and
-                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.CLOTH) and
-                CheckThreshold("Cloth", loot.link, itemSellPrice, loot.quantity)
-            then
-                return true, HL_LOOT_REASON.CLOTH
-            end
-
-            --> Mining
-            if
-                Options:Get('toggleMiningFilter') and
-                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.METAL_STONE) and
-                CheckThreshold("Metal & Stone", loot.link, itemSellPrice, loot.quantity)
-            then
-                return true, HL_LOOT_REASON.MINING
-            end
-
-            --> Jewelcrafting
-            if
-                Options:Get('toggleGemFilter') and
-                --[[(itemClass == HL_ITEM_CLASS.GEM or ]](itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.JEWELCRAFTING) and
-                CheckThreshold("Gem", loot.link, itemSellPrice, loot.quantity)
-            then
-                return true, HL_LOOT_REASON.GEM
-            end
-
-            --> Herbs
-            if
-                Options:Get('toggleHerbFilter') and
-                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.HERB) and
-                CheckThreshold("Herb", loot.link, itemSellPrice, loot.quantity)
-            then
-                return true, HL_LOOT_REASON.HERB
-            end
-
-            --> Leather
-            if
-                Options:Get('toggleLeatherFilter') and
-                ((itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.LEATHER) or
-                CheckUntyped('Leather', loot.link)) and
-                CheckThreshold("Leather", loot.link, itemSellPrice, loot.quantity)
-            then
-                return true, HL_LOOT_REASON.LEATHER
-            end
-
-            --> Fishing (-junk)
-            if
-                IsFishingLoot() and
-                Options:Get('toggleFishingFilter') and
-                not (itemClass == HL_ITEM_CLASS.MISCELLANEOUS and itemSubClass == HL_ITEM_SUB_CLASS.MISCELLANEOUS.JUNK)
-            then
-                return true, HL_LOOT_REASON.FISHING
-            end
-
-            --> Enchanting
-            if
-                Options:Get('toggleEnchantingFilter') and
-                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.ENCHANTING) and
-                CheckThreshold("Enchanting", loot.link, itemSellPrice, loot.quantity)
-            then
-                return true, HL_LOOT_REASON.ENCHANTING
-            end
-
-            --> Inscription
-            if
-                Options:Get('togglePigmentsFilter') and
-                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.INSCRIPTION) and
-                CheckThreshold("Inscription", loot.link, itemSellPrice, loot.quantity)
-            then
-                return true, HL_LOOT_REASON.INSCRIPTION
-            end
-
-            --> Cooking
-            if
-                Options:Get('toggleCookingFilter') and
-                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.COOKING) and
-                CheckThreshold("Cooking Ingredient", loot.link, itemSellPrice, loot.quantity)
-            then
-                return true, HL_LOOT_REASON.COOKING
-            end
-
-            --> Recipe
-            if Options:Get('toggleRecipeFilter') and itemClass == HL_ITEM_CLASS.RECIPE then
-                return true, HL_LOOT_REASON.RECIPE
-            end
-
-            --> Pots
-            if
-                Options:Get('togglePotionFilter') and
-                (itemClass == HL_ITEM_CLASS.CONSUMABLE and itemSubClass == HL_ITEM_SUB_CLASS.CONSUMABLE.POTION) and
-                CheckThreshold("Potion", loot.link, itemSellPrice, loot.quantity)
-            then
-                if Options:Get('selectPotionType') == "both" then
-                    return true, HL_LOOT_REASON.POTION
-                -- FIXME: Either make these experiemental or fix these so they work in any language
-                elseif Options:Get('selectPotionType') == "healing" and string.find(loot.item, L["Healing"])  then
-                    return true, HL_LOOT_REASON.POTION_HEALTH
-                elseif Options:Get('selectPotionType') == "mana" and string.find(loot.item, L["Mana"])  then
-                    return true, HL_LOOT_REASON.POTION_MANA
-                else
-                    return false, HL_LOOT_REASON.POTION_UNSUPPORTED
-                end
-            end
-
-            --> Flasks
-            if
-                Options:Get('toggleFlaskFilter') and
-                (itemClass == HL_ITEM_CLASS.CONSUMABLE and itemSubClass == HL_ITEM_SUB_CLASS.CONSUMABLE.FLASK) and
-                CheckThreshold("Flask", loot.link, itemSellPrice, loot.quantity)
-            then
-                return true, HL_LOOT_REASON.FLASK
-            end
-
-            --> Elixirs
-            if
-                Options:Get('toggleElixirFilter') and
-                (itemClass == HL_ITEM_CLASS.CONSUMABLE and itemSubClass == HL_ITEM_SUB_CLASS.CONSUMABLE.ELIXIR) and
-                CheckThreshold("Elixir", loot.link, itemSellPrice, loot.quantity)
-            then
-                return true, HL_LOOT_REASON.ELIXIR
-            end
-
-            --> Motes
-            if
-                Options:Get('toggleElementalFilter') and
-                (itemClass == HL_ITEM_CLASS.TRADESKILL and itemSubClass == HL_ITEM_SUB_CLASS.TRADESKILL.ELEMENTAL) and
-                CheckThreshold("Elemental", loot.link, itemSellPrice, loot.quantity)
-            then
-                return true, HL_LOOT_REASON.ELEMENTAL
-            end
-
-            -- LEGION
 
             --> Artifact Power
             if Options:Get('toggleAPFilter') and TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link), true) then
                 return true, HL_LOOT_REASON.ARTIFACT_POWER
             end
 
-            --> Defiled Augment Rune
-            if Options:Get('toggleAugmentRuneFilter') and CheckUntyped('Defiled Augment Rune', loot.link) then
-                return true, HL_LOOT_REASON.AUGMENT_RUNE
-            end
+            --> Custom Filters
+            local filterTriggered, filterName = RunConditions('tableFilters', item, 'toggleFilterTSMValue', 'inputFilterTSMSource', 'toggleUseQuantValue')
 
-            --> Artifact Research Notes
-            if Options:Get('toggleKnowledgeScrollFilter') and CheckUntyped('Artifact Research Notes', loot.link) then
-                return true, HL_LOOT_REASON.ARTIFACT_RESEARCH
-            end
-
-            --> Sentinax Beacons
-            if Options:Get('toggleSentinaxBeaconFilter') and CheckUntyped('Sentinax Beacons', loot.link) then
-                return true, HL_LOOT_REASON.SENTINAX_BEACON
-            end
-
-            -- QUALITY
-
-            -- For Equipment Only option
-            local equipOnly = Options:Get('toggleOnlyEquipQuality')
-            local isEquipment = IsEquippableItem(loot.link)
-            local meetsMinLvl = false
-            local meetsMinQual = false
-            if equipOnly and isEquipment then
-                if tonumber(loot.quality) >= tonumber(Options:Get('selectMinEquipQuality')) then
-                    meetsMinQual = true
-                end
-
-                if tonumber(itemLevel) >= tonumber(Options:Get('inputMinItemLevel')) then
-                    meetsMinLvl = true
-                end
-            end
-
-            --> Poor
-            if
-                Options:Get('togglePoorQualityFilter') and
-                loot.quality == LE_ITEM_QUALITY_POOR and
-                CheckThreshold("z1Poor", loot.link, itemSellPrice, loot.quantity) and
-                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
-            then
-                -- if equipOnly then
-                --     if (isEquipment and meetsMinLvl and meetsMinQual) then
-                --         return true, 'Poor Quality Equipment Filter'
-                --     else
-                --         return false, 'Does not meet equipment requirements.'
-                --     end
-                -- end
-                return true, HL_LOOT_REASON.QUALITY_POOR
-            end
-
-            --> Common
-            if
-                Options:Get('toggleCommonQualityFilter') and
-                loot.quality == LE_ITEM_QUALITY_COMMON and
-                CheckThreshold("z2Common", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
-            then
-                return true, HL_LOOT_REASON.QUALITY_COMMON
-            end
-
-            --> Uncommon
-            if
-                Options:Get('toggleUncommonQualityFilter') and
-                loot.quality == LE_ITEM_QUALITY_UNCOMMON and
-                CheckThreshold("z3Uncommon", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
-            then
-                return true, HL_LOOT_REASON.QUALITY_UNCOMMON
-            end
-
-            --> Rare
-            if
-                Options:Get('toggleRareQualityFilter') and
-                loot.quality == LE_ITEM_QUALITY_RARE and
-                CheckThreshold("z4Rare", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
-            then
-                return true, HL_LOOT_REASON.QUALITY_RARE
-            end
-
-            --> Epic
-            if
-                Options:Get('toggleEpicQualityFilter') and
-                loot.quality == LE_ITEM_QUALITY_EPIC and
-                CheckThreshold("z5Epic", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
-            then
-                return true, HL_LOOT_REASON.QUALITY_EPIC
-            end
-
-            --> Legendary
-            if
-                Options:Get('toggleLegendaryQualityFilter') and
-                loot.quality == LE_ITEM_QUALITY_LEGENDARY and
-                CheckThreshold("z6Legendary", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
-            then
-                return true, HL_LOOT_REASON.QUALITY_LEGENDARY
-            end
-
-            --> Artifact
-            if
-                Options:Get('toggleArtifactQualityFilter') and
-                loot.quality == LE_ITEM_QUALITY_ARTIFACT and
-                CheckThreshold("z7Artifact", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
-            then
-                return true, HL_LOOT_REASON.QUALITY_ARTIFACT
-            end
-
-            --> Heirloom
-            if
-                Options:Get('toggleHeirloomQualityFilter') and
-                loot.quality == LE_ITEM_QUALITY_HEIRLOOM and
-                CheckThreshold("z8Heirloom", loot.link, itemSellPrice, loot.quantity) and CheckILvl(itemLevel) and
-                (not equipOnly or ((isEquipment and meetsMinLvl and meetsMinQual) or not meetsMinQual))
-            then
-                return true, HL_LOOT_REASON.QUALITY_HEIRLOOM
-            end
-
-            return false, HL_LOOT_REASON.NOT_FOUND
+            return filterTriggered, filterTriggered and filterName or HL_LOOT_REASON.NOT_FOUND
         else
             Util:Announce(L["BagsFull"])
             Util:Debug(ERR_INV_FULL)
@@ -806,28 +592,32 @@ end
 -- ─── SELL POOR ITEMS ────────────────────────────────────────────────────────────
 --
 
-local function SellPoorItems()
-    local bag, slot
+local function SellFilters()
     local totalPrice = 0
     local totalCount = 0
-    for bag=0, NUM_BAG_SLOTS do
-        for slot = 1, GetContainerNumSlots(bag) do
-            local item = GetContainerItemID(bag,slot)
-            if item then
-                local itemName, itemLink, itemQuality = GetItemInfo(item)
-                local sellPrice = select(11,GetItemInfo(item))
-                if itemQuality == 0 and sellPrice > 0 then
-                    local itemCount = select(2,GetContainerItemInfo(bag,slot))
-                    Util:Debug(string.format(L["GreyItemSold"], itemLink, itemCount, Util:FormatMoney(sellPrice * itemCount, 'SMART', true)))
-                    UseContainerItem(bag,slot)
-                    totalPrice = totalPrice + sellPrice * itemCount
-                    totalCount = totalCount + itemCount
-                end
+    local sellFunc = function(bag, slot, itemLink)
+        if not itemLink then return false end
+        local item = {}
+        item.link = itemLink
+        item.item, _, item.quality, item.ilvl, item.minLvl, _, _, _, _, _, item.value, item.class, item.subClass = GetItemInfo(item.link)
+
+        local filterTriggered, filterName = RunConditions('tableSellFilters', item, 'toggleSellFilterTSMValue', 'inputSellFilterTSMSource')
+        local _, itemCount, locked, _, _, lootable, _, _ = GetContainerItemInfo(bag, slot)
+
+        if filterTriggered and not locked and not lootable then
+            UseContainerItem(bag, slot)
+            totalPrice = totalPrice + item.value * itemCount
+            totalCount = totalCount + itemCount
+            if Options:Get('toggleSellFiltersPrintEachItem') then
+                Util:Announce(L['ItemSold']:format(item.link, Util:FormatMoney(item.value, 'SMART', true)))
             end
         end
     end
-    if totalPrice > 0 then
-        Util:Announce(string.format(L["AllGreysSold"], totalCount, Util:FormatMoney(totalPrice, 'SMART', true)))
+    Util:ScanBags(sellFunc, true)
+
+    -- TODO: Calc price of sold items (sperate by filter? say which sold what?)
+    if totalPrice > 0 and Options:Get('toggleSellFiltersPrintTotal') then
+        Util:Announce(L["TotalItemsSold"]:format(totalCount, Util:FormatMoney(totalPrice, 'SMART', true)))
     end
 end
 
@@ -835,32 +625,31 @@ end
 -- ─── NEW LOOT ICON FUNCTIONS ────────────────────────────────────────────────────
 --
 
-local function GetItemValueText(itemLink, useTSM)
-    local itemValue
-    local prefixText = ''
+-- FIXME: Figure out why sometimes as of 7.2.5 it gets nil as the value
+local function GetItemValueText(item)
+    item.value = item.value or select(11, GetItemInfo(item.link))
 
-    -- FIXME: Figure out why sometimes as of 7.2.5 it gets nil as the value
-    if useTSM and IsAddOnLoaded('TradeSkillMaster') and TSMAPI then
+    local prefixText = ''
+    local itemValue = GetItemPrice(item, 'toggleTextTSMValue', 'inputTextTSMSource')
+
+    if Options:Get('toggleTextTSMValue') then
         local tsmSources = TSMAPI:GetPriceSources()
-        local priceSource = (tsmSources[Options:Get('inputValueTSMSource')]) and Options:Get('inputValueTSMSource') or 'DBMarket'
-        prefixText = tsmSources[priceSource]
+        prefixText = tsmSources[Options:Get('inputTextTSMSource')] or tsmSources['DBMarket']
 
         if prefixText:len() > 20 then
-           prefixText = prefixText:match('^%a+%s%-%s([%w%s]+)') or priceSource
-        end
-
-        itemValue = TSMAPI:GetItemValue(_G.TSMAPI.Item:ToItemString(itemLink), priceSource)
-        if not itemValue then
-            return GetItemValueText(itemLink, false)
-        end
+            prefixText = prefixText:match('^%a+%s%-%s([%w%s]+)')
+         end
     else
-        itemValue = select(11, GetItemInfo(itemLink))
         -- TODO: Localize
         prefixText = 'Vendor'
     end
 
-    prefixText = (prefixText ~= '' and Options:Get('toggleShowValuePrefix')) and prefixText..': ' or ''
-    return prefixText..Util:FormatMoney(itemValue, 'SMART', true)
+    if not itemValue then
+        return Util:FormatMoney(item.value, 'SMART', true)
+    else
+        prefixText = (prefixText ~= '' and Options:Get('toggleShowValuePrefix')) and prefixText..': ' or ''
+        return prefixText..Util:FormatMoney(itemValue, 'SMART', true)
+    end
 end
 
 local function GetSmartInfoText(loot)
@@ -961,7 +750,7 @@ local function SetLoot(frame, loot)
             left   = Options:Get('rangeThemeBorderInset'),
             right  = Options:Get('rangeThemeBorderInset'),
             top    = Options:Get('rangeThemeBorderInset'),
-            bottom = Options:Get('rangeThemeBorderInset') 
+            bottom = Options:Get('rangeThemeBorderInset')
         }
     })
 
@@ -1059,7 +848,7 @@ local function SetLoot(frame, loot)
 
         if Options:Get('toggleShowSellPrice') and loot.quantity > 0 and loot.slotType == HL_LOOT_SLOT_TYPE.ITEM then
 
-            frame.value:SetText(GetItemValueText(loot.link, Options:Get('toggleShowTSMValue')))
+            frame.value:SetText(GetItemValueText(loot))
 
             -- frame.value:ClearAllPoints()
             --[[if theme.text.value.top then
@@ -1359,23 +1148,25 @@ function HotLoot:ChatCommand(input)
         --InterfaceOptionsFrame_OpenToCategory(Options:Get('rame'))
         OpenOptionsWindow()
     elseif input == "help" then
+        -- TODO: Localize
         Util:Print('--- Available Commands ---')
         Util:Print('UNDER CONSTRUCTION')
-        Util:Print('- '..Util:ColorText('enable', 'info')..': Enables/disables the addon')
-        -- Util:Print('- '..Util:ColorText('debug', 'info')..': Enables/disables debug mode')
+        Util:Print('- '..Util:ColorText('enable',       'info')..': Enables/disables the addon')
+        -- Util:Print('- '..Util:ColorText('debug',     'info')..': Enables/disables debug mode')
         -- Util:Print('- '..Util:ColorText('autoclose', 'info')..': Toggles the autoclose option')
-        -- Util:Print('- '..Util:ColorText('skinning', 'info')..': Toggles skinning mode')
-        -- Util:Print('- '..Util:ColorText('monitor', 'info')..': Toggles loot monitor')
-        Util:Print('- '..Util:ColorText('include', 'info')..' <item>: Adds the item to the Include List')
-        Util:Print('- '..Util:ColorText('exclude', 'info')..' <item>: Adds the item to the Exclude List')
-        Util:Print('- '..Util:ColorText('filter', 'info')..' <item>: Test to see if an item will be looted')
+        -- Util:Print('- '..Util:ColorText('skinning',  'info')..': Toggles skinning mode')
+        -- Util:Print('- '..Util:ColorText('monitor',   'info')..': Toggles loot monitor')
+        Util:Print('- '..Util:ColorText('include',      'info')..' <item>: Adds the item to the Include List')
+        Util:Print('- '..Util:ColorText('exclude',      'info')..' <item>: Adds the item to the Exclude List')
+        Util:Print('- '..Util:ColorText('filter',       'info')..' <item>: Test to see if an item will be looted')
+        Util:Print('- '..Util:ColorText('sellFilter',   'info')..' <item>: Test to see if an item will be looted')
     elseif string.find(input, '^enable') then
         if Options:Get('toggleSystemEnable') then
             Options:Set('toggleSystemEnable', false)
-            Util:Print('Auto looting DISABLED.')            
+            Util:Print('Auto looting DISABLED.')
         else
             Options:Set('toggleSystemEnable', true)
-            Util:Print('Auto looting ENABLED.')            
+            Util:Print('Auto looting ENABLED.')
         end
     elseif string.find(input, '^include%s') then
         local item = string.gsub(input, '^include%s', '', 1)
@@ -1409,7 +1200,7 @@ function HotLoot:ChatCommand(input)
         }
 
         Util:Print("Running Filter...")
-        
+
         local result, reason = FilterSlot(loot)
 
         local printStr = ''
@@ -1420,6 +1211,7 @@ function HotLoot:ChatCommand(input)
             printStr = '%s was not caught. Reason: %s'
             Util:Print(printStr:format(loot.link, reason))
         end
+    elseif string.find(input, '^sellFilter%s') then
     else
         OpenOptionsWindow()
         -- print(input.." | trim: ".. input:trim())
@@ -1546,10 +1338,8 @@ function HotLoot:LOOT_SLOT_CLEARED(slot)
 end
 
 function HotLoot:MERCHANT_SHOW(...)
-    if Options:Get('toggleSystemEnable') and Options:Get('toggleSellPoorItems') then
-        Util:Debug("Merchant Window Opened")
-        SellPoorItems()
-    end
+    Util:Debug("Merchant Window Opened")
+    SellFilters()
 end
 
 function HotLoot:BAG_UPDATE(...)

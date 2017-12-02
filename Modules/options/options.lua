@@ -739,10 +739,11 @@ function Options:ViewFilter(name, isSellFilter)
             name = L['genEnable'],
             type = 'toggle',
             set = function(info, value)
-                Options.db.profile[filterTable][name].enabled = value
+                -- TODO: Figure out if this way or using `Options[table][table].thing is better.
+                filter.enabled = value
             end,
             get = function()
-                return Options.db.profile[filterTable][name].enabled
+                return filter.enabled
             end,
             order = 7
         }
@@ -755,10 +756,10 @@ function Options:ViewFilter(name, isSellFilter)
                 ['any'] = 'Any Condition'
             },
             set = function(info, value)
-                Options.db.profile[filterTable][name].trigger = value
+                filter.trigger = value
             end,
             get = function(info)
-                return Options.db.profile[filterTable][name].trigger
+                return filter.trigger
             end
         }
         opts.buttonAddCondition = {

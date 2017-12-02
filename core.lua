@@ -653,6 +653,8 @@ local function SellFilters()
         -- item.item, _, item.quality, item.ilvl, item.minLvl, _, _, _, _, _, item.value, item.class, item.subClass = GetItemInfo(item.link)
         local item = HotLoot.Item:New(itemLink, true)
 
+        if not item then return end
+
         local filterTriggered, filterName = private.RunConditions{
             filters   = Options:Get('tableSellFilters'),
             item      = item,

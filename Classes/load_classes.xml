@@ -1,0 +1,6 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Include file="class.lua"/>
+	<Include file="item.lua"/>
+	<Include file="lootitem.lua"/>
+	<Include file="lootinfo.lua"/>
+</Ui>

@@ -24,6 +24,7 @@ Locales\Locales.xml
 media\load_media.xml
 constants.lua
 core.lua
+Classes\load_classes.xml
 Modules\load_modules.xml
 Templates.xml
 # loottoasts.xml

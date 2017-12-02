@@ -229,21 +229,7 @@ function HotLoot:TestLootMonitor()
         end
     end
 
-    local itemTexture, _, isLocked, itemQuality = GetContainerItemInfo(rndBag, rndSlot)
-    local isQuestItem, questId, isActive = GetContainerItemQuestInfo(rndBag, rndSlot)
-    local itemName = GetItemInfo(itemLink)
-    local loot = {
-        texture     = itemTexture,
-        item        = itemName,
-        quantity    = 1,
-        quality     = itemQuality,
-        locked      = isLocked,
-        isQuestItem = isQuestItem,
-        questId     = questId,
-        isActive    = isActive,
-        link        = itemLink,
-        slotType    = HL_LOOT_SLOT_TYPE.ITEM
-    }
+    local loot = HotLoot.LootItem:NewDummy(itemLink)
 
     -- Create Toast
     -- TODO: Consider making this a func since its also used in the LOOT_OPENED event
@@ -288,16 +274,17 @@ end
 
 -- TODO: Find out what happens if gold isnt set to pick up and you use skinning mode on it.
 -- TODO: Use SplitContainerItem to only delete the right quant
-function private.AddToDeleteList(slot, item)
-    if (Options:Get('toggleSkinningMode') or Util:IsSkinKeyDown()) and item.quantity > 0 then
+function private.AddToDeleteList(item)
+    if not item.GetClass or item:GetClass() ~= 'LootItem' then error('Wrong class for argument.') end
+    if (Options:Get('toggleSkinningMode') or Util:IsSkinKeyDown()) and item:Quantity() > 0 then
         private.deleteList = private.deleteList or {}
 
-        local itemID = GetItemInfoInstant(item.link)
+        local itemID = item:ID()
         if not itemID then return false end
 
-        private.deleteList[itemID] = item.item
-        LootSlot(slot)
-        Util:Debug(Util:ColorText(item.link..' is set to be deleted!', 'alert'))
+        private.deleteList[itemID] = item:Name()
+        item:Loot()
+        Util:Debug(Util:ColorText(item:Link()..' is set to be deleted!', 'alert'))
     end
 end
 
@@ -340,17 +327,17 @@ function private.HasRoom(room)
     end
 end
 
-function private.CanStack(item, stackCount)
+function private.CanStack(item)
     local stackRoom = 0
     Util:ScanBags(
        function(bag, slot, itemLink)
            if itemLink == GetContainerItemLink(bag, slot) then
                 local bagQuant = select(2, GetContainerItemInfo(bag, slot))
-                stackRoom = stackRoom + (stackCount - bagQuant)
+                stackRoom = stackRoom + (item:StackCount() - bagQuant)
            end
        end
     )
-    if item.quantity <= stackRoom then
+    if item:Quantity() <= stackRoom then
         return true
     else
         return false
@@ -409,7 +396,7 @@ function private.GetItemPrice(item, opts)
             useQuant => 'toggleUseQuantValue'
         }
     ]]
-    if not item or not item.value or not item.link or not item.quantity then return 0 end
+    if not item or not item:Value() or not item:Link() or not item:Quantity() then return 0 end
     if not opts or type(opts) ~= 'table' then
         opts = {
             useTSM = false,
@@ -420,27 +407,28 @@ function private.GetItemPrice(item, opts)
         opts.useTSM = opts.useTSM or false
         opts.useQuant = opts.useQuant or false
     end
-    local value = item.value
+    local value = item:Value()
     local defaultSource = 'DBMarket'
 
     if opts.useTSM and Options:IsTSMLoaded() then
         local tsmSources = TSMAPI:GetPriceSources()
         local priceSource = tsmSources[opts.source] and opts.source or defaultSource
-        local tsmPrice = TSMAPI:GetItemValue(TSMAPI.Item:ToItemString(item.link), priceSource)
+        local tsmPrice = TSMAPI:GetItemValue(TSMAPI.Item:ToItemString(item:Link()), priceSource)
         value = tsmPrice or value
     end
 
-    if opts.useQuant and item.quantity ~= nil then
-        value = item.quantity * value
+    if opts.useQuant and item:Quantity() ~= nil then
+        value = item:Quantity() * value
     end
     return value
 end
 
 function private.RunConditions(opts)
+    if not opts.item.GetClass or opts.item:GetClass() ~= 'Item' then error('Wrong class for argument.') end
     --[[
         opts = {
             filters   => filters table,
-            item      => loot info table,
+            item      => Item class,
             tsmToggle => TSM on/off,
             tsmSource => TSM source string,
             useQuant  => toggleUseQuantValue
@@ -455,7 +443,7 @@ function private.RunConditions(opts)
     opts.useQuant  = type(opts.useQuant)  == 'boolean' and opts.useQuant  or false
 
     local function debug_c(str)
-        local debug = HotLoot.DEBUG_CONDITIONS or false
+        local debug = HotLoot.DEBUG_CONDITIONS
         if debug then
             Util:Print(str)
         end
@@ -465,14 +453,18 @@ function private.RunConditions(opts)
         if filter.enabled then
             local conditionsMet = 0
             for num, condition in ipairs(filter.conditions) do
-                if tonumber(condition.type) == HL_FILTER_TYPE.TYPE and opts.item.class then
+                if tonumber(condition.type) == HL_FILTER_TYPE.TYPE and opts.item:Class() then
                     --> Item Type
-                    if opts.item.class == tonumber(condition.value) then
-                        if tonumber(condition.subvalue) == opts.item.subClass or condition.subvalue == 'NONE' then
+                    debug_c('Item Type:     '..opts.item:Class())
+                    debug_c('Condition Val: '..condition.value)
+                    debug_c('Item SubType:     '..opts.item:SubClass())
+                    debug_c('Condition SubVal: '..condition.subvalue)
+                    if opts.item:Class() == tonumber(condition.value) then
+                        if tonumber(condition.subvalue) == opts.item:SubClass() or condition.subvalue == 'NONE' then
                             conditionsMet = conditionsMet + 1
                         end
                     end
-                elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE and opts.item.value then
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.VALUE and opts.item:Value() then
                     --> Item Value
                     local itemValue = private.GetItemPrice(opts.item, opts.tsmToggle, opts.tsmSource, opts.useQuant)
                     debug_c('Item Value:    '..Util:FormatMoney(itemValue, 'SMART', true))
@@ -491,50 +483,50 @@ function private.RunConditions(opts)
                             conditionsMet = conditionsMet + 1
                         end
                     end
-                elseif tonumber(condition.type) == HL_FILTER_TYPE.QUALITY and opts.item.quality then
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.QUALITY and opts.item:Quality() then
                     --> Item Quality
                     if condition.value == 'equalTo' then
-                        if tonumber(condition.subvalue) == opts.item.quality then
+                        if tonumber(condition.subvalue) == opts.item:Quality() then
                             conditionsMet = conditionsMet + 1
                         end
                     elseif condition.value == 'greaterThan' then
-                        if opts.item.quality > tonumber(condition.subvalue) then
+                        if opts.item:Quality() > tonumber(condition.subvalue) then
                             conditionsMet = conditionsMet + 1
                         end
                     elseif condition.value == 'lessThan' then
-                        if opts.item.quality < tonumber(condition.subvalue) then
+                        if opts.item:Quality() < tonumber(condition.subvalue) then
                             conditionsMet = conditionsMet + 1
                         end
                     end
-                elseif tonumber(condition.type) == HL_FILTER_TYPE.NAME and opts.item.item then
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.NAME and opts.item:Name() then
                     --> Item Name
                     if condition.value == 'contains' then
-                        if opts.item.item:match(condition.subvalue) then
+                        if opts.item:Name():match(condition.subvalue) then
                             conditionsMet = conditionsMet + 1
                         end
                     elseif condition.value == 'matches' then
-                        if opts.item.item:match(condition.subvalue) == opts.item.item then
+                        if opts.item:Name():match(condition.subvalue) == opts.item:Name() then
                             conditionsMet = conditionsMet + 1
                         end
                     end
-                elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL and opts.item.ilvl and Util:IsEquippableOrRelic(opts.item.link) then
+                elseif tonumber(condition.type) == HL_FILTER_TYPE.ILVL and opts.item:iLvl() and opts.item:IsEquippable() then
                     --> Item Level
                     if condition.value == 'equalTo' then
-                        if tonumber(condition.subvalue) == opts.item.ilvl then
+                        if tonumber(condition.subvalue) == opts.item:iLvl() then
                             conditionsMet = conditionsMet + 1
                         end
                     elseif condition.value == 'greaterThan' then
-                        if opts.item.ilvl > tonumber(condition.subvalue) then
+                        if opts.item:iLvl() > tonumber(condition.subvalue) then
                             conditionsMet = conditionsMet + 1
                         end
                     elseif condition.value == 'lessThan' then
-                        if opts.item.ilvl < tonumber(condition.subvalue) then
+                        if opts.item:iLvl() < tonumber(condition.subvalue) then
                             conditionsMet = conditionsMet + 1
                         end
                     end
                 elseif tonumber(condition.type) == HL_FILTER_TYPE.BIND then
                     --> Bind Type
-                    local bindType = Util:GetBindType(opts.item.link)
+                    local bindType = Util:GetBindType(opts.item:Link())
 
                     if bindType then
                         if condition.value == 'is' then
@@ -563,32 +555,33 @@ end
 -- NOTE: Returns 2 vars...
 --      1: result [boolean]
 --      2: filter caught in / reason not caught [string]
-function private.FilterSlot(loot)
+function private.FilterSlot(item)
+    if not item.GetClass or item:GetClass() ~= 'LootItem' then error('Wrong class for argument.') end
     -- FIXME: is this check for in raid part really needed?
-    if Options:Get('tableExcludeList')[loot.item] and loot.link and (not Options:Get('toggleDisableInRaid') or GetLootMethod() ~= 'master') then
+    if Options:Get('tableExcludeList')[item:Name()] and item:Link() and (not Options:Get('toggleDisableInRaid') or GetLootMethod() ~= 'master') then
         -- Don't Loot
-        Util:Announce(L["AnnounceItemExcluded"]:format(loot.link))
+        Util:Announce(L["AnnounceItemExcluded"]:format(item:Link()))
         return false, HL_LOOT_REASON.EXCLUDE
     end
 
-    if loot.slotType == HL_LOOT_SLOT_TYPE.COIN then
+    if item:IsGold() then
         -- Check Gold (Coin)
         if Options:Get('toggleGoldFilter') then
             return true, HL_LOOT_REASON.GOLD
         end
-    elseif loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
+    elseif item:IsCurrency() then
         -- Check Currency
         if Options:Get('toggleCurrencyFilter') then
             return true, HL_LOOT_REASON.CURRENCY
         end
-    elseif loot.slotType == HL_LOOT_SLOT_TYPE.ITEM and (not Options:Get('toggleDisableInRaid') or GetLootMethod() ~= 'master') then
-        local _, _, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice, itemClass, itemSubClass = GetItemInfo(loot.link)
-        loot.value = itemSellPrice
+    elseif item:IsItem() and (not Options:Get('toggleDisableInRaid') or GetLootMethod() ~= 'master') then
+        -- local _, _, _, itemLevel, _, itemType, itemSubType, itemStackCount, _, _, itemSellPrice, itemClass, itemSubClass = GetItemInfo(loot.link)
+        -- loot.value = itemSellPrice
 
-        local item = {
+--[[         local item = {
             item = loot.item,
             link = loot.link,
-            slotType = loot.slotType,
+            slotType = item:SlotType(),
             value = loot.value,
             quantity = loot.quantity,
             quality = loot.quality,
@@ -596,27 +589,29 @@ function private.FilterSlot(loot)
             ilvl = itemLevel,
             class = itemClass,
             subClass = itemSubClass
-        }
+        } ]]
 
-        if (private.HasRoom(1) or private.CanStack(item, itemStackCount)) then
+        item = item:ToItem()
+
+        if (private.HasRoom(1) or private.CanStack(item)) then
 
             -- TODO: Normalize these so that the check order is (pref, type, subtype, other) (there may be special cases)
 
             --> Debug
             if Options:Get('toggleDebugMode') then
                 local strFilterDebug = "-------------\n"..
-                    tostring(loot.link)..' x'..tostring(loot.quantity)..'\n'..
-                    '    - '..tostring(itemType)..' > '..tostring(itemSubType)
+                    tostring(item:Link())..' x'..tostring(item:Quantity())..'\n'..
+                    '    - '..item:LocalClass()..' > '..item:LocalSubClass()
                 Util:Debug(strFilterDebug)
             end
 
             --> Include List
-            if Options:Get('tableIncludeList')[loot.item] then
+            if Options:Get('tableIncludeList')[item:Name()] then
                 return true, HL_LOOT_REASON.INCLUDE
             end
 
             --> Artifact Power
-            if Options:Get('toggleAPFilter') and TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link), true) then
+            if Options:Get('toggleAPFilter') and TooltipScan.GetItemArtifactPower(item:ID(), true) then
                 return true, HL_LOOT_REASON.ARTIFACT_POWER
             end
 
@@ -653,9 +648,10 @@ local function SellFilters()
     local totalCount = 0
     local sellFunc = function(bag, slot, itemLink)
         if not itemLink then return false end
-        local item = {}
-        item.link = itemLink
-        item.item, _, item.quality, item.ilvl, item.minLvl, _, _, _, _, _, item.value, item.class, item.subClass = GetItemInfo(item.link)
+        -- local item = {}
+        -- item.link = itemLink
+        -- item.item, _, item.quality, item.ilvl, item.minLvl, _, _, _, _, _, item.value, item.class, item.subClass = GetItemInfo(item.link)
+        local item = HotLoot.Item:New(itemLink, true)
 
         local filterTriggered, filterName = private.RunConditions{
             filters   = Options:Get('tableSellFilters'),
@@ -667,10 +663,10 @@ local function SellFilters()
 
         if filterTriggered and not locked and not lootable then
             UseContainerItem(bag, slot)
-            totalPrice = totalPrice + item.value * itemCount
+            totalPrice = totalPrice + item:Value() * itemCount
             totalCount = totalCount + itemCount
             if Options:Get('toggleSellFiltersPrintEachItem') then
-                Util:Announce(L['ItemSold']:format(item.link, Util:FormatMoney(item.value, 'SMART', true)))
+                Util:Announce(L['ItemSold']:format(item:Link(), Util:FormatMoney(item:Value(), 'SMART', true)))
             end
         end
     end
@@ -688,8 +684,8 @@ end
 
 -- FIXME: Figure out why sometimes as of 7.2.5 it gets nil as the value
 local function GetItemValueText(item)
-    item.value = item.value or select(11, GetItemInfo(item.link))
-
+    -- item.value = item.value or select(11, GetItemInfo(item.link))
+    if not item.GetClass or item:GetClass() ~= 'Item' then error('Wrong class for argument.') end
     local prefixText = ''
     local itemValue = private.GetItemPrice(item, {
         useTSM = Options:Get('toggleTextTSMValue'),
@@ -709,7 +705,7 @@ local function GetItemValueText(item)
     end
 
     if not itemValue then
-        return Util:FormatMoney(item.value, 'SMART', true)
+        return Util:FormatMoney(item:Value(), 'SMART', true)
     else
         prefixText = (prefixText ~= '' and Options:Get('toggleShowValuePrefix')) and prefixText..': ' or ''
         return prefixText..Util:FormatMoney(itemValue, 'SMART', true)
@@ -717,31 +713,33 @@ local function GetItemValueText(item)
 end
 
 local function GetSmartInfoText(loot)
+    if not loot.GetClass or loot:GetClass() ~= 'LootItem' then error('Wrong class for argument.') end
 -- ────────────────────────────────────────────────────────────────────────────────
 -- TODO: Localize ALL these
 -- ────────────────────────────────────────────────────────────────────────────────
-    if loot.slotType == HL_LOOT_SLOT_TYPE.COIN then
+    if loot:IsGold() then
         --> If loot is gold
         -- ... show total player gold.
         -- TODO: LOCALIZE
         local template = 'Player Gold: %s'
         local goldValue = GetMoney()
         return template:format(Util:FormatMoney(goldValue, 'SMART', true))
-    elseif loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
+    elseif loot:IsCurrency() then
         --> If loot is currency
         -- ... Weekly max? Total max?
         return CURRENCY
     else
         --> If loot is an item
-        local reason = loot.reason
-        local itemID = Util:GetItemID(loot.link)
+        local reason = loot:GetInfo('reason')
+        local itemID = loot:ID()
 
         --> If the item is...
-        if reason == HL_LOOT_REASON.ARTIFACT_POWER then
+        if loot:GetInfo('reason') == HL_LOOT_REASON.ARTIFACT_POWER then
             -- Artifact Power
             -- TODO: LOCALIZE
-            return string.format('Gives %s AP', Util:ShortNumber(TooltipScan.GetItemArtifactPower(Util:GetItemID(loot.link)), 1))
+            return string.format('Gives %s AP', Util:ShortNumber(TooltipScan.GetItemArtifactPower(itemID), 1))
         elseif Options:Get('toggleFarmingMode') and HotLoot.farmingStats and HotLoot.farmingStats[itemID] then
+            -- TODO: Clean up farming mode
             local stat = HotLoot:GetFarmingStats(itemID)
             local statFormatted = function()
                 if stat < 1 then
@@ -760,8 +758,8 @@ local function GetSmartInfoText(loot)
 
             return string.format('Farmed: %s/%s', statFormatted(), perFormatted)
         else
-            local typeText        = select(6, GetItemInfo(loot.link)) or 'N/A'
-            local subtypeText     = select(7, GetItemInfo(loot.link)) or 'N/A'
+            local typeText        = select(2, GetItemInfoInstant(itemID)) or 'N/A'
+            local subtypeText     = select(3, GetItemInfoInstant(itemID)) or 'N/A'
             local typeTextDivider = ': '
 
             return Options:Get('toggleShowItemTypeNoInfo') and typeText..typeTextDivider..subtypeText or ''
@@ -771,10 +769,11 @@ end
 
 -- TODO: Add option to change text outline (ie outline, thickoutline, mono, none)
 local function SetLoot(frame, loot)
+    if not loot.GetClass or loot:GetClass() ~= 'LootItem' then error('Wrong class for argument.') end
     --> Set ToolTip
-    if loot.link then
+    if loot:Link() then
         -- NOTE: loot.link and loot.slotType need to be set before calling this func
-        frame.item = loot.link
+        frame.item = loot:Link()
         frame.ShowTooltip = function(self)
             if self.item then
                 GameTooltip:SetOwner(self, 'ANCHOR_CURSOR')
@@ -819,8 +818,8 @@ local function SetLoot(frame, loot)
     })
 
     --> Coin Type
-    if loot.slotType == HL_LOOT_SLOT_TYPE.COIN then
-        loot.item = Util:FormatMoney(Util:ToCopper(loot.item), 'SMART', true)
+    if loot:IsGold() then
+        loot.__data.name = Util:FormatMoney(Util:ToCopper(loot:Name()), 'SMART', true)
     end
 
     --> Set Theme Color
@@ -833,8 +832,8 @@ local function SetLoot(frame, loot)
     local borderBlue  = Options:Get('colorThemeBorder')['b']
     local borderAlpha = Options:Get('colorThemeBorder')['a']
 
-    if Options:Get('toggleColorByQuality') and loot.quantity > 0 and loot.quality then
-        borderRed, borderGreen, borderBlue = GetItemQualityColor(loot.quality)
+    if Options:Get('toggleColorByQuality') and loot:Quantity() > 0 and loot:Quality() then
+        borderRed, borderGreen, borderBlue = GetItemQualityColor(loot:Quality())
         borderAlpha = 1
     end
 
@@ -844,7 +843,7 @@ local function SetLoot(frame, loot)
     frame:SetAlpha(Options:Get('rangeTransparency'))
 
     --> Set Icon
-    frame.icon:SetTexture(loot.texture)
+    frame.icon:SetTexture(loot:Texture())
     -- frame.icon:ClearAllPoints()
     -- frame.icon:SetPoint('TOPLEFT', frame, 'TOPLEFT', theme.icon.left, theme.icon.top)
     if frame.size == HL_THEME_SIZE.SMALL then
@@ -861,13 +860,13 @@ local function SetLoot(frame, loot)
         alpha = Options:Get('colorFontColor')['a']
     }
 
-    if Options:Get('toggleFontColorByQual') and loot.quality then
-        colorFont.red, colorFont.green, colorFont.blue = GetItemQualityColor(loot.quality)
+    if Options:Get('toggleFontColorByQual') and loot:Quality() then
+        colorFont.red, colorFont.green, colorFont.blue = GetItemQualityColor(loot:Quality())
         colorFont.alpha = 1.0
     end
 
     --> Set Name
-    local nameText = loot.link or loot.item
+    local nameText = loot:Link() or loot:Name()
     local nameFont = GetFont('selectNameTextFont')
 
     frame.name:SetFont(nameFont, Options:Get('rangeNameTextSize'), Options:Get('selectNameTextOutline'))
@@ -882,16 +881,16 @@ local function SetLoot(frame, loot)
         frame.count:SetFont(countFont, Options:Get('rangeQuantTextSize'), Options:Get('selectQuantTextOutline'))
         frame.count:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha)
 
-        if Options:Get('toggleShowItemQuant') and loot.quantity > 0 then
-            local countText = loot.quantity
+        if Options:Get('toggleShowItemQuant') and loot:Quantity() > 0 then
+            local countText = loot:Quantity()
 
-            if Options:Get('toggleShowTotalQuant') and loot.slotType ~= nil then
-                if loot.slotType == HL_LOOT_SLOT_TYPE.CURRENCY then
-                    local _, currencyCurrentAmount, _, _, _, currencyMax, _ = GetCurrencyInfo(loot.link)
-                    local currencyTotalText = (currencyCurrentAmount + loot.quantity < currencyMax or currencyMax == 0) and (currencyCurrentAmount + loot.quantity) or currencyMax
-                    countText = loot.quantity..' ['..tostring(currencyTotalText)..']'
+            if Options:Get('toggleShowTotalQuant') and loot:SlotType() ~= nil then
+                if loot:IsCurrency() then
+                    local _, currencyCurrentAmount, _, _, _, currencyMax, _ = GetCurrencyInfo(loot:Link())
+                    local currencyTotalText = (currencyCurrentAmount + loot:Quantity() < currencyMax or currencyMax == 0) and (currencyCurrentAmount + loot:Quantity()) or currencyMax
+                    countText = loot:Quantity()..' ['..tostring(currencyTotalText)..']'
                 else
-                    countText = loot.quantity..' ['..tostring(GetItemCount(loot.item) + loot.quantity)..']'
+                    countText = loot:Quantity()..' ['..tostring(GetItemCount(loot:Link()) + loot:Quantity())..']'
                 end
             end
 
@@ -910,9 +909,9 @@ local function SetLoot(frame, loot)
         frame.value:SetFont(valueFont, Options:Get('rangeLine2TextSize'), Options:Get('selectLine2TextOutline'))
         frame.value:SetTextColor(colorFont.red, colorFont.green, colorFont.blue, colorFont.alpha)
 
-        if Options:Get('toggleShowSellPrice') and loot.quantity > 0 and loot.slotType == HL_LOOT_SLOT_TYPE.ITEM then
+        if Options:Get('toggleShowSellPrice') and loot:Quantity() > 0 and loot:IsItem() then
 
-            frame.value:SetText(GetItemValueText(loot))
+            frame.value:SetText(GetItemValueText(loot:ToItem()))
 
             -- frame.value:ClearAllPoints()
             --[[if theme.text.value.top then
@@ -1242,39 +1241,32 @@ function HotLoot:ChatCommand(input)
     elseif string.find(input, '^filter%s') then
         local itemInput = string.gsub(input, '^filter%s', '', 1)
 
-        local itemName, itemLink, itemQuality, _, _, _, _, _, _, iconFileDataID, _, _, _, _, _, _, isCraftingReagent = GetItemInfo(itemInput)
+        local itemID = GetItemInfoInstant(itemInput)
 
-        if not itemName then
+        if not itemID then
             -- TODO: Do this proper and localize it
             Util:Print(string.format(L['ErrorListItemNotFound'], Util:ColorText(itemInput, 'info'), 'filter test')..'\n'..'The item may just need to be cached, if you are sure its right just try again.')
             return false
         end
 
-        local loot = {
-            texture     = iconFileDataID,
-            item        = itemName,
-            quantity    = 1,
-            quality     = itemQuality,
-            locked      = false,
-            isQuestItem = false,
-            -- questId     = questId,
-            -- isActive    = isActive,
-            link        = itemLink,
-            slotType    = HL_LOOT_SLOT_TYPE.ITEM
-        }
-
         Util:Print("Running Filter...")
 
-        local result, reason = private.FilterSlot(loot)
+        Util:GetItemInfoDelayed(itemID,
+           function(itemLink, ...)
+                local lootItem = HotLoot.LootItem:NewDummy(itemLink)
 
-        local printStr = ''
-        if result then
-            printStr = '%s was caught in the %s.'
-            Util:Print(printStr:format(loot.link, reason))
-        else
-            printStr = '%s was not caught. Reason: %s'
-            Util:Print(printStr:format(loot.link, reason))
-        end
+                local result, reason = private.FilterSlot(lootItem)
+
+                local printStr = ''
+                if result then
+                    printStr = '%s was caught in the %s.'
+                    Util:Print(printStr:format(lootItem:Link(), reason))
+                else
+                    printStr = '%s was not caught. Reason: %s'
+                    Util:Print(printStr:format(lootItem:Link(), reason))
+                end
+           end
+        )
     elseif string.find(input, '^sellFilter%s') then
     elseif string.find(input, '^debugc') then
         self.DEBUG_CONDITIONS = not self.DEBUG_CONDITIONS
@@ -1302,31 +1294,30 @@ function HotLoot:LOOT_OPENED()
         local staggerCount = 0
 
         for slot, lootItem in pairs(lootInfo) do
-            lootItem.link = GetLootSlotLink(slot)
-            lootItem.slotType = GetLootSlotType(slot)
+            local item = HotLoot.LootItem:New(lootItem, slot)
 
-            local filtered, reason = private.FilterSlot(lootItem)
+            local filtered, reason = private.FilterSlot(item)
 
-            if filtered and not lootItem.locked then
+            if filtered and not item:Locked() then
                 Util:Debug("Item Looted in " .. Util:ColorText(reason, 'info') .. ".")
 
                 -- NOTE: Setting the reason into the loot var so it can be read by SetLoot()
-                lootItem.reason = reason
+                item:SetLootReason(reason)
 
                 if Options:Get('toggleEnableLootMonitor') then
                     local frame
                     local nextIndex = self:GetNextToastIndex()
 
                     -- Farming Mode
-                    if Options:Get('toggleFarmingMode') and lootItem.link then
-                        UpdateFarmingList(Util:GetItemID(lootItem.link), lootItem.quantity)
+                    if Options:Get('toggleFarmingMode') and item:Link() then
+                        UpdateFarmingList(item:ID(), item:Quantity())
                     end
 
                     -- TODO: This can be simplified
                     if not nextIndex then
                         frame = self:CreateLootToast()
                         self:ShiftToastPosUp()
-                        frame:SetLoot(lootItem)
+                        frame:SetLoot(item)
                         table.insert(self.toasts, frame)
                     else
                         frame = self.toasts[nextIndex]
@@ -1339,7 +1330,7 @@ function HotLoot:LOOT_OPENED()
                         end
 
                         self:ShiftToastPosUp()
-                        frame:SetLoot(lootItem)
+                        frame:SetLoot(item)
                     end
 
                     self:UpdateAnchors()
@@ -1364,7 +1355,7 @@ function HotLoot:LOOT_OPENED()
             elseif not filtered then
                 Util:Debug('Item NOT looted. '..Util:ColorText('('..tostring(reason)..')', 'alert'))
                 -- Send items that aren't looted to the skinning mode functions.
-                private.AddToDeleteList(slot, lootItem)
+                private.AddToDeleteList(item)
             end
         end
 

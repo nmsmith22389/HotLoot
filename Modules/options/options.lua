@@ -250,8 +250,95 @@ local defaults = {
         -- ─── FILTERS ─────────────────────────────────────────────────────
         --
 
-        tableFilters = {},
-        tableSellFilters = {},
+        tableFilters = {
+            ["Tradeskills"] = {
+                ["enabled"] = true,
+                ["conditions"] = {
+                    {
+                        ["value"] = "7",
+                        ["type"] = "0",
+                        ["subvalue"] = "8",
+                    }, -- [1]
+                    {
+                        ["value"] = "7",
+                        ["type"] = "0",
+                        ["subvalue"] = "5",
+                    }, -- [2]
+                    {
+                        ["value"] = "7",
+                        ["type"] = "0",
+                        ["subvalue"] = "9",
+                    }, -- [3]
+                    {
+                        ["value"] = "7",
+                        ["type"] = "0",
+                        ["subvalue"] = "6",
+                    }, -- [4]
+                    {
+                        ["value"] = "7",
+                        ["type"] = "0",
+                        ["subvalue"] = "7",
+                    }, -- [5]
+                    {
+                        ["value"] = "9",
+                        ["type"] = "0",
+                        ["subvalue"] = "NONE",
+                    }, -- [6]
+                },
+                ["trigger"] = "any",
+            },
+            ["Junk"] = {
+                ["enabled"] = true,
+                ["conditions"] = {
+                    {
+                        ["value"] = "equalTo",
+                        ["type"] = "2",
+                        ["subvalue"] = "0",
+                    }, -- [1]
+                    {
+                        ["value"] = "greaterThan",
+                        ["type"] = "1",
+                        ["subvalue"] = 20000,
+                    }, -- [2]
+                },
+                ["trigger"] = "all",
+            },
+            ["Quest"] = {
+                ["enabled"] = true,
+                ["conditions"] = {
+                    {
+                        ["value"] = "12",
+                        ["type"] = "0",
+                        ["subvalue"] = "NONE",
+                    }, -- [1]
+                },
+                ["trigger"] = "all",
+            },
+            ["Quality"] = {
+                ["enabled"] = false,
+                ["conditions"] = {
+                    {
+                        ["value"] = "greaterThan",
+                        ["type"] = "2",
+                        ["subvalue"] = "2",
+                    }, -- [1]
+                },
+                ["trigger"] = "all",
+            },
+        },
+        tableSellFilters = {
+            ["Junk"] = {
+                ["enabled"] = true,
+                ["conditions"] = {
+                    {
+                        ["value"] = "equalTo",
+                        ["type"] = "2",
+                        ["subvalue"] = "0",
+                    }, -- [1]
+                },
+                ["trigger"] = "all",
+            },
+        },
 
         toggleGoldFilter       = true,
         toggleQuestFilter      = true,

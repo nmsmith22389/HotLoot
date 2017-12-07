@@ -760,6 +760,8 @@ function Options:ViewFilter(name, isSellFilter)
     local filterTable = sellOrNot('table%sFilters')
     local filter = self.db.profile[filterTable][name]
     if not name or not filter then
+        -- FIXME: Below option is still nill when loading a profile. Get a better system to handle no/empty/default filter tables.
+        -- NOTE: THIS MIGHT ACTUALLY BE FIXED
         opts[sellOrNot('select%sFilter')] = {
             name = 'Current Filter',
             type = 'select',
@@ -770,6 +772,7 @@ function Options:ViewFilter(name, isSellFilter)
                 Options:ViewFilter(value, isSellFilter)
                 Options:Set(info, value)
             end,
+            width = 'double',
             order = 2
         }
         opts[sellOrNot('inputCreate%sFilter')] = {
@@ -792,6 +795,7 @@ function Options:ViewFilter(name, isSellFilter)
                 Options:ViewFilter(value, isSellFilter)
                 Options:Set(info, value)
             end,
+            width = 'double',
             order = 2
         }
         opts[sellOrNot('inputCreate%sFilter')] = {
@@ -807,7 +811,7 @@ function Options:ViewFilter(name, isSellFilter)
             name = Util:ColorText('Delete Current Filter', 'alert'),
             type = 'execute',
             confirm = function()
-                return ('Are you sure you want to delete \"%s\"?'):format(name);
+                return ('Are you sure you want to delete \"%s\"?'):format(name)
             end,
             func = function()
                 Options.db.profile[filterTable][name] = nil
@@ -815,12 +819,31 @@ function Options:ViewFilter(name, isSellFilter)
                 Options:Set(sellOrNot('select%sFilter'), nextFilter)
                 Options:ViewFilter(nextFilter, isSellFilter)
             end,
-            order = 5
+            order = 6
+        }
+        opts[sellOrNot('inputRename%sFilter')] = {
+            name = 'Rename Filter',
+            type = 'input',
+            confirm = function()
+                return ('Are you sure you want to rename \"%s\"?'):format(name)
+            end,
+            -- TODO: Test this and make sure it works... also localize!
+            set = function(info, value)
+                if Options.db.profile[filterTable][value] then
+                    Util:Print(Util:ColorText('The name \"%s\" is already taken. Please try another.', 'alert'):format(value))
+                else
+                    Options.db.profile[filterTable][value] = Options.db.profile[filterTable][name]
+                    Options.db.profile[filterTable][name] = nil
+                    Options:ViewFilter(value, isSellFilter)
+                end
+            end,
+            get = function() return '' end,
+            order = 8
         }
         opts[sellOrNot('header%sFilter')] = {
             name = name,
             type = 'header',
-            order = 6
+            order = 10
         }
         opts[sellOrNot('toggleEnable%sFilter')] = {
             name = L['genEnable'],
@@ -832,12 +855,12 @@ function Options:ViewFilter(name, isSellFilter)
             get = function()
                 return filter.enabled
             end,
-            order = 7
+            order = 12
         }
         opts.selectFilterTriggerType = {
             name = 'Trigger Type',
             type = 'select',
-            order = 8,
+            order = 14,
             values = {
                 ['all'] = 'All Conditions',
                 ['any'] = 'Any Condition'
@@ -864,18 +887,154 @@ function Options:ViewFilter(name, isSellFilter)
                 name = 'Condition '..i,
                 type = 'group',
                 inline = true,
-                order = 10 +  i,
+                order = 20 +  i,
                 args = GetConditionArgs(i, condition, isSellFilter)
             }
         end
     end
 
     if isSellFilter then
-        optionsTable.args.groupSellFilters.args.groupCustomFilters.args = opts
+        optionsTable.args.groupSellFilters.args = opts
+        optionsTable.args.groupSellFilters.args.groupSellFilterOptions = private.optionsSellFilter
     else
-        optionsTable.args.groupLootFilters.args.groupCustomFilters.args = opts
+        optionsTable.args.groupLootFilters.args = opts
+        optionsTable.args.groupSellFilters.args.groupSellFilterOptions = private.optionsFilterGeneral
+        optionsTable.args.groupSellFilters.args.groupSellFilterOptions = private.optionsFilter
     end
 end
+
+-- FIXME: Maybe put these in their own group since i dont think this is the best way.
+private.optionsSellFilter = {
+    name = 'Sell Filter Options',
+    type = 'group',
+    args = {
+        headerSFGeneral = {
+            name = L['genGeneral'],
+            type = 'header',
+            order = 2
+        },
+        toggleSellFiltersPrintEachItem = {
+            name = 'Announce Each Item Sold',
+            desc = 'Announces to chat the name and value of each item sold.',
+            type = 'toggle',
+            order = 4
+        },
+        toggleSellFiltersPrintTotal = {
+            name = 'Announce Items Sold Total',
+            desc = 'Announces to chat the total of all items sold.',
+            type = 'toggle',
+            order = 6
+        },
+        headerSFValue = {
+            name = 'Value',
+            type = 'header',
+            order = 8
+        },
+        -- TODO: Localize
+        groupTSMSource = {
+            name = L['groupTSMValue'],
+            type = 'group',
+            order = 10,
+            inline = true,
+            disabled = "IsTSMNotLoaded",
+            args = {
+                descTSMSource = {
+                    name = Util:ColorText(L['inputValueTSMSourceDescNote']:format(Util:ColorText('/tsm source', 'success')..Util:GetColorString('info')), 'info'),
+                    type = 'description',
+                    order = 2,
+                },
+                toggleSellFilterTSMValue = {
+                    name = 'Use TSM Value',
+                    desc = 'When looking at an items value use TSM as the source.',
+                    type = 'toggle',
+                    order = 4
+                },
+                inputSellFilterTSMSource = {
+                    name = L['inputValueTSMSourceName'],
+                    desc = L['inputValueTSMSourceDesc'],
+                    type = 'input',
+                    order = 6
+                }
+            }
+        },
+    }
+}
+
+private.optionsFilterGeneral = {
+    name = 'General Filters',
+    type = 'group',
+    order = 2,
+    args = {
+        toggleGoldFilter = {
+            name = L['toggleGoldFilterName'],
+            desc = L['toggleGoldFilterDesc'],
+            type = 'toggle',
+            width = 'full',
+            order = 2
+        },
+        toggleCurrencyFilter = {
+            name = L['toggleCurrencyFilterName'],
+            desc = L['toggleCurrencyFilterDesc'],
+            type = 'toggle',
+            width = 'full',
+            order = 4
+        },
+        toggleAPFilter = {
+            name = L['FilterNameTemplate']:format(ARTIFACT_POWER),
+            desc = L['FilterDescTemplate']:format(ARTIFACT_POWER),
+            type = 'toggle',
+            width = 'full',
+            order = 6
+        },
+    }
+}
+
+private.optionsFilter = {
+    name = 'Filter Options',
+    type = 'group',
+    order = 6,
+    args = {
+        headerValue = {
+            name = 'Value',
+            type = 'header',
+            order = 2
+        },
+        toggleUseQuantValue = {
+            name = L['toggleUseQuantValueName'],
+            desc = L['toggleUseQuantValueDesc'],
+            type = 'toggle',
+            order = 4
+        },
+        -- TODO: Localize
+        groupTSMSource = {
+            name = L['groupTSMValue'],
+            type = 'group',
+            order = 6,
+            inline = true,
+            disabled = "IsTSMNotLoaded",
+            args = {
+                descTSMSource = {
+                    -- FIXME: make sure this slash code is right
+                    name = Util:ColorText(L['inputValueTSMSourceDescNote']:format(Util:ColorText('/tsm source', 'success')..Util:GetColorString('info')), 'info'),
+                    type = 'description',
+                    order = 2,
+                },
+                toggleFilterTSMValue = {
+                    name = 'Use TSM Value',
+                    desc = 'When looking at an items value use TSM as the source.',
+                    type = 'toggle',
+                    order = 4
+                },
+                inputFilterTSMSource = {
+                    name = L['inputValueTSMSourceName'],
+                    desc = L['inputValueTSMSourceDesc'],
+                    type = 'input',
+                    order = 6
+                }
+            }
+        },
+    }
+}
 
 --
 -- ─── OPTIONS ────────────────────────────────────────────────────────────────────
@@ -963,6 +1122,21 @@ end
 
 function Options:RefreshConfig(db)
     HotLoot:RefreshAnchorPosition()
+
+    if Options:Get('selectFilter') == nil then
+        local nextFilter = next(Options:GetFilterList())
+        if nextFilter then
+            Options:Set('selectFilter', nextFilter)
+            Options:ViewFilter(nextFilter)
+        end
+    end
+    if Options:Get('selectSellFilter') == nil then
+        local nextFilter = next(Options:GetFilterList(true))
+        if nextFilter then
+            Options:Set('selectSellFilter', nextFilter)
+            Options:ViewFilter(nextFilter, true)
+        end
+    end
 end
 
 --
@@ -1968,108 +2142,27 @@ optionsTable = {
             type = 'group',
             order = 5,
             args = {
-                groupGeneralFilters = {
-                    name = 'General Filters',
-                    type = 'group',
-                    order = 2,
-                    args = {
-                        toggleGoldFilter = {
-                            name = L['toggleGoldFilterName'],
-                            desc = L['toggleGoldFilterDesc'],
-                            type = 'toggle',
-                            width = 'full',
-                            order = 2
-                        },
-                        toggleCurrencyFilter = {
-                            name = L['toggleCurrencyFilterName'],
-                            desc = L['toggleCurrencyFilterDesc'],
-                            type = 'toggle',
-                            width = 'full',
-                            order = 4
-                        },
-                        toggleAPFilter = {
-                            name = L['FilterNameTemplate']:format(ARTIFACT_POWER),
-                            desc = L['FilterDescTemplate']:format(ARTIFACT_POWER),
-                            type = 'toggle',
-                            width = 'full',
-                            order = 6
-                        },
-                    }
+                selectFilter = {
+                    name = 'Current Filter',
+                    type = 'select',
+                    values = function()
+                        return Options:GetFilterList()
+                    end,
+                    set = function(info, value)
+                        Options:ViewFilter(value)
+                        Options:Set(info, value)
+                    end,
+                    order = 2
                 },
-                groupCustomFilters = {
-                    name = 'Custom Filters',
-                    type = 'group',
-                    order = 4,
-                    args = {
-                        selectFilter = {
-                            name = 'Current Filter',
-                            type = 'select',
-                            values = function()
-                                return Options:GetFilterList()
-                            end,
-                            set = function(info, value)
-                                Options:ViewFilter(value)
-                                Options:Set(info, value)
-                            end,
-                            order = 2
-                        },
-                        inputCreateFilter = {
-                            name = 'Create Filter',
-                            type = 'input',
-                            set = function(info, value)
-                                Options:CreateFilter(info, value, false)
-                            end,
-                            get = function() return '' end,
-                            order = 4
-                        }
-                    }
+                inputCreateFilter = {
+                    name = 'Create Filter',
+                    type = 'input',
+                    set = function(info, value)
+                        Options:CreateFilter(info, value, false)
+                    end,
+                    get = function() return '' end,
+                    order = 4
                 },
-                groupFilterOptions = {
-                    name = 'Filter Options',
-                    type = 'group',
-                    order = 6,
-                    args = {
-                        headerValue = {
-                            name = 'Value',
-                            type = 'header',
-                            order = 2
-                        },
-                        toggleUseQuantValue = {
-                            name = L['toggleUseQuantValueName'],
-                            desc = L['toggleUseQuantValueDesc'],
-                            type = 'toggle',
-                            order = 4
-                        },
-                        -- TODO: Localize
-                        groupTSMSource = {
-                            name = L['groupTSMValue'],
-                            type = 'group',
-                            order = 6,
-                            inline = true,
-                            disabled = "IsTSMNotLoaded",
-                            args = {
-                                descTSMSource = {
-                                    -- FIXME: make sure this slash code is right
-                                    name = Util:ColorText(L['inputValueTSMSourceDescNote']:format(Util:ColorText('/tsm source', 'success')..Util:GetColorString('info')), 'info'),
-                                    type = 'description',
-                                    order = 2,
-                                },
-                                toggleFilterTSMValue = {
-                                    name = 'Use TSM Value',
-                                    desc = 'When looking at an items value use TSM as the source.',
-                                    type = 'toggle',
-                                    order = 4
-                                },
-                                inputFilterTSMSource = {
-                                    name = L['inputValueTSMSourceName'],
-                                    desc = L['inputValueTSMSourceDesc'],
-                                    type = 'input',
-                                    order = 6
-                                }
-                            }
-                        },
-                    }
-                }
             }
         },
         groupIncludeExclude = {
@@ -2176,118 +2269,27 @@ optionsTable = {
             type = 'group',
             order = 8,
             args = {
-                --[[ groupGeneralFilters = {
-                    name = 'General Filters',
-                    type = 'group',
-                    order = 2,
-                    args = {
-                        toggleGoldFilter = {
-                            name = L['toggleGoldFilterName'],
-                            desc = L['toggleGoldFilterDesc'],
-                            type = 'toggle',
-                            width = 'full',
-                            order = 2
-                        },
-                        toggleCurrencyFilter = {
-                            name = L['toggleCurrencyFilterName'],
-                            desc = L['toggleCurrencyFilterDesc'],
-                            type = 'toggle',
-                            width = 'full',
-                            order = 4
-                        },
-                        toggleAPFilter = {
-                            name = L['FilterNameTemplate']:format(ARTIFACT_POWER),
-                            desc = L['FilterDescTemplate']:format(ARTIFACT_POWER),
-                            type = 'toggle',
-                            width = 'full',
-                            order = 6
-                        },
-                    }
-                }, ]]
-                groupCustomFilters = {
-                    name = 'Custom Filters',
-                    type = 'group',
-                    order = 4,
-                    args = {
-                        selectSellFilter = {
-                            name = 'Current Filter',
-                            type = 'select',
-                            values = function()
-                                return Options:GetFilterList(true)
-                            end,
-                            set = function(info, value)
-                                Options:ViewFilter(value, true)
-                                Options:Set(info, value)
-                            end,
-                            order = 2
-                        },
-                        inputCreateSellFilter = {
-                            name = 'Create Filter',
-                            type = 'input',
-                            set = function(info, value)
-                                Options:CreateFilter(info, value, true)
-                            end,
-                            get = function() return '' end,
-                            order = 4
-                        }
-                    }
+                selectSellFilter = {
+                    name = 'Current Filter',
+                    type = 'select',
+                    values = function()
+                        return Options:GetFilterList(true)
+                    end,
+                    set = function(info, value)
+                        Options:ViewFilter(value, true)
+                        Options:Set(info, value)
+                    end,
+                    order = 2
                 },
-                groupSellFilterOptions = {
-                    name = 'Sell Filter Options',
-                    type = 'group',
-                    order = 6,
-                    args = {
-                        headerSFGeneral = {
-                            name = L['genGeneral'],
-                            type = 'header',
-                            order = 2
-                        },
-                        toggleSellFiltersPrintEachItem = {
-                            name = 'Announce Each Item Sold',
-                            desc = 'Announces to chat the name and value of each item sold.',
-                            type = 'toggle',
-                            order = 4
-                        },
-                        toggleSellFiltersPrintTotal = {
-                            name = 'Announce Items Sold Total',
-                            desc = 'Announces to chat the total of all items sold.',
-                            type = 'toggle',
-                            order = 6
-                        },
-                        headerSFValue = {
-                            name = 'Value',
-                            type = 'header',
-                            order = 8
-                        },
-                        -- TODO: Localize
-                        groupTSMSource = {
-                            name = L['groupTSMValue'],
-                            type = 'group',
-                            order = 10,
-                            inline = true,
-                            disabled = "IsTSMNotLoaded",
-                            args = {
-                                descTSMSource = {
-                                    name = Util:ColorText(L['inputValueTSMSourceDescNote']:format(Util:ColorText('/tsm source', 'success')..Util:GetColorString('info')), 'info'),
-                                    type = 'description',
-                                    order = 2,
-                                },
-                                toggleSellFilterTSMValue = {
-                                    name = 'Use TSM Value',
-                                    desc = 'When looking at an items value use TSM as the source.',
-                                    type = 'toggle',
-                                    order = 4
-                                },
-                                inputSellFilterTSMSource = {
-                                    name = L['inputValueTSMSourceName'],
-                                    desc = L['inputValueTSMSourceDesc'],
-                                    type = 'input',
-                                    order = 6
-                                }
-                            }
-                        },
-                    }
-                }
+                inputCreateSellFilter = {
+                    name = 'Create Filter',
+                    type = 'input',
+                    set = function(info, value)
+                        Options:CreateFilter(info, value, true)
+                    end,
+                    get = function() return '' end,
+                    order = 4
+                },
             }
         },
         groupLootFrame = {
@@ -2361,15 +2363,20 @@ function Options:OnInitialize()
 
     private.enum.chatWindows = GetChatWindows()
 
-    local lists = {'tableFarmingList', 'tableIncludeList', 'tableExcludeList'}
-    for _,ls in ipairs(lists) do
-        setmetatable(self.db.profile[ls], {
+    do
+        local lists = {'tableFarmingList', 'tableIncludeList', 'tableExcludeList'}
+        local mt = {
             __index = function(t, k)
                 return rawget(t, tostring(k))
             end,
             __newindex = function(t, k, v)
                 rawset(t, tostring(k), v)
             end
-        })
+        }
+        for _,ls in ipairs(lists) do
+            if getmetatable(self.db.profile[ls]) ~= mt then
+                setmetatable(self.db.profile[ls], mt)
+            end
+        end
     end
 end

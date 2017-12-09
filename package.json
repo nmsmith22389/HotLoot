@@ -1,0 +1,32 @@
+{
+  "name": "hotloot-gh-pages",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.html",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nmsmith22389/HotLoot.git"
+  },
+  "author": "Neil Smith (nmsmith22389)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nmsmith22389/HotLoot/issues"
+  },
+  "homepage": "https://github.com/nmsmith22389/HotLoot#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "browser-sync": "^2.18.13",
+    "foundation-sites": "^6.4.4-rc1",
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^4.0.0",
+    "gulp-babel": "^7.0.0",
+    "gulp-pug": "^3.3.0",
+    "gulp-sass": "^3.1.0",
+    "gulp-sourcemaps": "^2.6.1",
+    "ngrok": "^2.2.24"
+  }
+}

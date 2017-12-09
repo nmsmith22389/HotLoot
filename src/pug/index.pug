@@ -1,0 +1,45 @@
+doctype html
+html(lang='en')
+    //- Head
+    include includes/head.pug
+    body
+        .nav-container(data-sticky-container)
+            .top-bar.nav-main(data-sticky,data-options='anchor: page; marginTop: 0; stickyOn: small;')
+                .top-bar-left
+                    .nav-title HotLoot
+                .top-bar-right
+                    ul.menu
+                        li: a: i.fas.fa-home
+                        li: a: i.fas.fa-download
+                        li: a: i.fas.fa-book
+                        li: a: i.fas.fa-question
+        .grid-container
+            .grid-x
+                .cell
+                    img.hero-image(src='https://placeimg.com/1000/400/tech')
+            .grid-x.grid-padding-x
+                .cell.medium-8
+                    h2 What is HotLoot?
+                    p &emsp;HotLoot makes looting items less frustrating by streamlining the process. The addon achieves this by enabling you to loot certain items automatically, rather than manually picking them up. Items can be filtered by profession, quest and more. This makes it possible to pick up only the items that you are really looking for, without having to worry about all the junk.
+                .cell.medium-auto.text-center
+                    a.button.success.download 
+                        .text Download HotLoot
+                        i.icon.fas.fa-download
+                    br
+                    a.button.curse.download
+                        .text Download from 
+                        //- .icon Curse
+                        img(src="images/curse-horizontal-darkbg.png", alt="Curse")
+                    small ~512 KB Compressed
+            .grid-x
+                .cell
+                    .hero-quote
+                        i.fas.fa-quote-left.fa-lg(data-fa-transform='left-5')
+                        |HotLoot is an excellent addon that makes looting a whole lot easier. Thanks to the customisable filter, you will be able to loot only the items that you actually need.
+                        i.fas.fa-quote-right.fa-lg(data-fa-transform='right-5')
+                        .hero-quote-author.
+                            &mdash; Xenius01, Curse Addon Spotlight
+
+
+        //- Foot
+        include includes/foot.pug

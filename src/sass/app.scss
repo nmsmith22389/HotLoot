@@ -1,0 +1,117 @@
+@import '../../node_modules/foundation-sites/scss/foundation';
+
+@import url('https://fonts.googleapis.com/css?family=Fugaz+One|Open+Sans:300,400');
+
+@import 'settings';
+
+@include foundation-everything;
+
+.nav-container {
+    // transition: all 1s ease;
+    // height: 0px !important;
+    // position: absolute;
+    // width: 100%;
+    // left: 0;
+    // top: 0;
+    
+    .nav-main {
+        // height: inherit;
+        .nav-title {
+            font-size: 2.5rem;
+            margin-left: 1rem;
+            line-height: 100%;
+            font-weight: bold;
+            transition: font-size 0.5s ease, line-height 0.5s ease, margin-left 0.5s ease;
+            color: $warning-color;
+        }
+        &.is-stuck {
+            .nav-title {
+                // .is-at-top {
+                // }
+                font-size: 2rem;
+                margin-left: 0;
+            }
+        }
+        .top-bar-right {
+            // TODO: Put somewhere and use or get rid of this .icon class.
+            [data-prefix="fas"] {
+                font-size: 1.5rem;
+                line-height: 1em;
+                color: $white
+            }
+            .icon {
+                text-align: center;
+                padding: 0.5rem 1rem;
+
+                [data-prefix="fas"] {
+                    font-size: 1.5rem;
+                    line-height: 1em;
+                }
+                div:last-child {
+                    margin-top: 0.35rem;
+                }
+            }
+        }
+    }
+}
+
+.button.download {
+    width: 100%;
+
+    &.curse {
+        background-color: #6441a4;
+        &:hover {
+            background-color: darken($color: #6441a4, $amount: 5%);
+        }
+    }
+
+    img {
+        height: 2.25rem;
+    }
+
+    .icon {
+        font-size: 2rem;
+    }
+
+    .text {
+        font-size: 1.5rem;
+        
+        &:first-child {
+            margin-bottom: 0.5rem;
+        }
+        &:last-child {
+            margin-top: 0.5rem;
+        }
+    }
+}
+
+.full-width {
+    width: 100%;
+}
+
+.hero-image {
+    width: 100%;
+    margin-bottom: 2rem;
+}
+
+.hero-quote {
+    margin: 2rem 0;
+    color: $body-font-color;
+    text-align: center;
+    font-family: 'Fugaz One';
+    background-color: darken($color: $body-background, $amount: 5%);
+    border-radius: $global-radius;
+    padding: 2rem 2rem;
+    @extend .h2;
+    .hero-quote-author {
+        @extend .h5;
+        font-family: $body-font-family;
+        text-align: right;
+        font-style: italic;
+        margin-top: 1rem;
+    }
+
+    @include breakpoint(medium) {
+        padding: 3rem 5rem;
+    }
+}

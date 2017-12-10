@@ -6,6 +6,8 @@ old-changelog.txt
 # Ignore macOS stuff
 .DS_Store
 
+node_modules
+
 # Ignore Notes
 notes/*
 !/notes/todo.notes

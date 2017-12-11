@@ -7,8 +7,8 @@ local Media = LibStub("LibSharedMedia-3.0")
 local AGSMW = LibStub("AceGUISharedMediaWidgets-1.0")
 
 do
-	local widgetType = "LSM30_Font"
-	local widgetVersion = 10
+	local widgetType = "LSM30_Border"
+	local widgetVersion = 11
 
 	local contentFrameCache = {}
 	local function ReturnSelf(self)
@@ -26,6 +26,16 @@ do
 		end
 	end
 
+	local function ContentOnEnter(this, button)
+		local self = this.obj
+		local text = this.text:GetText()
+		local border = self.list[text] ~= text and self.list[text] or Media:Fetch('border',text)
+		this.dropdown:SetBackdrop({edgeFile = border,
+			bgFile=[[Interface\DialogFrame\UI-DialogBox-Background-Dark]],
+			tile = true, tileSize = 16, edgeSize = 16,
+			insets = { left = 4, right = 4, top = 4, bottom = 4 }})
+	end
+
 	local function GetContentLine()
 		local frame
 		if next(contentFrameCache) then
@@ -36,6 +46,7 @@ do
 				frame:SetHeight(18)
 				frame:SetHighlightTexture([[Interface\QuestFrame\UI-QuestTitleHighlight]], "ADD")
 				frame:SetScript("OnClick", ContentOnClick)
+				frame:SetScript("OnEnter", ContentOnEnter)
 			local check = frame:CreateTexture("OVERLAY")
 				check:SetWidth(16)
 				check:SetHeight(16)
@@ -44,8 +55,8 @@ do
 				check:Hide()
 			frame.check = check
 			local text = frame:CreateFontString(nil,"OVERLAY","GameFontWhite")
-				text:SetPoint("LEFT", check, "RIGHT", 1, 0)
-				text:SetPoint("RIGHT", frame, "RIGHT", -2, 0)
+				text:SetPoint("TOPLEFT", check, "TOPRIGHT", 1, 0)
+				text:SetPoint("BOTTOMRIGHT", frame, "BOTTOMRIGHT", -2, 0)
 				text:SetJustifyH("LEFT")
 				text:SetText("Test Test Test Test Test Test Test")
 			frame.text = text
@@ -86,14 +97,18 @@ do
 	end
 
 	local function SetList(self, list) -- Set the list of values for the dropdown (key => value pairs)
-		self.list = list or Media:HashTable("font")
+		self.list = list or Media:HashTable("border")
 	end
+
 
 	local function SetText(self, text) -- Set the text displayed in the box.
 		self.frame.text:SetText(text or "")
-		local font = self.list[text] ~= text and self.list[text] or Media:Fetch('font',text)
-		local _, size, outline= self.frame.text:GetFont()
-		self.frame.text:SetFont(font,size,outline)
+		local border = self.list[text] ~= text and self.list[text] or Media:Fetch('border',text)
+
+		self.frame.displayButton:SetBackdrop({edgeFile = border,
+			bgFile=[[Interface\DialogFrame\UI-DialogBox-Background-Dark]],
+			tile = true, tileSize = 16, edgeSize = 16,
+			insets = { left = 4, right = 4, top = 4, bottom = 4 }})
 	end
 
 	local function SetLabel(self, text) -- Set the text for the label.
@@ -141,14 +156,13 @@ do
 			table.sort(sortedlist, textSort)
 			for i, k in ipairs(sortedlist) do
 				local f = GetContentLine()
-				local _, size, outline= f.text:GetFont()
-				local font = self.list[k] ~= k and self.list[k] or Media:Fetch('font',k)
-				f.text:SetFont(font,size,outline)
 				f.text:SetText(k)
+				--print(k)
 				if k == self.value then
 					f.check:Show()
 				end
 				f.obj = self
+				f.dropdown = self.dropdown
 				self.dropdown:AddFrame(f)
 			end
 			wipe(sortedlist)
@@ -177,7 +191,7 @@ do
 	end
 
 	local function Constructor()
-		local frame = AGSMW:GetBaseFrame()
+		local frame = AGSMW:GetBaseFrameWithWindow()
 		local self = {}
 
 		self.type = widgetType

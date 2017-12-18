@@ -288,13 +288,14 @@ function private.AddToDeleteList(item)
     end
 end
 
+-- FIXME: Fix deleteList to use the classes? and find a better key than 
 function private.RunDeleteList()
     if not Util:IsEmpty(private.deleteList) then
         -- TODO: Rename
         Util:Announce(L["SkinAnnounce1"])
         Util:ScanBags(function(bag, slot, itemLink)
             if itemLink then
-                local itemID = GetItemInfoInstant(itemID)
+                local itemID = GetItemInfoInstant(itemLink)
                 if itemID and private.deleteList[itemID] then
                     ClearCursor()
                     PickupContainerItem(bag, slot)
@@ -643,6 +644,8 @@ end
 -- ─── SELL POOR ITEMS ────────────────────────────────────────────────────────────
 --
 
+-- FIXME: Tries to sell items that are junk but also a quest item... see:
+--          http://www.wowhead.com/item=97985/dusty-old-robot
 local function SellFilters()
     local totalPrice = 0
     local totalCount = 0

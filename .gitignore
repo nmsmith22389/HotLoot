@@ -2,6 +2,7 @@
 
 # Addon Garbage
 old-changelog.txt
+LOCALE-OUTPUT.lua
 
 # Ignore macOS stuff
 .DS_Store
